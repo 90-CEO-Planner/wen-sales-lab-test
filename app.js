@@ -348,10 +348,11 @@ async function sendCode(){
  AUTH.email=em;AUTH.busy=true;AUTH.msg="";render();
  var r=await sb.auth.signInWithOtp({email:em,options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});
  AUTH.busy=false;
- if(r.error){AUTH.msg=friendly(r.error);}else{AUTH.step="code";AUTH.msg="Code sent. It can take a minute to arrive.";startCool();}
+ if(r.error){AUTH.msg=friendly(r.error);}else{AUTH.step="code";AUTH.msg="Code sent. It can take a minute to arrive. Only the code in the newest email works, so please use that one.";startCool();}
  render();
 }
-function startCool(){AUTH.cool=60;clearInterval(AUTH.tm);AUTH.tm=setInterval(function(){AUTH.cool--;if(AUTH.cool<=0){AUTH.cool=0;clearInterval(AUTH.tm);}if(PHASE==="signin"){var b=document.querySelectorAll('[data-a=sendcode]');b.forEach(function(x){x.disabled=AUTH.cool>0;x.textContent=AUTH.cool>0?(AUTH.step==="email"?"Wait "+AUTH.cool+"s":"Resend in "+AUTH.cool+"s"):(AUTH.step==="email"?"Email me a code":"Send a new code");});}},1000);}
+function coolLeft(){try{var u=+localStorage.getItem("wsl_cool")||0;return Math.max(0,Math.ceil((u-Date.now())/1000));}catch(e){return 0;}}
+function startCool(keep){if(!keep){try{localStorage.setItem("wsl_cool",String(Date.now()+60000));}catch(e){}}AUTH.cool=keep?coolLeft():60;clearInterval(AUTH.tm);AUTH.tm=setInterval(function(){AUTH.cool--;if(AUTH.cool<=0){AUTH.cool=0;clearInterval(AUTH.tm);}if(PHASE==="signin"){var b=document.querySelectorAll('[data-a=sendcode]');b.forEach(function(x){x.disabled=AUTH.cool>0;x.textContent=AUTH.cool>0?(AUTH.step==="email"?"Wait "+AUTH.cool+"s":"Resend in "+AUTH.cool+"s"):(AUTH.step==="email"?"Email me a code":"Send a new code");});}},1000);}
 async function verifyCode(){
  var c=(AUTH.code||"").replace(/\D/g,"");if(c.length<6||c.length>10){AUTH.msg="Please enter the code from the email (6 to 10 digits).";render();return;}
  AUTH.busy=true;AUTH.msg="";render();
@@ -471,8 +472,9 @@ sb.auth.onAuthStateChange(function(ev,sess){
 (async function boot(){
  var hp=location.hash||"";if(/error_description/.test(hp)||/error=/.test(location.search)){AUTH.msg="That sign-in link didn’t work here. It may have expired or been opened in a different browser. Please use the code from the same email instead.";}
  var s=await sb.auth.getSession();
+ if(!(s.data&&s.data.session)&&/[?&]code=/.test(location.search)){AUTH.msg="That link can only sign you in on the device where you asked for it. Please ask for a new code and type it in here.";try{history.replaceState(null,"",location.pathname+(location.hash||""));}catch(e){}}
  if(s.data&&s.data.session){SYNC.token=s.data.session.access_token;loadAll();}
- else{PHASE="signin";render();}
+ else{PHASE="signin";if(coolLeft()>0)startCool(true);render();}
 })();
 
 })();
