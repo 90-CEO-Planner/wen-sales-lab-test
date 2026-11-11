@@ -200,17 +200,6 @@ function groupsHtml(L,plan,off){
 }
 function remindCard(){return '<div class="card"><h2>Reminders</h2><div class="row"><button type="button" class="chip" aria-pressed="'+S.remind.weekly+'" data-a="remind" data-k="weekly">Weekly reminder (default)</button><button type="button" class="chip" aria-pressed="'+S.remind.steps+'" data-a="remind" data-k="steps">Add reminders for individual steps</button></div><p class="mute">Your preference is saved. Reminders are not sent in this test build.</p></div>';}
 function helpCard(){return '<div class="card"><h2>Need help?</h2><p><strong>A question</strong> about the programme: we reply within two working days.<br><strong>Can\'t get in, or something broke:</strong> use the urgent route and we\'ll look at it first.</p></div>';}
-function home1(){
- var d=doneCount(),ns=nextStep(),left=STEPS.filter(function(s){return !S.steps[s.n];}).reduce(function(a,s){return a+s.m;},0);
- var h='<p class="mute">Preparation only. You won\'t contact anyone this week.</p>';
- h+='<div class="card"><div class="row" style="justify-content:space-between"><strong>'+d+' of 7 steps done</strong><span class="mute">About '+hm(left)+' left</span></div><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/7*100)+'%"></i></div>';
- if(ns){h+='<h3>Your next step</h3><p><strong>Step '+ns.n+': '+esc(ns.t)+'</strong> <span class="tag">'+ns.m+' min</span></p><a class="btn" href="#/step/'+ns.n+'">Continue</a>';}
- else{h+='<div class="note ok"><strong>Week 1 is done.</strong> Weeks 2 to 4 are not part of this test build.</div>';}
- h+='</div>';
- h+=planCard(STEPS);
- h+='<div class="card"><h2>The seven steps</h2>'+STEPS.map(function(s){var dn=S.steps[s.n];return '<a class="step'+(dn?' done':'')+'" href="#/step/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min &middot; builds on: '+esc(s.b)+'</span></span><span class="mute">'+(dn?"Done":"Open")+'</span></a>';}).join("")+'<p class="mute">Total about '+hm(mins(STEPS))+'.</p></div>';
- return h+remindCard()+helpCard();
-}
 function toggle(arr,v,max){var i=arr.indexOf(v);if(i>-1)arr.splice(i,1);else if(arr.length<max)arr.push(v);}
 function snapFields(){var m={},els=document.querySelectorAll("#app input[id],#app textarea[id],#app select[id]");for(var i=0;i<els.length;i++){var e=els[i];if(e.dataset.bind||e.dataset.sk||e.dataset.col||e.dataset.resv||e.dataset.out)continue;m[e.id]=e.value;}return m;}
 function restoreFields(m){for(var id in m){var e=document.getElementById(id);if(e&&e.tagName!=="SELECT"&&!e.value&&m[id])e.value=m[id];}}
@@ -225,13 +214,13 @@ function step1(){
  h+='<label for="wh">Where is it sold?</label><input id="wh" type="text" data-bind="focus.where" value="'+esc(f.where)+'" placeholder="For example: Etsy, my own site"><label for="ur">A link to it (optional)</label><input id="ur" type="text" data-bind="focus.url" value="'+esc(f.url)+'" placeholder="https://"><p class="mute">If you add a link, it can go in your first email so the partner can see it. Leave it blank if you would rather not.</p></div>';
  if(f.product&&f.format){
   h+='<div class="card"><h2>Help your messages sound specific</h2><p class="mute">Two short sentences make the biggest difference. Nothing here is shared with anyone.</p>';
-  h+='<label for="pb">What problem does it solve? Finish the sentence: "They struggle with..."</label><input id="pb" type="text" data-bind="focus.problem" value="'+esc(f.problem)+'" placeholder="For example: knowing what to do first, so the week disappears into busy work">';
-  h+='<label for="oc">What do they get from it? Finish the sentence: "After using it, they..."</label><input id="oc" type="text" data-bind="focus.outcome" value="'+esc(f.outcome)+'" placeholder="For example: have a clear 90-day plan and know what matters each week">';
+  h+='<label for="pb">What problem does it solve for your buyer?</label><p class="mute" style="margin:2px 0 6px">In your own words, as you would explain it to a friend. For example: they do not know which tasks to focus on, so their week disappears into busy work.</p><input id="pb" type="text" data-bind="focus.problem" value="'+esc(f.problem)+'" placeholder="Their problem, in your words">';
+  h+='<label for="oc">What does your buyer get from it?</label><p class="mute" style="margin:2px 0 6px">The result or benefit, in your own words. For example: a clear 90-day plan and a short list of priorities each week.</p><input id="oc" type="text" data-bind="focus.outcome" value="'+esc(f.outcome)+'" placeholder="What they get, in your words">';
   h+='<label>Is there anything you would be happy to offer a partner or their audience? (optional)</label><div class="row">'+incKeys().map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(f.inc.indexOf(x[0])>-1)+'" data-a="finc" data-val="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>';
   ["disc","comm"].forEach(function(k){if(f.inc.indexOf(k)>-1)h+='<label for="id'+k+'">'+INCDET[k].split(". ")[0]+'?</label><input id="id'+k+'" type="text" data-bind="focus.incd.'+k+'" value="'+esc(f.incd[k])+'" placeholder="'+esc(INCDET[k].split("For example: ")[1])+'">';});
   h+='<div class="note info"><strong>You stay in control.</strong> Nothing is offered in a message unless you have listed it here and then chosen it for that specific partner. If you leave this blank, your messages simply propose the collaboration.</div></div>';
   var pl=productLine();
-  h+='<div class="card"><h2>How we will describe your product</h2><p class="mute">This is the picture the Message Builder works from. Change anything above and it updates.</p><div class="note ok" aria-live="polite">'+esc(pl)+'</div>'+(S.buyer.who?'':'<p class="mute">You will describe your buyer in step 2, and it will be added here.</p>')+'</div>';
+  h+='<div class="card"><h2>Your product at a glance</h2><p class="mute">This is what the Message Builder will work from. Change anything above and it updates.</p><div class="note ok" id="glance" aria-live="polite">'+productDetailsHtml()+'</div>'+(S.buyer.who?'':'<p class="mute">You will describe your buyer in step 2, and it will be added here.</p>')+'</div>';
  }
  h+='<div class="card"><h2>Where you are now</h2><p class="mute">Last 30 days, for this product.</p>'+numField("Orders","orders")+numField("Revenue","revenue")+numField("Sales that came from someone else sending you buyers","partner")+'<label for="hr">Hours a week you can really give</label><input id="hr" type="number" data-bind="base.hours" value="'+esc(S.base.hours)+'" style="max-width:140px">'+scale("base.comfort","How comfortable are you contacting people you don\'t know? (1 = not at all, 5 = very)")+scale("base.confidence","Optional: how confident are you that you can find the right partner? (1 to 5)")+'</div>';
  var unk=[["orders","Orders"],["revenue","Revenue"],["partner","Partner-sourced sales"]].filter(function(k){return S.base[k[0]].s==="unknown";});
@@ -320,7 +309,8 @@ function step7(){
  h+='</div><div class="card"><h2>Optional: what surprised you this week?</h2><textarea rows="3" style="min-height:80px" data-bind="refl" aria-label="What surprised you this week (optional)" placeholder="Skip this if you like"></textarea></div>';
  return shell(7,h);
 }
-function productLine(){var f=S.focus,fm=FMTP[f.format]||"",buyer=lc(S.buyer.who),problem=lc(f.problem),outcome=lc(f.outcome),pt=priceText();var s=(f.product||"Your product")+(fm?" is "+fm:" is your focus product")+(buyer?" for "+buyer:"")+".";if(problem)s+=" "+(buyer?"Many of them":"Many of its customers")+" struggle with "+problem+".";if(outcome)s+=" After using it, they "+outcome+".";if(pt)s+=" It costs "+pt+".";return s;}
+function productLine(){var f=S.focus,fm=FMTP[f.format]||"",buyer=(S.buyer.who||"").trim(),pt=priceText();return (f.product||"Your product")+(fm?" · "+fm:"")+(buyer?" · for "+buyer:"")+(pt?" · "+pt:"");}
+function productDetailsHtml(){var f=S.focus,fm=FMTP[f.format]||"",pt=priceText(),buyer=(S.buyer.who||"").trim();var h='<strong>'+esc(f.product||"Your product")+'</strong>'+(fm?' &middot; '+esc(fm):'')+(pt?' &middot; '+esc(pt):'')+(buyer?'<br>For: '+esc(buyer):'');if((f.problem||"").trim())h+='<br>The problem it solves: '+esc(f.problem.trim());if((f.outcome||"").trim())h+='<br>What customers get: '+esc(f.outcome.trim());return h;}
 /* ---------- account screens ---------- */
 function friendly(e){var m=String((e&&e.message)||"");
  if(/rate|seconds|too many|limit/i.test(m))return "Please wait a minute before asking for another code.";
@@ -384,6 +374,18 @@ async function restoreVersion(id){
 }
 
 /* ---------- dashboard ---------- */
+function home1(){
+ var d=doneCount(),ns=nextStep(),left=STEPS.filter(function(s){return !S.steps[s.n];}).reduce(function(a,s){return a+s.m;},0);
+ var h="";
+ if(ns){
+  h+='<div class="hero"><div class="kicker">'+(d===0?"Start here":"Your next step")+'</div><h2>Step '+ns.n+': '+esc(ns.t)+'</h2><p>About '+ns.m+' minutes. '+(d===0?"You can stop at any time and come back. Everything saves as you go.":"Pick up where you left off.")+'</p><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/7*100)+'%"></i></div><p style="font-size:14px">'+d+' of 7 steps done &middot; about '+hm(left)+' left</p><a class="btn" href="#/step/'+ns.n+'">'+(d===0?"Start step 1":"Continue with step "+ns.n)+' &rarr;</a></div>';
+ }else{
+  h+='<div class="hero"><div class="kicker">Week 1 complete</div><h2>Well done, Week 1 is finished</h2><p>All seven steps are done. Weeks 2 to 4 are not part of this test build, and your Week 1 work stays saved.</p></div>';
+ }
+ h+='<div class="card"><h2>The seven steps</h2>'+STEPS.map(function(s){var dn=S.steps[s.n],isNext=ns&&ns.n===s.n;return '<a class="step'+(dn?" done":"")+(isNext?" next":"")+'" href="#/step/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(dn?"Done":(isNext?"Next":"Open"))+'</span></a>';}).join("")+'<p class="mute">Total about '+hm(mins(STEPS))+'. Do them in the order that suits you.</p></div>';
+ h+=planCard(STEPS).replace("<h2>Plan your sessions</h2>","<h2>Plan your sessions (optional)</h2>");
+ return h+remindCard()+helpCard();
+}
 function topbar(){return '<div class="topbar"><span class="mute">Signed in as '+esc(ME?ME.email:"")+'</span>'+pillHtml()+'</div>'+(UI.toast?'<div id="toast" class="note info" role="status">'+esc(UI.toast)+'</div>':'');}
 function home(){
  var h='<h1>My Sprint</h1><p class="mute">Partnership-to-Sales &middot; Week 1 of 4</p>';
@@ -456,7 +458,7 @@ document.addEventListener("input",function(e){
  var t=e.target;
  if(t.dataset.auth){AUTH[t.dataset.auth]=t.value;return;}
  if(PHASE!=="app")return;
- if(t.dataset.bind){var p=t.dataset.bind;if(p==="refl"){S.refl=t.value;save();return;}setPath(p,t.value);}
+ if(t.dataset.bind){var p=t.dataset.bind;if(p==="refl"){S.refl=t.value;save();return;}setPath(p,t.value);var gl=document.getElementById("glance");if(gl)gl.innerHTML=productDetailsHtml();}
  else if(t.dataset.sk){S.sketch[t.dataset.sk]=S.sketch[t.dataset.sk]||{};S.sketch[t.dataset.sk].note=t.value;save();}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="signin"&&e.target.dataset&&e.target.dataset.auth){e.preventDefault();if(e.target.dataset.auth==="email")sendCode();else if(e.target.dataset.auth==="code")verifyCode();else if(e.target.dataset.auth==="pw")pwLogin();}});
