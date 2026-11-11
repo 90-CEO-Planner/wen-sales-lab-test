@@ -332,9 +332,9 @@ function signinHtml(){
  var h='<div class="card" style="max-width:460px;margin:24px auto"><h1>Sign in to the Sales Lab</h1>';
  if(AUTH.msg)h+='<div class="note info" role="status">'+esc(AUTH.msg)+'</div>';
  if(AUTH.step==="email"){
-  h+='<p>Enter the email address you joined with. We’ll email you a 6-digit code and a sign-in link.</p><label for="em">Email address</label><input id="em" type="email" inputmode="email" autocomplete="email" data-auth="email" value="'+esc(AUTH.email)+'"><p><button type="button" class="btn" data-a="sendcode"'+(AUTH.busy||AUTH.cool>0?" disabled":"")+'>'+(AUTH.busy?"Sending...":(AUTH.cool>0?"Wait "+AUTH.cool+"s":"Email me a code"))+'</button></p>';
+  h+='<p>Enter the email address you joined with. We’ll email you a sign-in code and a link.</p><label for="em">Email address</label><input id="em" type="email" inputmode="email" autocomplete="email" data-auth="email" value="'+esc(AUTH.email)+'"><p><button type="button" class="btn" data-a="sendcode"'+(AUTH.busy||AUTH.cool>0?" disabled":"")+'>'+(AUTH.busy?"Sending...":(AUTH.cool>0?"Wait "+AUTH.cool+"s":"Email me a code"))+'</button></p>';
  }else{
-  h+='<p>We sent a code to <strong>'+esc(AUTH.email)+'</strong>. Enter the 6 digits, or open the link in the same email on this device.</p><label for="cd">6-digit code</label><input id="cd" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" data-auth="code" value="'+esc(AUTH.code)+'" style="max-width:200px;font-size:22px;letter-spacing:4px"><p><button type="button" class="btn" data-a="verify"'+(AUTH.busy?" disabled":"")+'>'+(AUTH.busy?"Checking...":"Sign in")+'</button> <button type="button" class="btn ghost" data-a="sendcode"'+(AUTH.busy||AUTH.cool>0?" disabled":"")+'>'+(AUTH.cool>0?"Resend in "+AUTH.cool+"s":"Send a new code")+'</button></p><p class="mute"><button type="button" class="chip sm" data-a="changeemail">Use a different email</button></p><details><summary class="mute">Can’t sign in?</summary><p class="mute">Check your spam folder, make sure you’re using the email you joined with, and try the code rather than the link if you opened the email on a different device or browser.</p></details>';
+  h+='<p>We sent a code to <strong>'+esc(AUTH.email)+'</strong>. Enter the code, or open the link in the same email on this device.</p><label for="cd">Code from the email</label><input id="cd" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" data-auth="code" value="'+esc(AUTH.code)+'" style="max-width:200px;font-size:22px;letter-spacing:4px"><p><button type="button" class="btn" data-a="verify"'+(AUTH.busy?" disabled":"")+'>'+(AUTH.busy?"Checking...":"Sign in")+'</button> <button type="button" class="btn ghost" data-a="sendcode"'+(AUTH.busy||AUTH.cool>0?" disabled":"")+'>'+(AUTH.cool>0?"Resend in "+AUTH.cool+"s":"Send a new code")+'</button></p><p class="mute"><button type="button" class="chip sm" data-a="changeemail">Use a different email</button></p><details><summary class="mute">Can’t sign in?</summary><p class="mute">Check your spam folder, make sure you’re using the email you joined with, and try the code rather than the link if you opened the email on a different device or browser.</p></details>';
  }
  if(CFG.testMode)h+='<details style="margin-top:16px"><summary class="mute">Test sign-in (fictional accounts only)</summary><label for="tp">Password</label><input id="tp" type="password" autocomplete="current-password" data-auth="pw" value="'+esc(AUTH.pw)+'"><p><button type="button" class="btn ghost" data-a="pwlogin">Test sign-in</button></p><p class="mute">Uses the email entered above. Only in the test build.</p></details>';
  return h+'</div>';
@@ -353,7 +353,7 @@ async function sendCode(){
 }
 function startCool(){AUTH.cool=60;clearInterval(AUTH.tm);AUTH.tm=setInterval(function(){AUTH.cool--;if(AUTH.cool<=0){AUTH.cool=0;clearInterval(AUTH.tm);}if(PHASE==="signin"){var b=document.querySelectorAll('[data-a=sendcode]');b.forEach(function(x){x.disabled=AUTH.cool>0;x.textContent=AUTH.cool>0?(AUTH.step==="email"?"Wait "+AUTH.cool+"s":"Resend in "+AUTH.cool+"s"):(AUTH.step==="email"?"Email me a code":"Send a new code");});}},1000);}
 async function verifyCode(){
- var c=(AUTH.code||"").replace(/\D/g,"");if(c.length!==6){AUTH.msg="Please enter the 6-digit code from the email.";render();return;}
+ var c=(AUTH.code||"").replace(/\D/g,"");if(c.length<6||c.length>10){AUTH.msg="Please enter the code from the email (6 to 10 digits).";render();return;}
  AUTH.busy=true;AUTH.msg="";render();
  var r=await sb.auth.verifyOtp({email:AUTH.email,token:c,type:"email"});
  AUTH.busy=false;
@@ -469,7 +469,7 @@ sb.auth.onAuthStateChange(function(ev,sess){
  else if(ev==="SIGNED_IN"&&PHASE!=="app"&&PHASE!=="loading"){setTimeout(loadAll,0);}
 });
 (async function boot(){
- var hp=location.hash||"";if(/error_description/.test(hp)||/error=/.test(location.search)){AUTH.msg="That sign-in link didn’t work here. It may have expired or been opened in a different browser. Please use the 6-digit code from the same email instead.";}
+ var hp=location.hash||"";if(/error_description/.test(hp)||/error=/.test(location.search)){AUTH.msg="That sign-in link didn’t work here. It may have expired or been opened in a different browser. Please use the code from the same email instead.";}
  var s=await sb.auth.getSession();
  if(s.data&&s.data.session){SYNC.token=s.data.session.access_token;loadAll();}
  else{PHASE="signin";render();}
