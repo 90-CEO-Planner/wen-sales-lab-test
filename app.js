@@ -5,6 +5,7 @@
 var CFG=window.SL_CONFIG;
 function netFetch(){var f=window.__slFetch||window.fetch.bind(window);return f.apply(null,arguments);} /* test seam: lets the test suite simulate a dropped connection */
 var sb=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"pkce"},global:{fetch:netFetch}});
+var FLAGS={};
 var S=null,CONTENT={},ME=null,PHASE="boot",ERR="",route="#/";
 var SYNC={version:0,bk:{},timer:null,busy:false,again:false,status:"idle",lastSaved:null,retry:0,note:"",token:null,poll:null};
 var AUTH={step:"email",email:"",code:"",pw:"",msg:"",busy:false,cool:0,tm:null};
@@ -112,6 +113,7 @@ async function loadAll(){
  }
  var c=await sb.from("content").select("key,body");
  CONTENT={};if(!c.error&&c.data)c.data.forEach(function(x){CONTENT[x.key]=x.body;});
+ var fl=await sb.rpc("get_flags");FLAGS=(!fl.error&&fl.data)?fl.data:{};
  PHASE="app";route=location.hash||"#/";if(!/^#\//.test(route))route="#/";
  render();
  clearInterval(SYNC.poll);SYNC.poll=setInterval(checkRemote,20000);
@@ -377,6 +379,26 @@ async function signOut(){
  clearInterval(SYNC.poll);clearMirror();
  await sb.auth.signOut();
 }
+async function exportData(){
+ if(changedKeys().length){try{await flush();}catch(e){}}
+ var r=await sb.rpc("export_my_data");
+ if(r.error){toast(/feature_off/.test(r.error.message||"")?"Downloading your data is switched off at the moment.":"Couldn’t prepare your download. Please try again.");render();return;}
+ var d=new Date(),name="wen-sales-lab-my-data-"+d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+".json";
+ var blob=new Blob([JSON.stringify(r.data,null,2)],{type:"application/json"}),a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+ setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
+ toast("Your download has been prepared: "+name);render();
+}
+async function deleteData(){
+ var t=window.prompt("This permanently deletes all your saved Sales Lab work, including earlier versions. It can’t be undone. To go ahead, type DELETE MY DATA exactly.");
+ if(t===null)return;
+ if(t!=="DELETE MY DATA"){toast("Nothing was deleted. The words didn’t match.");render();return;}
+ var r=await sb.rpc("delete_my_data",{p_confirm:"DELETE MY DATA"});
+ if(r.error){toast("Couldn’t delete your work. Nothing was changed. Please try again.");render();return;}
+ clearInterval(SYNC.poll);clearMirror();S=null;
+ await sb.auth.signOut();
+ AUTH.msg="Your saved work has been deleted. You can sign in again to start fresh.";render();
+}
 async function showVersions(){var r=await sb.rpc("list_versions");UI.versions=r.error?[]:r.data;render();}
 async function restoreVersion(id){
  if(!confirm("Restore this earlier version? Your current version is kept too, so you can switch back."))return;
@@ -407,6 +429,7 @@ function home(){
  if(S.focus.product&&S.focus.format)h+='<div class="note ok"><strong>Your product:</strong> '+esc(productLine())+'</div>';
  h+=home1();
  h+='<div class="card"><h2>Your account</h2><p>Signed in as <strong>'+esc(ME?ME.email:"")+'</strong>.</p><p><button type="button" class="btn ghost" data-a="signout">Sign out</button></p></div>';
+ h+='<div class="card"><h2>Your data</h2><p class="mute">Your work belongs to you. You can download a copy at any time, or delete it.</p><div class="row">'+(FLAGS.exports===false?'<p class="mute">Downloading your data is switched off at the moment.</p>':'<button type="button" class="btn ghost" data-a="exportdata">Download my data</button>')+'<button type="button" class="btn ghost" data-a="deletedata">Delete my saved work</button></div></div>';
  h+='<div class="card"><h2>Earlier saved versions</h2><p class="mute">Your work saves automatically. If something was overwritten by mistake, for example from another tab or device, you can bring an earlier version back.</p>';
  if(UI.versions===null)h+='<button type="button" class="chip" data-a="showversions">Show earlier versions</button>';
  else if(!UI.versions.length)h+='<p class="mute">No earlier versions yet.</p>';
@@ -490,6 +513,8 @@ document.addEventListener("click",function(e){
  if(PHASE!=="app")return;
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
+ if(a==="exportdata"){exportData();return;}
+ if(a==="deletedata"){deleteData();return;}
  if(a==="restorev"){restoreVersion(d.id);return;}
  var f=S.focus;
  if(a==="ffmt"){if(f.format!==d.val){var wasDef=!f.freq||f.freq===(FREQDEF[f.format]||"");f.format=d.val;if(wasDef)f.freq=FREQDEF[d.val]||f.freq;var ks=incKeys().map(function(x){return x[0];});f.inc=f.inc.filter(function(k){return ks.indexOf(k)>-1;});}save();}
