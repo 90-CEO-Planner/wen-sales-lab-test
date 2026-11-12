@@ -337,7 +337,7 @@ function friendly(e){var m=String((e&&e.message)||"");
  if(/fetch|network/i.test(m))return "We couldn’t reach the server. Check your connection and try again.";
  return "Something went wrong. Please try again.";}
 function signinHtml(){
- var h='<div class="card" style="max-width:460px;margin:24px auto"><h1>Sign in to the Sales Lab</h1>';
+ var h='<div class="card" style="max-width:460px;margin:24px auto"><img class="signlogo" src="logo-160.png" alt="WEN" width="72" height="72"><h1>Sign in to the Sales Lab</h1>';
  if(AUTH.msg)h+='<div class="note info" role="status">'+esc(AUTH.msg)+'</div>';
  if(AUTH.step==="email"){
   h+='<p>Enter the email address you joined with. We’ll email you a sign-in code and a link.</p><label for="em">Email address</label><input id="em" type="email" inputmode="email" autocomplete="email" data-auth="email" value="'+esc(AUTH.email)+'"><p><button type="button" class="btn" data-a="sendcode"'+(AUTH.busy||AUTH.cool>0?" disabled":"")+'>'+(AUTH.busy?"Sending...":(AUTH.cool>0?"Wait "+AUTH.cool+"s":"Email me a code"))+'</button></p>';
@@ -353,7 +353,7 @@ var SUPPORT_EMAIL="hello@thewomensentrepreneurialnetwork.com";
 function mailtoHref(subject,body){return "mailto:"+SUPPORT_EMAIL+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);}
 function helpCard(){
  var ns=nextStep(),stepLine=ns?("Step "+ns.n+": "+ns.t):"";
- return '<div class="card"><h2>Need help?</h2><p>We’re here to help you make progress with your Sales Lab sprint.</p>'
+ return '<div class="card"><span class="ci" aria-hidden="true">'+ICO.chat+'</span><h2>Need help?</h2><p>We’re here to help you make progress with your Sales Lab sprint.</p>'
   +'<p>Have a question or something not working? Email us and include the step you’re working on. We aim to respond within two working days.</p>'
   +'<p><a class="btn" href="'+mailtoHref("Sales Lab help","Hi, I need help with the Sales Lab.\n\nThe step I'm working on: "+stepLine+"\nMy question or what isn't working: \n")+'">Email WEN support</a></p>'
   +'<p class="mute">Or write to '+SUPPORT_EMAIL+'.</p></div>';
@@ -499,7 +499,8 @@ function home1(){
  }else{
   h+='<div class="hero"><div class="kicker">Week 1 complete</div><h2>Well done, Week 1 is finished</h2><p>All seven steps are done. Weeks 2 to 4 are not part of this test build, and your Week 1 work stays saved.</p></div>';
  }
- h+='<div class="card"><h2>The seven steps</h2>'+STEPS.map(function(s){var dn=S.steps[s.n],isNext=ns&&ns.n===s.n;return '<a class="step'+(dn?" done":"")+(isNext?" next":"")+'" href="#/step/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(dn?"Done":(isNext?"Next":"Open"))+'</span></a>';}).join("")+'<p class="mute">Total about '+hm(mins(STEPS))+'. Do them in the order that suits you.</p></div>';
+ var GROUPS={1:["g1","Get set up"],3:["g2","Find your partners"],6:["g3","Make your offer"]};
+ h+='<div class="card"><h2>The seven steps</h2>'+STEPS.map(function(s){var dn=S.steps[s.n],isNext=ns&&ns.n===s.n,gp=s.n<3?"g1":(s.n<6?"g2":"g3"),gh=GROUPS[s.n]?'<h3 class="grp '+GROUPS[s.n][0]+'l">'+GROUPS[s.n][1]+'</h3>':"";return gh+'<a class="step '+gp+(dn?" done":"")+(isNext?" next":"")+'" href="#/step/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(dn?"Done":(isNext?"Next":"Open"))+'</span></a>';}).join("")+'<p class="mute">Total about '+hm(mins(STEPS))+'. Do them in the order that suits you.</p></div>';
  h+=sprintGlance();
  h+=planCard(STEPS).replace("<h2>Plan your sessions</h2>","<h2>Plan your sessions (optional)</h2>");
  return h+remindCard()+helpCard();
@@ -508,15 +509,23 @@ function home1(){
 function sprintGlance(){
  if(!doneCount()&&!S.cands.length)return "";
  var b=S.base||{},have=b.orders&&b.orders.s&&b.revenue&&b.revenue.s&&b.partner&&b.partner.s;
- return '<div class="card"><h2>Your sprint so far</h2>'
-  +'<p><strong>Partners found:</strong> '+S.cands.length+'</p>'
-  +'<p><strong>On your shortlist:</strong> '+shortlisted().length+'</p>'
-  +'<p><strong>Your starting numbers:</strong> '+(have?"recorded":"not recorded yet")+'</p></div>';
+ return '<div class="card"><h2>Your sprint so far</h2><div class="tiles">'
+  +'<div class="tile"><span class="ti" aria-hidden="true">'+ICO.people+'</span><b>'+S.cands.length+'</b><span>Partners found</span></div>'
+  +'<div class="tile"><span class="ti" aria-hidden="true">'+ICO.star+'</span><b>'+shortlisted().length+'</b><span>On your shortlist</span></div>'
+  +'<div class="tile"><span class="ti" aria-hidden="true">'+ICO.chart+'</span><b aria-hidden="true">'+(have?"&#10003;":"&ndash;")+'</b><span>Starting numbers<span class="sr">: '+(have?"recorded":"not recorded yet")+'</span></span></div>'
+  +'</div></div>';
 }
+var ICO={
+ people:'<svg viewBox="0 0 24 24" width="22" height="22" focusable="false"><circle cx="9" cy="8" r="3.5" fill="currentColor"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0z" fill="currentColor"/><circle cx="17" cy="9" r="2.6" fill="currentColor"/><path d="M16 14.2a5.2 5.2 0 0 1 5.5 5.8h-4.3a8 8 0 0 0-1.2-4.2z" fill="currentColor"/></svg>',
+ star:'<svg viewBox="0 0 24 24" width="22" height="22" focusable="false"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="currentColor"/></svg>',
+ chart:'<svg viewBox="0 0 24 24" width="22" height="22" focusable="false"><path d="M4 20V10h4v10zm6 0V4h4v16zm6 0v-7h4v7z" fill="currentColor"/></svg>',
+ bell:'<svg viewBox="0 0 24 24" width="20" height="20" focusable="false"><path d="M12 3a6 6 0 0 0-6 6v3.5L4.5 16h15L18 12.5V9a6 6 0 0 0-6-6zm0 18a2.5 2.5 0 0 0 2.4-2h-4.8A2.5 2.5 0 0 0 12 21z" fill="currentColor"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" width="20" height="20" focusable="false"><path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-5 4V5a1 1 0 0 1 1-1z" fill="currentColor"/></svg>'
+};
 function remindCard(){
  var r=S.remind||{},day=(r.day==null||r.day==="")?"1":String(r.day);
  var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
- var h='<div class="card"><h2>Reminders</h2><div class="row"><button type="button" class="chip" aria-pressed="'+!!r.weekly+'" data-a="remind" data-k="weekly">Weekly reminder (default)</button></div>'; /* individual step reminders are hidden until they exist (Jen, 12 Nov 2026) */
+ var h='<div class="card"><span class="ci" aria-hidden="true">'+ICO.bell+'</span><h2>Reminders</h2><div class="row"><button type="button" class="chip" aria-pressed="'+!!r.weekly+'" data-a="remind" data-k="weekly">Weekly reminder (default)</button></div>'; /* individual step reminders are hidden until they exist (Jen, 12 Nov 2026) */
  if(r.weekly)h+='<label for="rday">Day for your weekly reminder</label><select id="rday" data-bind="remind.day" style="max-width:220px">'+days.map(function(n,i){return '<option value="'+i+'"'+(String(i)===day?" selected":"")+'>'+n+'</option>';}).join("")+'</select>';
  return h+'<p class="mute">Your choices are saved. The weekly email is not sent in this test build.</p></div>';
 }
