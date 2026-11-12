@@ -205,7 +205,7 @@ function snapFields(){var m={},els=document.querySelectorAll("#app input[id],#ap
 function restoreFields(m){for(var id in m){var e=document.getElementById(id);if(e&&e.tagName!=="SELECT"&&!e.value&&m[id])e.value=m[id];}}
 function step1(){
  var f=S.focus,h=LC("w1s1.lesson");
- h+='<div class="card"><h2>Your focus product</h2><label for="fp">What is it called?</label><input id="fp" type="text" data-bind="focus.product" value="'+esc(f.product)+'" placeholder="For example: CEO Planner">';
+ h+='<div class="card"><h2>Your focus product</h2><label for="fp">What is it called?</label><input id="fp" type="text" data-bind="focus.product" value="'+esc(f.product)+'" placeholder="For example: Money Map">';
  h+='<label>What kind of product is it?</label><div class="row">'+FORMATS.map(function(x){return '<button type="button" class="chip" aria-pressed="'+(f.format===x[0])+'" data-a="ffmt" data-val="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>';
  if(f.format){
   h+='<label>How do customers pay?</label><div class="row">'+FREQ.map(function(x){return '<button type="button" class="chip" aria-pressed="'+(f.freq===x[0])+'" data-a="ffreq" data-val="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>';
@@ -214,8 +214,8 @@ function step1(){
  h+='<label for="wh">Where is it sold?</label><input id="wh" type="text" data-bind="focus.where" value="'+esc(f.where)+'" placeholder="For example: Etsy, my own site"><label for="ur">A link to it (optional)</label><input id="ur" type="text" data-bind="focus.url" value="'+esc(f.url)+'" placeholder="https://"><p class="mute">If you add a link, it can go in your first email so the partner can see it. Leave it blank if you would rather not.</p></div>';
  if(f.product&&f.format){
   h+='<div class="card"><h2>Help your messages sound specific</h2><p class="mute">Two short sentences make the biggest difference. Nothing here is shared with anyone.</p>';
-  h+='<label for="pb">What problem does it solve for your buyer?</label><p class="mute" style="margin:2px 0 6px">In your own words, as you would explain it to a friend. For example: they do not know which tasks to focus on, so their week disappears into busy work.</p><input id="pb" type="text" data-bind="focus.problem" value="'+esc(f.problem)+'" placeholder="Their problem, in your words">';
-  h+='<label for="oc">What does your buyer get from it?</label><p class="mute" style="margin:2px 0 6px">The result or benefit, in your own words. For example: a clear 90-day plan and a short list of priorities each week.</p><input id="oc" type="text" data-bind="focus.outcome" value="'+esc(f.outcome)+'" placeholder="What they get, in your words">';
+  h+='<label for="pb">What problem does it solve for your buyer?</label><p class="mute" style="margin:2px 0 6px">In your own words, as you would explain it to a friend. For example: they do not know how much is safe to spend, so every late invoice feels like a crisis.</p><input id="pb" type="text" data-bind="focus.problem" value="'+esc(f.problem)+'" placeholder="Their problem, in your words">';
+  h+='<label for="oc">What does your buyer get from it?</label><p class="mute" style="margin:2px 0 6px">The result or benefit, in your own words. For example: a simple monthly money plan and a clear view of what is safe to spend.</p><input id="oc" type="text" data-bind="focus.outcome" value="'+esc(f.outcome)+'" placeholder="What they get, in your words">';
   h+='<label>Is there anything you would be happy to offer a partner or their audience? (optional)</label><div class="row">'+incKeys().map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(f.inc.indexOf(x[0])>-1)+'" data-a="finc" data-val="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>';
   ["disc","comm"].forEach(function(k){if(f.inc.indexOf(k)>-1)h+='<label for="id'+k+'">'+INCDET[k].split(". ")[0]+'?</label><input id="id'+k+'" type="text" data-bind="focus.incd.'+k+'" value="'+esc(f.incd[k])+'" placeholder="'+esc(INCDET[k].split("For example: ")[1])+'">';});
   h+='<div class="note info"><strong>You stay in control.</strong> Nothing is offered in a message unless you have listed it here and then chosen it for that specific partner. If you leave this blank, your messages simply propose the collaboration.</div></div>';
@@ -235,11 +235,12 @@ function step2(){
  return shell(2,h);
 }
 function step3(){
- var h=LC("w1s3.lesson");
+ var h=LC("w1s3.lesson")+LC("w1s3.finding");
  h+='<div class="note warn"><strong>Guardrails.</strong> Public pages only. No private contact details, so keep emails and phone numbers in your own email, not here. Don\'t contact anyone this week. Follow each platform\'s rules.</div>';
- h+='<div class="card"><h2>Add a candidate</h2><label for="cn">Name of the business or creator</label><input id="cn" type="text" data-bind="cdraft.name" value="'+esc(S.cdraft.name)+'" placeholder="Name"><label for="cl">Link to their public page</label><input id="cl" type="text" data-bind="cdraft.link" value="'+esc(S.cdraft.link)+'" placeholder="https://"><label>Type</label><div class="row">'+TYPES.map(function(t){return '<button type="button" class="chip sm" aria-pressed="'+(S.newType===t[0])+'" data-a="newtype" data-val="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>'+(S.cmsg?'<div class="note warn" role="alert">'+esc(S.cmsg)+'</div>':'')+'<p><button type="button" class="btn" data-a="addc">Add candidate</button></p></div>';
+ h+=findHelpHtml();
+ h+='<div class="card"><h2>Add a candidate</h2><p class="mute">Add only people you have checked: they exist, their public link works, and their audience looks like your buyer.</p><label for="cn">Name of the business or creator</label><input id="cn" type="text" data-bind="cdraft.name" value="'+esc(S.cdraft.name)+'" placeholder="Name"><label for="cl">Link to their public page</label><input id="cl" type="text" data-bind="cdraft.link" value="'+esc(S.cdraft.link)+'" placeholder="https://"><label>Type</label><div class="row">'+TYPES.map(function(t){return '<button type="button" class="chip sm" aria-pressed="'+(S.newType===t[0])+'" data-a="newtype" data-val="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>'+(S.cmsg?'<div class="note warn" role="alert">'+esc(S.cmsg)+'</div>':'')+'<p><button type="button" class="btn" data-a="addc">Add candidate</button></p></div>';
  var n=S.cands.length;
- h+='<div class="card"><h2>Your candidates ('+n+')</h2><p class="mute">About 10 to 15 gives you a good pool to choose from. A shorter list of strong candidates is better than padding.</p>';
+ h+='<div class="card"><h2>Your candidates ('+n+')</h2><p class="mute">A small number of relevant, checked partners is the goal. Five to eight is a good result, and three is enough to move on. Do not pad the list.</p>';
  if(!n)h+='<p class="mute">None yet. Tap "Week 1 example" at the top to see how it looks filled in.</p>';
  S.cands.forEach(function(c){h+='<div class="crow"><span><strong>'+esc(c.name)+'</strong><br><span class="mute">'+esc(typeLabel(c.type))+(c.link?" &middot; "+esc(c.link):"")+'</span></span><button type="button" class="chip sm" data-a="delc" data-id="'+c.id+'">Remove</button></div>';});
  var types={};S.cands.forEach(function(c){types[c.type]=1;});
@@ -311,6 +312,19 @@ function step7(){
 }
 function productLine(){var f=S.focus,fm=FMTP[f.format]||"",buyer=(S.buyer.who||"").trim(),pt=priceText();return (f.product||"Your product")+(fm?" · "+fm:"")+(buyer?" · for "+buyer:"")+(pt?" · "+pt:"");}
 function productDetailsHtml(){var f=S.focus,fm=FMTP[f.format]||"",pt=priceText(),buyer=(S.buyer.who||"").trim();var h='<strong>'+esc(f.product||"Your product")+'</strong>'+(fm?' &middot; '+esc(fm):'')+(pt?' &middot; '+esc(pt):'')+(buyer?'<br>For: '+esc(buyer):'');if((f.problem||"").trim())h+='<br>The problem it solves: '+esc(f.problem.trim());if((f.outcome||"").trim())h+='<br>What customers get: '+esc(f.outcome.trim());return h;}
+function findPromptText(){var f=S.focus,t=LC("w1s3.prompt"),b=S.buyer||{};
+function line(label,arr){return arr&&arr.length?label+arr.join(", ")+".\n":"";}
+var fmt=FMTP[f.format]||"",pt=priceText();
+var map={product:(f.product||"").trim()||"[your product]",format:fmt?" ("+fmt+")":"",price:pt?", priced at "+pt:"",
+problem:(f.problem||"").trim()?"The problem it solves for my buyer: "+f.problem.trim()+"\n":"",
+outcome:(f.outcome||"").trim()?"What my buyer gets from it: "+f.outcome.trim()+"\n":"",
+buyer:(b.who||"").trim()||"[describe your buyer in step 2]",
+buys:line("Other things they buy or follow: ",b.buys),places:line("Places they spend time: ",b.places),
+types:(S.types&&S.types.length)?S.types.map(typeLabel).join("; "):"anyone who fits, including people who sell something next to mine"};
+Object.keys(map).forEach(function(k){t=t.split("{"+k+"}").join(map[k]);});
+return t;}
+function findHelpHtml(){var missing=!(S.focus.product||"").trim()||!(S.buyer.who||"").trim();
+return '<div class="card"><h2>Stuck? Ask an AI tool to help you search</h2><p>Copy this into ChatGPT, Claude or any AI tool you already use. It has been filled in from your own answers in steps 1 and 2, so you do not have to type anything again. It asks for a few strong suggestions rather than a long list. If you want more, run it again.</p>'+(missing?'<div class="note info">Some of it is blank because steps 1 or 2 are not finished yet. Fill those in and this updates by itself.</div>':'')+'<textarea readonly rows="9" id="findprompt" aria-label="Prompt to copy into your AI tool" style="font-size:14px">'+esc(findPromptText())+'</textarea><p><button type="button" class="btn" data-a="copyprompt">Copy this prompt</button> <span class="mute" id="copymsg" aria-live="polite"></span></p><div class="note warn"><strong>Check everything it gives you.</strong> AI tools sometimes make up names or links. Before you add anyone to your candidate list below, check three things: the business or creator really exists, the public link opens and goes where it says, and the people who follow them look like your buyer. If you cannot confirm all three, leave them out. Never paste customer details or anyone\'s private information into the AI tool.</div></div>';}
 /* ---------- account screens ---------- */
 function friendly(e){var m=String((e&&e.message)||"");
  if(/rate|seconds|too many|limit/i.test(m))return "Please wait a minute before asking for another code.";
@@ -427,6 +441,7 @@ document.addEventListener("click",function(e){
  if(a==="signout"){signOut();return;}
  if(a==="retryload"){loadAll();return;}
  if(PHASE!=="app")return;
+ if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
  if(a==="restorev"){restoreVersion(d.id);return;}
  var f=S.focus;
