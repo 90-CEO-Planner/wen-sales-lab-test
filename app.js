@@ -477,8 +477,25 @@ function home1(){
   h+='<div class="hero"><div class="kicker">Week 1 complete</div><h2>Well done, Week 1 is finished</h2><p>All seven steps are done. Weeks 2 to 4 are not part of this test build, and your Week 1 work stays saved.</p></div>';
  }
  h+='<div class="card"><h2>The seven steps</h2>'+STEPS.map(function(s){var dn=S.steps[s.n],isNext=ns&&ns.n===s.n;return '<a class="step'+(dn?" done":"")+(isNext?" next":"")+'" href="#/step/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(dn?"Done":(isNext?"Next":"Open"))+'</span></a>';}).join("")+'<p class="mute">Total about '+hm(mins(STEPS))+'. Do them in the order that suits you.</p></div>';
+ h+=sprintGlance();
  h+=planCard(STEPS).replace("<h2>Plan your sessions</h2>","<h2>Plan your sessions (optional)</h2>");
  return h+remindCard()+helpCard();
+}
+/* M2 slice D: a short "so far" summary, and reminder choices with a day picker */
+function sprintGlance(){
+ if(!doneCount()&&!S.cands.length)return "";
+ var b=S.base||{},have=b.orders&&b.orders.s&&b.revenue&&b.revenue.s&&b.partner&&b.partner.s;
+ return '<div class="card"><h2>Your sprint so far</h2>'
+  +'<p><strong>Partners found:</strong> '+S.cands.length+'</p>'
+  +'<p><strong>On your shortlist:</strong> '+shortlisted().length+'</p>'
+  +'<p><strong>Your starting numbers:</strong> '+(have?"recorded":"not recorded yet")+'</p></div>';
+}
+function remindCard(){
+ var r=S.remind||{},day=(r.day==null||r.day==="")?"1":String(r.day);
+ var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+ var h='<div class="card"><h2>Reminders</h2><div class="row"><button type="button" class="chip" aria-pressed="'+!!r.weekly+'" data-a="remind" data-k="weekly">Weekly reminder (default)</button></div>'; /* individual step reminders are hidden until they exist (Jen, 12 Nov 2026) */
+ if(r.weekly)h+='<label for="rday">Day for your weekly reminder</label><select id="rday" data-bind="remind.day" style="max-width:220px">'+days.map(function(n,i){return '<option value="'+i+'"'+(String(i)===day?" selected":"")+'>'+n+'</option>';}).join("")+'</select>';
+ return h+'<p class="mute">Your choices are saved. The weekly email is not sent in this test build.</p></div>';
 }
 function topbar(){return '<div class="topbar"><span class="mute">Signed in as '+esc(ME?ME.email:"")+'</span>'+pillHtml()+'</div>'+(UI.toast?'<div id="toast" class="note info" role="status">'+esc(UI.toast)+'</div>':'');}
 function home(){
