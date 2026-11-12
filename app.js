@@ -10,6 +10,50 @@ var S=null,CONTENT={},ME=null,PHASE="boot",ERR="",route="#/";
 var SYNC={version:0,bk:{},timer:null,busy:false,again:false,status:"idle",lastSaved:null,retry:0,note:"",token:null,poll:null};
 var AUTH={step:"email",email:"",code:"",pw:"",msg:"",busy:false,cool:0,tm:null};
 var UI={versions:null,toast:"",toastTm:null,pending:false};
+/* ---------- M3: server-side access check, framed use, session care ---------- */
+var ENDED=false,LAST_ACCESS=Date.now();
+var FRAMED=false;try{FRAMED=window.top!==window.self;}catch(e){FRAMED=true;}
+var STORAGE_OK=true;try{localStorage.setItem("wsl_t","1");localStorage.removeItem("wsl_t");}catch(e){STORAGE_OK=false;}
+async function accessCall(body){
+ try{
+  var tok=null;try{var g=await sb.auth.getSession();tok=g.data&&g.data.session?g.data.session.access_token:null;}catch(e){}
+  var h={"Content-Type":"application/json",apikey:CFG.key};if(tok)h.Authorization="Bearer "+tok;
+  var r=await netFetch(CFG.url+"/functions/v1/access-check",{method:"POST",headers:h,body:JSON.stringify(body)});
+  var j=null;try{j=await r.json();}catch(e){}
+  return {s:r.status,j:j};
+ }catch(e){return {s:0,j:null};}
+}
+/* Only "yes" lets a code be sent. When the check itself cannot be reached ("unknown"), only an address this device has already verified
+   as a member in the last 60 days may continue, so members are not locked out by an outage but strangers cannot trigger an email. */
+function okMap(){try{return JSON.parse(localStorage.getItem("wsl_ok")||"{}")||{};}catch(e){return {};}}
+function rememberOk(em){try{var m=okMap(),n=Date.now();Object.keys(m).forEach(function(k){if(n-m[k]>60*86400000)delete m[k];});m[em]=n;localStorage.setItem("wsl_ok",JSON.stringify(m));}catch(e){}}
+function isRememberedOk(em){var t=okMap()[em];return !!t&&Date.now()-t<60*86400000;}
+async function precheckEmail(em){
+ var r=await accessCall({action:"precheck",email:em});
+ if(r.s===429)return "slow";
+ if(r.s===200&&r.j){if(r.j.allowed===true){rememberOk(em);return "yes";}return r.j.reason==="unavailable"?"down":"no";}
+ return isRememberedOk(em)?"yes":"down";
+}
+/* Re-checks that the signed-in person still has access. Returns false only when we are sure it has ended. */
+async function stillHasAccess(){
+ var r=await accessCall({action:"recheck"});LAST_ACCESS=Date.now();
+ if(r.s===200&&r.j&&r.j.active===false&&!r.j.unavailable)return false;
+ return true;
+}
+async function periodicAccess(){
+ if(PHASE!=="app"||Date.now()-LAST_ACCESS<5*60*1000)return;
+ if(!(await stillHasAccess())){
+  try{if(S&&changedKeys().length)await flush();}catch(e){}
+  ENDED=true;clearInterval(SYNC.poll);PHASE="noaccess";render();
+ }
+}
+setInterval(periodicAccess,15*60*1000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&Date.now()-LAST_ACCESS>30*60*1000)periodicAccess();});
+async function signOutAll(){
+ try{if(S&&changedKeys().length)await flush();}catch(e){}
+ clearInterval(SYNC.poll);clearMirror();
+ await sb.auth.signOut({scope:"global"});
+}
 
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function keysOf(o){var m={};Object.keys(o).forEach(function(k){m[k]=JSON.stringify(o[k]);});return m;}
@@ -60,7 +104,7 @@ async function flush(){
   }
  }catch(e){
   failed=true;
-  if(isNoAccess(e)){PHASE="noaccess";SYNC.busy=false;render();return;}
+  if(isNoAccess(e)){ENDED=true;PHASE="noaccess";SYNC.busy=false;render();return;}
   if(isNoSession(e)){var rf=await sb.auth.refreshSession();if(rf.error||!rf.data.session){PHASE="signin";AUTH.msg="Your session ended. Please sign in again. Your changes are kept on this device.";SYNC.busy=false;render();return;}}
   var off=(typeof navigator!=="undefined"&&navigator.onLine===false)||/fetch|network|Failed|load/i.test(String(e&&e.message));
   setStatus(off?"offline":"error");
@@ -100,12 +144,15 @@ async function loadAll(){
  ME={id:u.data.user.id,email:u.data.user.email,admin:false};
  var ad=await sb.rpc("is_admin");ME.admin=!ad.error&&ad.data===true;
  var r=await sb.rpc("get_state");
+ if(r.error&&isNoAccess(r.error)){var rc=await accessCall({action:"recheck"});LAST_ACCESS=Date.now();if(rc.j&&rc.j.active===true)r=await sb.rpc("get_state");}
+ ENDED=false;
  if(r.error){
   if(isNoAccess(r.error)&&ME.admin){PHASE="adminonly";route="#/admin";render();adminLoad();return;}
   if(isNoAccess(r.error)){PHASE="noaccess";render();return;}
   if(isNoSession(r.error)){PHASE="signin";render();return;}
   ERR=r.error.message;PHASE="error";render();return;
  }
+ rememberOk((ME.email||"").toLowerCase());
  var sv=normalise(r.data.state);SYNC.version=r.data.version;SYNC.bk=keysOf(sv);S=sv;SYNC.note="";
  var m=readMirror();
  if(m&&m.state&&m.bk){
@@ -331,6 +378,7 @@ function findHelpHtml(){var missing=!(S.focus.product||"").trim()||!(S.buyer.who
 return '<div class="card"><h2>Stuck? Ask an AI tool to help you search</h2><p>Copy this into ChatGPT, Claude or any AI tool you already use. It has been filled in from your own answers in steps 1 and 2, so you do not have to type anything again. It asks for a few strong suggestions rather than a long list. If you want more, run it again.</p>'+(missing?'<div class="note info">Some of it is blank because steps 1 or 2 are not finished yet. Fill those in and this updates by itself.</div>':'')+'<textarea readonly rows="9" id="findprompt" aria-label="Prompt to copy into your AI tool" style="font-size:14px">'+esc(findPromptText())+'</textarea><p><button type="button" class="btn" data-a="copyprompt">Copy this prompt</button> <span class="mute" id="copymsg" aria-live="polite"></span></p><div class="note warn"><strong>Check everything it gives you.</strong> AI tools sometimes make up names or links. Before you add anyone to your candidate list below, check three things: the business or creator really exists, the public link opens and goes where it says, and the people who follow them look like your buyer. If you cannot confirm all three, leave them out. Never paste customer details or anyone\'s private information into the AI tool.</div></div>';}
 /* ---------- account screens ---------- */
 function friendly(e){var m=String((e&&e.message)||"");
+ if(/signups? not allowed|otp_disabled/i.test(m)||(e&&e.code==="otp_disabled"))return "We couldn’t set up your sign-in just now. Please try again in a minute, or email us at "+SUPPORT_EMAIL+".";
  if(/rate|seconds|too many|limit/i.test(m))return "Please wait a minute before asking for another code.";
  if(/not authorized|authorised/i.test(m))return "This test build can only email approved addresses. Please use the test sign-in below, or ask for your address to be added.";
  if(/expired|invalid|token/i.test(m))return "That code didn’t work. It may have expired. Please check it or ask for a new one.";
@@ -339,6 +387,7 @@ function friendly(e){var m=String((e&&e.message)||"");
 function signinHtml(){
  var h='<div class="card" style="max-width:460px;margin:24px auto"><img class="signlogo" src="logo-160.png" alt="WEN" width="72" height="72"><h1>Sign in to the Sales Lab</h1>';
  if(AUTH.msg)h+='<div class="note info" role="status">'+esc(AUTH.msg)+'</div>';
+ if(FRAMED)h+='<div class="note info" role="status">You’re viewing the Sales Lab inside another page. '+(STORAGE_OK?'If signing in doesn’t stay, ':'Your browser is blocking sign-in here, so ')+'<a href="'+esc(location.href.split("#")[0])+'" target="_blank" rel="noopener">open the Sales Lab on its own page</a> (opens in a new tab).</div>';
  if(AUTH.step==="email"){
   h+='<p>Enter the email address you joined with. We’ll email you a sign-in code and a link.</p><label for="em">Email address</label><input id="em" type="email" inputmode="email" autocomplete="email" data-auth="email" value="'+esc(AUTH.email)+'"><p><button type="button" class="btn" data-a="sendcode"'+(AUTH.busy||AUTH.cool>0?" disabled":"")+'>'+(AUTH.busy?"Sending...":(AUTH.cool>0?"Wait "+AUTH.cool+"s":"Email me a code"))+'</button></p>';
  }else{
@@ -358,14 +407,25 @@ function helpCard(){
   +'<p><a class="btn" href="'+mailtoHref("Sales Lab help","Hi, I need help with the Sales Lab.\n\nThe step I'm working on: "+stepLine+"\nMy question or what isn't working: \n")+'">Email WEN support</a></p>'
   +'<p class="mute">Or write to '+SUPPORT_EMAIL+'.</p></div>';
 }
-function noaccessHtml(){return '<div class="card" style="max-width:520px;margin:24px auto"><h1>We can’t find your membership</h1><p>You’re signed in as <strong>'+esc(ME?ME.email:"")+'</strong>, but that address isn’t on the Sales Lab access list.</p><p>Membership is checked against the email you purchased with. If you used a different address, sign out and try that one. If you think this is a mistake, <a href="'+mailtoHref("Sales Lab access problem","Hi, I can't get into the Sales Lab.\n\nThe email I signed in with: "+(ME?ME.email:"")+"\nThe email I bought with (if different): \n")+'">email us at '+SUPPORT_EMAIL+'</a> and we’ll sort it out. We reply to access problems first.</p><p><button type="button" class="btn" data-a="signout">Sign out</button></p></div>';}
+function noaccessHtml(){
+ if(ENDED)return '<div class="card" style="max-width:520px;margin:24px auto"><h1>Your Sales Lab access has ended</h1><p>You’re signed in as <strong>'+esc(ME?ME.email:"")+'</strong>, but that membership no longer shows as active.</p><p>Your saved work has not been deleted. If you think this is a mistake, <a href="'+mailtoHref("Sales Lab access ended","Hi, my Sales Lab access has ended and I think it shouldn't have.\n\nThe email I signed in with: "+(ME?ME.email:"")+"\n")+'">email us at '+SUPPORT_EMAIL+'</a> and we’ll sort it out. We reply to access problems first.</p><p><button type="button" class="btn" data-a="signout">Sign out</button></p></div>';
+ return noaccessFirstHtml();
+}
+function noaccessFirstHtml(){return '<div class="card" style="max-width:520px;margin:24px auto"><h1>We can’t find your membership</h1><p>You’re signed in as <strong>'+esc(ME?ME.email:"")+'</strong>, but that address isn’t on the Sales Lab access list.</p><p>Membership is checked against the email you purchased with. If you used a different address, sign out and try that one. If you think this is a mistake, <a href="'+mailtoHref("Sales Lab access problem","Hi, I can't get into the Sales Lab.\n\nThe email I signed in with: "+(ME?ME.email:"")+"\nThe email I bought with (if different): \n")+'">email us at '+SUPPORT_EMAIL+'</a> and we’ll sort it out. We reply to access problems first.</p><p><button type="button" class="btn" data-a="signout">Sign out</button></p></div>';}
 function errorHtml(){return '<div class="card" style="max-width:520px;margin:24px auto"><h1>Something went wrong</h1><p>We couldn’t load your sprint. Your work is safe. Please try again.</p><p class="mute">'+esc(ERR)+'</p><p><button type="button" class="btn" data-a="retryload">Try again</button> <button type="button" class="btn ghost" data-a="signout">Sign out</button></p></div>';}
 function loadingHtml(){return '<div class="card" style="max-width:420px;margin:40px auto;text-align:center"><p>Loading...</p></div>';}
 async function sendCode(){
  var em=(AUTH.email||"").trim().toLowerCase();
  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){AUTH.msg="Please enter a valid email address.";render();return;}
  AUTH.email=em;AUTH.busy=true;AUTH.msg="";render();
- var r=await sb.auth.signInWithOtp({email:em,options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});
+ var pc=await precheckEmail(em);
+ if(pc==="no"||pc==="slow"||pc==="down"){
+  AUTH.busy=false;
+  AUTH.msg=pc==="no"?"We can’t find a Sales Lab membership for that email address. Please check it is the one you joined with, or email us at "+SUPPORT_EMAIL+" and we’ll help."
+   :(pc==="slow"?"That’s a lot of tries in a row. Please wait a few minutes and try again.":"We can’t check your membership just now. Please try again in a few minutes, or email us at "+SUPPORT_EMAIL+".");
+  render();return;
+ }
+ var r=await sb.auth.signInWithOtp({email:em,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});
  AUTH.busy=false;
  if(r.error){AUTH.msg=friendly(r.error);}else{AUTH.step="code";AUTH.msg="Code sent. It can take a minute to arrive. Only the code in the newest email works, so please use that one.";startCool();}
  render();
@@ -398,8 +458,8 @@ var FLAGLABEL={ai_drafts:"AI drafts",reminders:"Reminders",exports:"Download my 
 function adminTop(){return '<div class="topbar"><span class="mute">Signed in as '+esc(ME?ME.email:"")+'</span><button type="button" class="btn ghost" data-a="signout">Sign out</button></div>'+(UI.toast?'<div id="toast" class="note info" role="status">'+esc(UI.toast)+'</div>':'');}
 async function adminLoad(){
  ADMIN.busy=true;ADMIN.err="";
- var m=await sb.rpc("admin_list_members"),f=await sb.rpc("admin_list_flags"),hh=await sb.rpc("admin_health");
- ADMIN.busy=false;ADMIN.health=hh.error?null:hh.data;
+ var m=await sb.rpc("admin_list_members"),f=await sb.rpc("admin_list_flags"),hh=await sb.rpc("admin_health"),ao=await sb.rpc("admin_access_overview"),au=await sb.rpc("admin_list_entitlement_audit",{p_limit:30});
+ ADMIN.busy=false;ADMIN.health=hh.error?null:hh.data;ADMIN.access=ao.error?null:ao.data;ADMIN.audit=au.error?null:au.data;
  if(m.error||f.error){ADMIN.err=(m.error||f.error).message||"error";ADMIN.members=[];ADMIN.flags=[];}
  else{ADMIN.members=m.data||[];ADMIN.flags=f.data||[];}
  renderSafe();
@@ -411,6 +471,8 @@ function adminHtml(){
  if(ADMIN.err)h+='<div class="note bad" role="status">Couldn’t load the admin tools. '+esc(ADMIN.err)+'</div>';
  if(!ADMIN.members)return h+'<p class="mute">Loading...</p>';
  h+=adminHealthHtml();
+ h+=adminAccessHtml();
+ h+=adminAuditHtml();
  h+='<div class="card"><h2>Members</h2>';
  if(!ADMIN.members.length)h+='<p class="mute">No one is on the access list yet.</p>';
  h+=ADMIN.members.map(function(m){
@@ -427,6 +489,43 @@ function adminHtml(){
    +'<button type="button" class="chip sm" data-a="adminflag" data-key="'+esc(f.key)+'" data-on="'+(f.enabled?'0':'1')+'" aria-label="'+(f.enabled?'Switch off ':'Switch on ')+esc(nm)+'">'+(f.enabled?'Switch off':'Switch on')+'</button></span></div>';
  }).join('');
  return h+'</div>';
+}
+function adminAccessHtml(){
+ var A=ADMIN.access,h='<div class="card"><h2>Access checks</h2>';
+ if(!A)return h+'<div class="note warn" role="status">Couldn’t load the access summary.</div></div>';
+ var when=A.last_check?new Date(A.last_check).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"never";
+ h+='<p class="mute">Added by you: '+(A.manual_active||0)+' with access. From Simvoly: '+(A.simvoly_active||0)+' with access, '+(A.simvoly_ended||0)+' ended.<br>Last check: '+esc(when)+'. Checks in the last day: '+(A.checks_last_day||0)+'.</p>';
+ if(A.simvoly_stale>0)h+='<div class="note warn" role="status"><strong>Worth a look: </strong>'+A.simvoly_stale+' Simvoly member(s) have not been re-checked for over 3 days.</div>';
+ if(A.simvoly_errors>0)h+='<div class="note warn" role="status"><strong>Worth a look: </strong>'+A.simvoly_errors+' Simvoly check(s) could not be completed. Access was left as it was.</div>';
+ h+='<h3>Check one address with Simvoly</h3><p class="mute">Needs the Simvoly address and key to be saved, but does NOT switch live checking on and changes nothing. Shows the shape of Simvoly’s answer (field names and group numbers), never names or addresses.</p><label for="adm-probe">Email address</label><input id="adm-probe" type="email" autocomplete="off"><p><button type="button" class="btn ghost" data-a="adminprobe">Check this address</button></p>'+(ADMIN.probe?'<pre class="mute" style="white-space:pre-wrap">'+esc(ADMIN.probe)+'</pre>':'');
+ h+='<p><button type="button" class="btn ghost" data-a="adminsweep"'+(ADMIN.sweeping?" disabled":"")+'>'+(ADMIN.sweeping?"Checking...":"Re-check Simvoly access now")+'</button></p></div>';
+ return h;
+}
+var AUDITLABEL={granted:"Access given",switched_on:"Access switched on",switched_off:"Access switched off",added_off:"Added with access off",removed_entry:"Entry removed",baseline:"Starting point"};
+function adminAuditHtml(){
+ var A=ADMIN.audit,h='<div class="card"><h2>Access history</h2><p class="mute">Every time access is given or taken away, by you or by the Simvoly check. Latest 30.</p>';
+ if(!A)return h+'<div class="note warn" role="status">Couldn’t load the access history.</div></div>';
+ if(!A.length)return h+'<p class="mute">Nothing recorded yet.</p></div>';
+ return h+A.map(function(x){
+  var when=new Date(x.at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+  var by=x.actor==="simvoly-check"?"Simvoly check":(x.actor==="baseline"?"existing entry":(x.actor==="database"?"database":x.actor));
+  return '<div class="crow"><span><strong>'+esc(x.email)+'</strong><br><span class="mute">'+esc(AUDITLABEL[x.action]||x.action)+' &middot; '+esc(x.source||"")+' &middot; by '+esc(by)+' &middot; '+esc(when)+'</span></span></div>';
+ }).join('')+'</div>';
+}
+async function adminProbe(){
+ var el=document.getElementById("adm-probe"),em=el?el.value.trim():"";
+ if(!em){toast("Please type an email address first.");return;}
+ var r=await accessCall({action:"probe",email:em});
+ ADMIN.probe=(r.s===200&&r.j)?JSON.stringify(r.j,null,1):"Couldn’t run the check (status "+r.s+"). Nothing was changed.";
+ render();
+}
+async function adminSweep(){
+ ADMIN.sweeping=true;render();
+ var r=await accessCall({action:"sweep",hours:1});
+ ADMIN.sweeping=false;
+ if(r.s===200&&r.j)toast(r.j.note?r.j.note+".":"Checked "+r.j.checked+", ended "+r.j.ended+", could not check "+r.j.errors+".");
+ else toast("Couldn’t run the check. Nothing was changed.");
+ adminLoad();
 }
 function adminHealthHtml(){
  var H=ADMIN.health,h='<div class="card"><h2>Health check</h2>';
@@ -535,7 +634,7 @@ function home(){
  h+='<div class="tabs"><button type="button" class="chip" aria-pressed="true">Week 1'+(week1Done()?' &#10003;':'')+'</button><button type="button" class="chip" disabled>Week 2</button><button type="button" class="chip" disabled>Week 3</button><button type="button" class="chip" disabled>Week 4</button></div>';
  if(S.focus.product&&S.focus.format)h+='<div class="note ok"><strong>Your product:</strong> '+esc(productLine())+'</div>';
  h+=home1();
- h+='<div class="card"><h2>Your account</h2><p>Signed in as <strong>'+esc(ME?ME.email:"")+'</strong>.</p><p><button type="button" class="btn ghost" data-a="signout">Sign out</button></p></div>';
+ h+='<div class="card"><h2>Your account</h2><p>Signed in as <strong>'+esc(ME?ME.email:"")+'</strong>.</p><p class="row"><button type="button" class="btn ghost" data-a="signout">Sign out</button> <button type="button" class="btn ghost" data-a="signoutall">Sign out of all devices</button></p>'+(FRAMED?'<p class="mute"><a href="'+esc(location.href.split("#")[0])+'" target="_blank" rel="noopener">Open the Sales Lab on its own page</a></p>':'')+'</div>';
  if(ME&&ME.admin)h+='<div class="card"><h2>Admin</h2><p class="mute">Manage who has access and the on and off switches.</p><p><a class="btn ghost" href="#/admin">Open admin tools</a></p></div>';
  h+='<div class="card"><h2>Your data</h2><p class="mute">Your work belongs to you. You can download a copy at any time, or delete it.</p><div class="row">'+(FLAGS.exports===false?'<p class="mute">Downloading your data is switched off at the moment.</p>':'<button type="button" class="btn ghost" data-a="exportdata">Download my data</button>')+'<button type="button" class="btn ghost" data-a="deletedata">Delete my saved work</button></div></div>';
  h+='<div class="card"><h2>Earlier saved versions</h2><p class="mute">Your work saves automatically. If something was overwritten by mistake, for example from another tab or device, you can bring an earlier version back.</p>';
@@ -619,6 +718,9 @@ document.addEventListener("click",function(e){
  if(a==="pwlogin"){pwLogin();return;}
  if(a==="changeemail"){AUTH.step="email";AUTH.msg="";AUTH.code="";render();return;}
  if(a==="signout"){signOut();return;}
+ if(a==="signoutall"){signOutAll();return;}
+ if(a==="adminsweep"){adminSweep();return;}
+ if(a==="adminprobe"){adminProbe();return;}
  if(a==="retryload"){loadAll();return;}
  if(a==="adminent"){adminSetAccess(d.email,d.on==="1");return;}
  if(a==="adminadd"){adminAddMember();return;}
