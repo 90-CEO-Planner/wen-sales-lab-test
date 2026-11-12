@@ -66,11 +66,22 @@ label{display:block;font-weight:600;margin:12px 0 4px}
 details summary{cursor:pointer;padding:6px 0}
 input[type=email],input[type=password]{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--ink)}
 .chip[disabled]{opacity:.45}
+/* Group A accessibility fixes (12 Nov 2026) */
+:root{--focus:#1f2937;--field:#767676}
+@media (prefers-color-scheme:dark){:root{--focus:#f59e0b;--field:#8b97a4}
+.btn,.chip[aria-pressed=true],.step.done .n{color:#06191b}.btn.ghost{color:var(--acc)}}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.hero :focus-visible{outline-color:#fff}
+@media (prefers-color-scheme:dark){.hero :focus-visible{outline-color:#06191b}}
+h1:focus{outline:none}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+input[type=text],input[type=number],input[type=email],input[type=password],select,textarea{border-color:var(--field)}
 </style>
 </head>
 <body>
 <div class="banner"><span>WEN Sales Lab &middot; test build for review (M1). Fictional data only. Not the live product.</span></div>
 <main id="app"></main>
+<div id="srlive" class="sr" role="status" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>

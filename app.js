@@ -413,8 +413,41 @@ function home(){
  else h+=UI.versions.slice(0,8).map(function(v){var d=new Date(v.saved_at);return '<div class="crow"><span>'+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+' at '+pad(d.getHours())+':'+pad(d.getMinutes())+'</span><button type="button" class="chip sm" data-a="restorev" data-id="'+v.id+'">Restore</button></div>';}).join("");
  return h+'</div>';
 }
+/* ---------- keyboard and screen reader helpers (Group A) ---------- */
+function a11ySig(e){
+ var a=document.getElementById("app");
+ if(!e||!a||e===a||!a.contains(e)||e.tagName==="INPUT"||e.tagName==="TEXTAREA"||e.tagName==="SELECT")return null;
+ var d=e.dataset||{},k=Object.keys(d).sort().map(function(x){return x+"="+d[x];}).join("|");
+ return e.tagName+"|"+(e.id||"")+"|"+k+"|"+(k||e.id?"":(e.getAttribute("href")||e.textContent.slice(0,30)));
+}
+function a11yFind(sig){
+ var els=document.getElementById("app").querySelectorAll(sig.split("|")[0].toLowerCase());
+ for(var i=0;i<els.length;i++){if(a11ySig(els[i])===sig)return els[i];}
+ return null;
+}
+function a11yGroups(){
+ var rows=document.querySelectorAll("#app .row");
+ for(var i=0;i<rows.length;i++){
+  var r=rows[i];
+  if(r.getAttribute("role")||!r.querySelector("button.chip[aria-pressed]"))continue;
+  var t="",p=r.previousElementSibling,par=r.parentNode;
+  if(p&&p.tagName==="LABEL")t=p.textContent;
+  else if(par.classList&&par.classList.contains("q")){
+   var c=par.cloneNode(true),cr=c.querySelectorAll(".row");
+   for(var k=0;k<cr.length;k++)cr[k].parentNode.removeChild(cr[k]);
+   t=c.textContent;
+  }else if(r.querySelector("button[data-a=fitgo]"))t="Choose a candidate";
+  t=t.replace(/\s+/g," ").trim();
+  if(!t)continue;
+  var card=r.closest(".card"),hd=card?card.querySelector("h2,h3"):null;
+  if(hd&&hd.textContent&&t.indexOf(hd.textContent)<0&&!r.querySelector("button[data-a=fitgo]"))t+=" ("+hd.textContent.trim()+")";
+  r.setAttribute("role","group");r.setAttribute("aria-label",t);
+ }
+ var fg=document.querySelectorAll("#app button[data-a=fitgo][title]");
+ for(var j=0;j<fg.length;j++)fg[j].setAttribute("aria-label","Candidate "+fg[j].textContent.replace(/\s+/g," ").trim()+": "+fg[j].getAttribute("title"));
+}
 function render(){
- var y=window.scrollY,html;
+ var y=window.scrollY,html,sig=a11ySig(document.activeElement),vk=PHASE+"|"+(PHASE==="signin"?AUTH.step:"")+"|"+route;
  if(PHASE==="boot"||PHASE==="loading")html=loadingHtml();
  else if(PHASE==="signin")html=signinHtml();
  else if(PHASE==="noaccess")html=noaccessHtml();
@@ -426,6 +459,20 @@ function render(){
  }
  var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);
  if(PHASE==="app"){var r=document.querySelector("[data-bind=refl]");if(r)r.value=S.refl||"";}
+ a11yGroups();
+ if(vk!==UI.vk){
+  /* a new screen: move focus to its heading so keyboard and screen reader users start at the top */
+  UI.vk=vk;var h1=document.querySelector("#app h1"),cd=PHASE==="signin"&&AUTH.step!=="email"?document.getElementById("cd"):null;
+  if(cd){try{cd.focus({preventScroll:true});}catch(e){}}
+  else if(h1){h1.setAttribute("tabindex","-1");try{h1.focus({preventScroll:true});}catch(e){}}
+ }else if(sig){
+  /* the same screen redrawn (a chip was pressed): put focus back on the same control */
+  var again=a11yFind(sig);if(again){try{again.focus({preventScroll:true});}catch(e){}}
+ }
+ /* messages that appear after a redraw are not announced by screen readers on their own, so say them in a standing live region */
+ var say=(PHASE==="signin"&&AUTH.msg)?AUTH.msg:(UI.toast||"");
+ if(say&&say!==UI.said){var lr=document.getElementById("srlive");if(lr){lr.textContent="";setTimeout(function(){lr.textContent=say;},50);}}
+ UI.said=say;
  window.scrollTo(0,y);
 }
 
