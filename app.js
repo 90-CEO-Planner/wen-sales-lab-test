@@ -387,8 +387,8 @@ var FLAGLABEL={ai_drafts:"AI drafts",reminders:"Reminders",exports:"Download my 
 function adminTop(){return '<div class="topbar"><span class="mute">Signed in as '+esc(ME?ME.email:"")+'</span><button type="button" class="btn ghost" data-a="signout">Sign out</button></div>'+(UI.toast?'<div id="toast" class="note info" role="status">'+esc(UI.toast)+'</div>':'');}
 async function adminLoad(){
  ADMIN.busy=true;ADMIN.err="";
- var m=await sb.rpc("admin_list_members"),f=await sb.rpc("admin_list_flags");
- ADMIN.busy=false;
+ var m=await sb.rpc("admin_list_members"),f=await sb.rpc("admin_list_flags"),hh=await sb.rpc("admin_health");
+ ADMIN.busy=false;ADMIN.health=hh.error?null:hh.data;
  if(m.error||f.error){ADMIN.err=(m.error||f.error).message||"error";ADMIN.members=[];ADMIN.flags=[];}
  else{ADMIN.members=m.data||[];ADMIN.flags=f.data||[];}
  renderSafe();
@@ -399,6 +399,7 @@ function adminHtml(){
  h+='<h1>Admin</h1><p class="mute">You can see who has access and when they last saved. You cannot see anyone\'s work here.</p>';
  if(ADMIN.err)h+='<div class="note bad" role="status">Couldn’t load the admin tools. '+esc(ADMIN.err)+'</div>';
  if(!ADMIN.members)return h+'<p class="mute">Loading...</p>';
+ h+=adminHealthHtml();
  h+='<div class="card"><h2>Members</h2>';
  if(!ADMIN.members.length)h+='<p class="mute">No one is on the access list yet.</p>';
  h+=ADMIN.members.map(function(m){
@@ -415,6 +416,17 @@ function adminHtml(){
    +'<button type="button" class="chip sm" data-a="adminflag" data-key="'+esc(f.key)+'" data-on="'+(f.enabled?'0':'1')+'" aria-label="'+(f.enabled?'Switch off ':'Switch on ')+esc(nm)+'">'+(f.enabled?'Switch off':'Switch on')+'</button></span></div>';
  }).join('');
  return h+'</div>';
+}
+function adminHealthHtml(){
+ var H=ADMIN.health,h='<div class="card"><h2>Health check</h2>';
+ if(!H)return h+'<div class="note warn" role="status">Couldn’t run the health check.</div></div>';
+ var al=H.alerts||[];
+ if(!al.length)h+='<div class="note ok" role="status"><strong>Everything looks fine.</strong></div>';
+ else h+=al.map(function(a){return '<div class="note '+(a.level==="bad"?"bad":(a.level==="warn"?"warn":"info"))+'" role="status"><strong>'+(a.level==="bad"?"Needs attention: ":(a.level==="warn"?"Worth a look: ":"Note: "))+'</strong>'+esc(a.text)+'</div>';}).join("");
+ var b=H.backups||{},m=H.members||{},r=H.reminders_last_7_days||{};
+ var when=b.last_scheduled_at?new Date(b.last_scheduled_at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"none yet";
+ h+='<p class="mute">Last nightly backup: '+esc(when)+'.<br>People with access: '+(m.access_on||0)+'. People with saved work: '+(m.with_saved_work||0)+'.<br>Reminder emails in the last 7 days: '+(r.sent||0)+' sent, '+(r.dry_run||0)+' trial runs, '+(r.failed||0)+' failed.</p></div>';
+ return h;
 }
 async function adminSetAccess(email,on){
  if(!window.confirm(on?("Give "+email+" access to the Sales Lab?"):("Turn off access for "+email+"? They won’t be able to open the Sales Lab until you turn it back on. Their saved work is kept.")))return;
