@@ -97,9 +97,11 @@ async function loadAll(){
  PHASE="loading";render();
  var u=await sb.auth.getUser();
  if(u.error||!u.data.user){PHASE="signin";render();return;}
- ME={id:u.data.user.id,email:u.data.user.email};
+ ME={id:u.data.user.id,email:u.data.user.email,admin:false};
+ var ad=await sb.rpc("is_admin");ME.admin=!ad.error&&ad.data===true;
  var r=await sb.rpc("get_state");
  if(r.error){
+  if(isNoAccess(r.error)&&ME.admin){PHASE="adminonly";route="#/admin";render();adminLoad();return;}
   if(isNoAccess(r.error)){PHASE="noaccess";render();return;}
   if(isNoSession(r.error)){PHASE="signin";render();return;}
   ERR=r.error.message;PHASE="error";render();return;
@@ -379,6 +381,62 @@ async function signOut(){
  clearInterval(SYNC.poll);clearMirror();
  await sb.auth.signOut();
 }
+/* ---------- admin tools (M2 slice B). Shows access and save times only, never a member's work ---------- */
+var ADMIN={members:null,flags:null,busy:false,err:""};
+var FLAGLABEL={ai_drafts:"AI drafts",reminders:"Reminders",exports:"Download my data"};
+function adminTop(){return '<div class="topbar"><span class="mute">Signed in as '+esc(ME?ME.email:"")+'</span><button type="button" class="btn ghost" data-a="signout">Sign out</button></div>'+(UI.toast?'<div id="toast" class="note info" role="status">'+esc(UI.toast)+'</div>':'');}
+async function adminLoad(){
+ ADMIN.busy=true;ADMIN.err="";
+ var m=await sb.rpc("admin_list_members"),f=await sb.rpc("admin_list_flags");
+ ADMIN.busy=false;
+ if(m.error||f.error){ADMIN.err=(m.error||f.error).message||"error";ADMIN.members=[];ADMIN.flags=[];}
+ else{ADMIN.members=m.data||[];ADMIN.flags=f.data||[];}
+ renderSafe();
+}
+function adminHtml(){
+ var h='';
+ if(PHASE==="app")h+='<a class="back" href="#/">&larr; My Sprint</a>';
+ h+='<h1>Admin</h1><p class="mute">You can see who has access and when they last saved. You cannot see anyone\'s work here.</p>';
+ if(ADMIN.err)h+='<div class="note bad" role="status">Couldn’t load the admin tools. '+esc(ADMIN.err)+'</div>';
+ if(!ADMIN.members)return h+'<p class="mute">Loading...</p>';
+ h+='<div class="card"><h2>Members</h2>';
+ if(!ADMIN.members.length)h+='<p class="mute">No one is on the access list yet.</p>';
+ h+=ADMIN.members.map(function(m){
+  var when=m.last_saved?new Date(m.last_saved).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"never";
+  return '<div class="crow"><span><strong>'+esc(m.email)+'</strong><br><span class="mute">'+(m.has_work?'Has saved work, last saved '+esc(when):'No saved work yet')+(m.note?' &middot; '+esc(m.note):'')+'</span></span>'
+   +'<span class="row"><span class="pill '+(m.active?'ok':'warn')+'">'+(m.active?'Access on':'Access off')+'</span>'
+   +'<button type="button" class="chip sm" data-a="adminent" data-email="'+esc(m.email)+'" data-on="'+(m.active?'0':'1')+'" aria-label="'+(m.active?'Turn access off for ':'Turn access on for ')+esc(m.email)+'">'+(m.active?'Turn off':'Turn on')+'</button></span></div>';
+ }).join('');
+ h+='<h3>Give someone access</h3><label for="adm-email">Email address</label><input id="adm-email" type="email" inputmode="email" autocomplete="off"><p><button type="button" class="btn" data-a="adminadd">Give access</button></p></div>';
+ h+='<div class="card"><h2>Switches</h2><p class="mute">Switching something off takes effect the next time a member opens the Sales Lab.</p>';
+ h+=(ADMIN.flags||[]).map(function(f){
+  var nm=FLAGLABEL[f.key]||f.key;
+  return '<div class="crow"><span><strong>'+esc(nm)+'</strong><br><span class="mute">'+esc(f.note||"")+'</span></span><span class="row"><span class="pill '+(f.enabled?'ok':'warn')+'">'+(f.enabled?'On':'Off')+'</span>'
+   +'<button type="button" class="chip sm" data-a="adminflag" data-key="'+esc(f.key)+'" data-on="'+(f.enabled?'0':'1')+'" aria-label="'+(f.enabled?'Switch off ':'Switch on ')+esc(nm)+'">'+(f.enabled?'Switch off':'Switch on')+'</button></span></div>';
+ }).join('');
+ return h+'</div>';
+}
+async function adminSetAccess(email,on){
+ if(!window.confirm(on?("Give "+email+" access to the Sales Lab?"):("Turn off access for "+email+"? They won’t be able to open the Sales Lab until you turn it back on. Their saved work is kept.")))return;
+ var r=await sb.rpc("admin_set_entitlement",{p_email:email,p_active:on,p_note:null});
+ if(r.error){toast("That didn’t work. Nothing was changed.");render();return;}
+ toast(on?("Access turned on for "+email+"."):("Access turned off for "+email+"."));await adminLoad();
+}
+async function adminAddMember(){
+ var el=document.getElementById("adm-email"),em=el?el.value.trim().toLowerCase():"";
+ if(!em||em.indexOf("@")<1||em.indexOf(" ")>-1){toast("Please enter a full email address.");render();return;}
+ if(!window.confirm("Give "+em+" access to the Sales Lab?"))return;
+ var r=await sb.rpc("admin_set_entitlement",{p_email:em,p_active:true,p_note:"Added by admin"});
+ if(r.error){toast("That didn’t work. Nothing was changed.");render();return;}
+ toast("Access given to "+em+".");await adminLoad();
+}
+async function adminSetFlag(key,on){
+ var nm=FLAGLABEL[key]||key;
+ if(!window.confirm((on?"Switch on ":"Switch off ")+nm+"?"))return;
+ var r=await sb.rpc("admin_set_flag",{p_key:key,p_enabled:on});
+ if(r.error){toast("That didn’t work. Nothing was changed.");render();return;}
+ toast(nm+" is now "+(on?"on.":"off."));await adminLoad();
+}
 async function exportData(){
  if(changedKeys().length){try{await flush();}catch(e){}}
  var r=await sb.rpc("export_my_data");
@@ -429,6 +487,7 @@ function home(){
  if(S.focus.product&&S.focus.format)h+='<div class="note ok"><strong>Your product:</strong> '+esc(productLine())+'</div>';
  h+=home1();
  h+='<div class="card"><h2>Your account</h2><p>Signed in as <strong>'+esc(ME?ME.email:"")+'</strong>.</p><p><button type="button" class="btn ghost" data-a="signout">Sign out</button></p></div>';
+ if(ME&&ME.admin)h+='<div class="card"><h2>Admin</h2><p class="mute">Manage who has access and the on and off switches.</p><p><a class="btn ghost" href="#/admin">Open admin tools</a></p></div>';
  h+='<div class="card"><h2>Your data</h2><p class="mute">Your work belongs to you. You can download a copy at any time, or delete it.</p><div class="row">'+(FLAGS.exports===false?'<p class="mute">Downloading your data is switched off at the moment.</p>':'<button type="button" class="btn ghost" data-a="exportdata">Download my data</button>')+'<button type="button" class="btn ghost" data-a="deletedata">Delete my saved work</button></div></div>';
  h+='<div class="card"><h2>Earlier saved versions</h2><p class="mute">Your work saves automatically. If something was overwritten by mistake, for example from another tab or device, you can bring an earlier version back.</p>';
  if(UI.versions===null)h+='<button type="button" class="chip" data-a="showversions">Show earlier versions</button>';
@@ -475,9 +534,11 @@ function render(){
  else if(PHASE==="signin")html=signinHtml();
  else if(PHASE==="noaccess")html=noaccessHtml();
  else if(PHASE==="error")html=errorHtml();
+ else if(PHASE==="adminonly")html=adminTop()+adminHtml();
  else{
   var m=(route||"#/").match(/^#\/step\/(\d)/);
-  if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else html=home();
+  if(route==="#/admin"&&ME&&ME.admin){html=adminHtml();if(!ADMIN.members&&!ADMIN.busy)adminLoad();}
+  else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else html=home();
   html=topbar()+html;
  }
  var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);
@@ -490,7 +551,7 @@ function render(){
   else if(h1){h1.setAttribute("tabindex","-1");try{h1.focus({preventScroll:true});}catch(e){}}
  }else if(sig){
   /* the same screen redrawn (a chip was pressed): put focus back on the same control */
-  var again=a11yFind(sig);if(again){try{again.focus({preventScroll:true});}catch(e){}}
+  var again=a11yFind(sig);if(again){if(again.tagName==="H1")again.setAttribute("tabindex","-1");try{again.focus({preventScroll:true});}catch(e){}}
  }
  /* messages that appear after a redraw are not announced by screen readers on their own, so say them in a standing live region */
  var say=(PHASE==="signin"&&AUTH.msg)?AUTH.msg:(UI.toast||"");
@@ -510,6 +571,9 @@ document.addEventListener("click",function(e){
  if(a==="changeemail"){AUTH.step="email";AUTH.msg="";AUTH.code="";render();return;}
  if(a==="signout"){signOut();return;}
  if(a==="retryload"){loadAll();return;}
+ if(a==="adminent"){adminSetAccess(d.email,d.on==="1");return;}
+ if(a==="adminadd"){adminAddMember();return;}
+ if(a==="adminflag"){adminSetFlag(d.key,d.on==="1");return;}
  if(PHASE!=="app")return;
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
@@ -555,7 +619,7 @@ window.addEventListener("hashchange",function(){if(PHASE!=="app")return;route=lo
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
- if(ev==="SIGNED_OUT"){S=null;ME=null;CONTENT={};PHASE="signin";AUTH.step="email";AUTH.code="";UI.versions=null;render();}
+ if(ev==="SIGNED_OUT"){S=null;ME=null;CONTENT={};ADMIN.members=null;ADMIN.flags=null;PHASE="signin";AUTH.step="email";AUTH.code="";UI.versions=null;render();}
  else if(ev==="SIGNED_IN"&&PHASE!=="app"&&PHASE!=="loading"){setTimeout(loadAll,0);}
 });
 (async function boot(){
