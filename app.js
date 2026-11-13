@@ -401,8 +401,9 @@ function signinHtml(){
 /* M2 fix (12 Nov 2026): every "contact us" must give a real way to contact WEN */
 var SUPPORT_EMAIL="hello@thewomensentrepreneurialnetwork.com";
 function mailtoHref(subject,body){return "mailto:"+SUPPORT_EMAIL+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);}
+function supportStepLine(){var m=(route||"").match(/^#\/step\/([1-7])$/),m2=(route||"").match(/^#\/w2\/([1-6])$/);if(m)return "Week 1, step "+m[1]+": "+STEPS[+m[1]-1].t;if(m2)return "Week 2, step "+m2[1]+": "+STEPS2[+m2[1]-1].t;return "";}
 function helpCard(){
- var ns=nextStep(),stepLine=ns?("Step "+ns.n+": "+ns.t):"";
+ var stepLine=supportStepLine();
  return '<div class="card"><span class="ci" aria-hidden="true">'+ICO.chat+'</span><h2>Need help?</h2><p>We’re here to help you make progress with your Sales Lab sprint.</p>'
   +'<p>Have a question or something not working? Email us and include the step you’re working on. We aim to respond within two working days.</p>'
   +'<p><a class="btn" href="'+mailtoHref("Sales Lab help","Hi, I need help with the Sales Lab.\n\nThe step I'm working on: "+stepLine+"\nMy question or what isn't working: \n")+'">Email WEN support</a></p>'
@@ -768,9 +769,22 @@ async function deleteData(){
  await sb.auth.signOut();
  AUTH.msg="Your saved work has been deleted. You can sign in again to start fresh.";render();
 }
-async function showVersions(){var r=await sb.rpc("list_versions");UI.versions=r.error?[]:r.data;render();}
+function verSummary(st){
+ var x=normalise(st&&typeof st==="object"?st:{}),c=Array.isArray(x.cands)?x.cands:[],s1=(x.steps&&typeof x.steps==="object")?x.steps:{},sh=c.filter(function(k){return k&&k.short;}).length,d1=STEPS.filter(function(k){return s1[k.n];}).length,d2=STEPS2.filter(function(k){return x.w2.steps[k.n];}).length;
+ var sent=Object.keys(x.out||{}).filter(function(k){return x.out[k]&&x.out[k].status==="sent";}).length;
+ var t=c.length+" partner"+(c.length===1?"":"s")+" found, "+sh+" on your shortlist, "+d1+" of 7 Week 1 steps done";
+ if(d2||sent)t+=", "+d2+" of 6 Week 2 steps done, "+sent+" message"+(sent===1?"":"s")+" sent";
+ return t;
+}
+async function showVersions(){
+ var r=await sb.from("state_history").select("id,version,saved_at,state").order("id",{ascending:false}).limit(8);
+ if(!r.error&&r.data){UI.versions=r.data.map(function(v){return {id:v.id,version:v.version,saved_at:v.saved_at,sum:verSummary(v.state)};});}
+ else{var r2=await sb.rpc("list_versions");UI.versions=r2.error?[]:r2.data;}
+ render();
+}
 async function restoreVersion(id){
- if(!confirm("Restore this earlier version? Your current version is kept too, so you can switch back."))return;
+ var vv=(UI.versions||[]).filter(function(x){return x.id==id;})[0];
+ if(!confirm("Restore the version saved on "+(vv?new Date(vv.saved_at).toLocaleString("en-GB",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"that date")+(vv&&vv.sum?" ("+vv.sum+")":"")+"? Your current version is kept too, so you can switch back."))return;
  if(changedKeys().length)await flush();
  var r=await sb.rpc("restore_version",{p_id:+id,p_expected:SYNC.version});
  if(r.error){toast("Couldn’t restore that version.");render();return;}
@@ -1359,7 +1373,8 @@ var SHELLCSS='body.hasnav main{padding-bottom:96px}#mnav{display:none}'
 +'.xk{font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#fff}.xt{font:700 22px/1.25 Poppins,system-ui,sans-serif;color:#fff;margin:2px 0 0}'
 +'.xs{color:#F5F2EE;margin:0 0 12px;font-size:16px;max-width:none}.xo{background:#000;border-left:4px solid #00C2CB;border-radius:8px;padding:12px 14px;margin:8px 0}.xo b{display:block;color:#00C2CB;font:700 11px Montserrat,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}.xo span{color:#fff;font:400 14px/1.4 "Open Sans",system-ui,sans-serif}'
 +'.xm{color:#cfc7bb;font-size:13px;margin:8px 0 0;max-width:none}.xi{display:flex;width:54px;height:54px;border-radius:50%;border:2px solid #fff;align-items:center;justify-content:center;flex:none}.xi svg{width:28px;height:28px;fill:#000}.xi.dk svg{fill:#fff}'
-+'.btn.teal{background:#00C2CB;color:#000;border-color:#00C2CB}.btn.teal:hover{background:#00AEB6}.xp .btn{display:block;text-align:center;margin-top:14px}';
++'.btn.teal{background:#00C2CB;color:#000;border-color:#00C2CB}.btn.teal:hover{background:#00AEB6}.xp .btn{display:block;text-align:center;margin-top:14px}'
++'@media(max-width:480px){.tabs{flex-wrap:nowrap;gap:6px}.tabs .chip{flex:1 1 0;min-width:0;white-space:nowrap;padding:8px 4px;font-size:13.5px;text-align:center}}';
 function effRoute(){var r=route||"#/";if(/^#\/community/.test(r)&&FLAGS.community!==true)return "#/";return r;}
 function tabsFor(){var t=[["home","Home","#/"],["sprint","My Sprint","#/sprint"],["exp","Experiments","#/experiments"],["res","Results","#/results"]];if(FLAGS.community===true)t.push(["comm","Community","#/community"]);t.push(["profile","Profile","#/profile"]);return t;}
 function tabOf(r){r=r||"#/";if(r==="#/sprint"||/^#\/(step|w2)\/\d$/.test(r))return "sprint";if(r==="#/experiments")return "exp";if(r==="#/results")return "res";if(/^#\/community/.test(r))return "comm";if(r==="#/profile")return "profile";return "home";}
@@ -1395,7 +1410,7 @@ function experimentsPage(){
  EXPX.forEach(function(x,i){
   var cur=x[0]==="part";
   h+='<div class="xp"><div class="xh2"><span class="xi'+((x[0]==="show"||x[0]==="live")?' dk':'')+'" style="background:'+x[5]+'">'+x[6]+'</span><div><div class="xk">Experiment '+(i+1)+'</div><div class="xt">'+esc(x[1])+'</div></div></div><p class="xs">'+esc(x[2])+'</p><div class="xo"><b>Your outcome</b><span>'+esc(x[3])+'</span></div><div class="xm">4 weeks &middot; 3 to 5 hours a week &middot; Best for: '+esc(x[4])+'</div>';
-  h+=cur?'<div class="xm">Open in this test build. Your progress: '+(week1Done()?"Week 2":"Week 1")+' of 4. Find it under My Sprint.</div>':'<div class="xm"><strong>Coming soon.</strong> Not open in this test build.</div>';
+  h+=cur?'<div class="xm">Open in this test build. Your progress: '+(week1Done()?"Week 2":"Week 1")+' of 4. Find it under <a href="#/sprint">My Sprint</a>.</div>':'<div class="xm"><strong>Coming soon.</strong> Not open in this test build.</div>';
   h+='</div>';
  });
  return h+'</div>';
@@ -1420,7 +1435,7 @@ function profilePage(){
  h+='<div class="card"><h2>Earlier saved versions</h2><p class="mute">Your work saves automatically. If something was overwritten by mistake, for example from another tab or device, you can bring an earlier version back.</p>';
  if(UI.versions===null)h+='<button type="button" class="chip" data-a="showversions">Show earlier versions</button>';
  else if(!UI.versions.length)h+='<p class="mute">No earlier versions yet.</p>';
- else h+=UI.versions.slice(0,8).map(function(v){var d=new Date(v.saved_at);return '<div class="crow"><span>'+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+' at '+pad(d.getHours())+':'+pad(d.getMinutes())+'</span><button type="button" class="chip sm" data-a="restorev" data-id="'+v.id+'">Restore</button></div>';}).join("");
+ else h+='<p class="mute"><strong>Your current work:</strong> '+esc(verSummary(S))+'</p>'+UI.versions.slice(0,8).map(function(v){var d=new Date(v.saved_at);return '<div class="crow" style="display:block"><p style="margin:0"><strong>'+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+' at '+pad(d.getHours())+':'+pad(d.getMinutes())+'</strong></p><p class="mute" style="margin:2px 0 8px">'+(v.sum?esc(v.sum):"A summary is not available for this version.")+'</p><button type="button" class="chip sm" data-a="restorev" data-id="'+v.id+'">Restore this version</button></div>';}).join("");
  h+='</div>'+helpCard();
  if(ME&&ME.admin)h+='<div class="card"><h2>Admin</h2><p class="mute">Manage who has access and the on and off switches.</p><p><a class="btn ghost" href="#/admin">Open admin tools</a></p></div>';
  return h;
@@ -1933,7 +1948,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
