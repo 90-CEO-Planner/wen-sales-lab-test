@@ -58,8 +58,8 @@ async function signOutAll(){
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function keysOf(o){var m={};Object.keys(o).forEach(function(k){m[k]=JSON.stringify(o[k]);});return m;}
 function changedKeys(){var out=[];if(!S)return out;Object.keys(S).forEach(function(k){if(SYNC.bk[k]!==JSON.stringify(S[k]))out.push(k);});return out;}
-function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF()};}
-function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return rvfix(w4fix(w3fix(w2fix(o))));}
+function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF(),past:[],chk:CHKDEF()};}
+function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return d5fix(rvfix(w4fix(w3fix(w2fix(o)))));}
 
 /* ---------- local mirror: survives a closed tab or a dropped connection ---------- */
 function mirrorKey(){return ME?"wsl_mirror_"+ME.id:null;}
@@ -163,6 +163,7 @@ async function loadAll(){
  var c=await sb.from("content").select("key,body");
  CONTENT={};if(!c.error&&c.data)c.data.forEach(function(x){CONTENT[x.key]=x.body;});
  var fl=await sb.rpc("get_flags");FLAGS=(!fl.error&&fl.data)?fl.data:{};
+ await sprLoad();
  if(FLAGS.community===true)comPeek();
  PHASE="app";route=location.hash||"#/";if(!/^#\//.test(route))route="#/";
  render();
@@ -829,12 +830,12 @@ function remindCard(){
  var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
  var h='<div class="card"><span class="ci" aria-hidden="true">'+ICO.bell+'</span><h2>Reminders</h2><div class="row"><button type="button" class="chip" aria-pressed="'+!!r.weekly+'" data-a="remind" data-k="weekly">Weekly reminder (default)</button></div>'; /* individual step reminders are hidden until they exist (Jen, 12 Nov 2026) */
  if(r.weekly)h+='<label for="rday">Day for your weekly reminder</label><select id="rday" data-bind="remind.day" style="max-width:220px">'+days.map(function(n,i){return '<option value="'+i+'"'+(String(i)===day?" selected":"")+'>'+n+'</option>';}).join("")+'</select>';
- return h+'<p class="mute">Your choices are saved. The weekly email is not sent in this test build.</p></div>';
+ return h+rvRemindNote()+'<p class="mute">Your choices are saved. The weekly email is not sent in this test build.</p></div>';
 }
 function topbar(){return '<div class="topbar"><span class="mute">Signed in as '+esc(ME?ME.email:"")+'</span>'+pillHtml()+'</div>'+(UI.toast?'<div id="toast" class="note info" role="status">'+esc(UI.toast)+'</div>':'');}
 function home(){
  var wk=(S.week===4&&week3Done()&&week2Done()&&week1Done())?4:((S.week===3||S.week===4)&&week2Done()&&week1Done())?3:((S.week===2||S.week===3||S.week===4)&&week1Done()?2:1);
- var h='<h1>My Sprint</h1><p class="mute">Partnership-to-Sales &middot; Week '+wk+' of 4</p>';
+ var h='<h1>My Sprint</h1><p class="mute">Partnership-to-Sales &middot; Week '+wk+' of 4</p>'+sprintBar(true);
  h+='<div class="tabs"><button type="button" class="chip" aria-pressed="'+(wk===1)+'" data-a="w2-week" data-val="1">Week 1'+(week1Done()?' &#10003;':'')+'</button><button type="button" class="chip" aria-pressed="'+(wk===2)+'" data-a="w2-week" data-val="2"'+(week1Done()?'':' disabled title="Opens when you finish Week 1"')+'>Week 2</button><button type="button" class="chip" aria-pressed="'+(wk===3)+'" data-a="w3-week" data-val="3"'+(week2Done()&&week1Done()?'':' disabled title="Opens when you finish Week 2"')+'>Week 3</button><button type="button" class="chip" aria-pressed="'+(wk===4)+'" data-a="w4-week" data-val="4"'+(week3Done()&&week2Done()&&week1Done()?'':' disabled title="Opens when you finish Week 3"')+'>Week 4</button></div>';
  if(!week1Done())h+='<p class="mute">Week 2 opens when you finish Week 1 (choose "Ready for Week 2" in the last step).</p>';
  if(wk===1)h+=w2Banner();
@@ -1640,24 +1641,33 @@ function w4Verdict(i){
  if(i.partners>=VMIN_PARTNERS&&res===0&&i.fuSent>=i.partners&&i.daysSinceSend>=7)return vmk("Approach needs reviewing","warn","R7",[i.partners+" partners contacted, follow-ups sent, and no replies after a week or more."],["Silence has many causes: busy inboxes, the wrong contact route or timing.","It does not mean the idea is bad."],["Review who you contacted and how you asked. Is each partner’s audience really your buyer?","Try a different channel, or a warm contact, before changing the offer."]);
  return vmk("Insufficient evidence","info","R8",[(res===0?"Messages have gone out and no replies have come in yet.":""),(i.maybe>0&&i.yes===0?i.maybe+" partner"+(i.maybe===1?"":"s")+" said “maybe later”, which is a soft answer.":""),"There is not enough yet to read."],[small,"No reply yet is unknown, not a no."],[res===0?"Wait for the follow-up window, send one helpful follow-up, then decide.":"Keep the door open with the “maybe later” partners and message your next partner."]);
 }
-function w4DaysAgo(s){var a=parseYmd(s),b=parseYmd(today());if(a==null||b==null)return 0;return Math.max(0,Math.round((b-a)/86400000));}
-function w4Inputs(){
- var sent=w2Sent(),c=S.col||{},ids={},yes=0,maybe=0,no=0,nor=0,fu=0,minAgo=null,r=S.w4.res;
- sent.forEach(function(e){ids[e.id]=1;var rp=e.o.reply;if(rp==="yes")yes++;else if(rp==="maybe")maybe++;else if(rp==="no")no++;else nor++;if(e.o.fuSent)fu++;var d=w4DaysAgo(e.o.sentAt);if(minAgo===null||d<minAgo)minAgo=d;});
- var partners=sent.length;
- if(c.status==="proposed"&&c.pid&&!ids[c.pid]){partners++;if(c.reply==="maybe")maybe++;else if(c.reply==="no")no++;else if(c.reply==="agreed")yes++;else nor++;var d2=w4DaysAgo(c.sentAt);if(minAgo===null||d2<minAgo)minAgo=d2;}
- return {partners:partners,msgs:partners,yes:yes,maybe:maybe,no:no,noreply:nor,fuSent:fu,agreed:c.reply==="agreed",ran:S.w4.ran==="yes",clicks:r.clicks,orders:r.orders,enq:r.enq,daysSinceSend:minAgo||0};
+function w4DaysAgo(s,ref){var a=parseYmd(s),b=parseYmd(ref||today());if(a==null||b==null)return 0;return Math.max(0,Math.round((b-a)/86400000));}
+function w4Inputs(asOf,resOv){
+ var sent=w2Sent(),c=S.col||{},ids={},yes=0,maybe=0,no=0,nor=0,fu=0,minAgo=null,r=resOv||S.w4.res,n=0;
+ sent.forEach(function(e){
+  if(asOf&&e.o.sentAt>asOf)return;
+  ids[e.id]=1;n++;var rp=e.o.reply;if(asOf&&e.o.repliedAt&&e.o.repliedAt>asOf)rp="";
+  if(rp==="yes")yes++;else if(rp==="maybe")maybe++;else if(rp==="no")no++;else nor++;
+  if(e.o.fuSent&&!(asOf&&e.o.fuAt&&e.o.fuAt>asOf))fu++;
+  var d=w4DaysAgo(e.o.sentAt,asOf);if(minAgo===null||d<minAgo)minAgo=d;
+ });
+ var partners=n,cOk=c.status==="proposed"&&c.pid&&(!asOf||c.sentAt<=asOf),cRep=c.reply;
+ if(asOf&&c.repliedAt&&c.repliedAt>asOf)cRep="";
+ if(cOk&&!ids[c.pid]){partners++;if(cRep==="maybe")maybe++;else if(cRep==="no")no++;else if(cRep==="agreed")yes++;else nor++;var d2=w4DaysAgo(c.sentAt,asOf);if(minAgo===null||d2<minAgo)minAgo=d2;}
+ return {partners:partners,msgs:partners,yes:yes,maybe:maybe,no:no,noreply:nor,fuSent:fu,agreed:!!(cOk&&cRep==="agreed"),ran:S.w4.ran==="yes",clicks:r.clicks,orders:r.orders,enq:r.enq,daysSinceSend:minAgo||0};
 }
 function w4Rec(v){
  var l=v.label,w=(S.focus.where||""),etsy=/etsy/i.test(w),low=(S.base&&S.base.comfort&&S.base.comfort<=2),t,b,f,x="";
  if(l==="Promising"){t="Repeat Partnership-to-Sales with a second partner";b="You recorded a sale. A second, similar collaboration shows whether it was luck or a pattern.";f="Choose the next partner on your shortlist and use the same small option.";}
- else if(l==="Traffic but no sales"){t="Improve the offer or page, then repeat";b="People arrived but did not buy, so the weak point is probably after the click.";f="Look at your page, price and offer through a buyer's eyes, change one thing, then repeat.";x=etsy?"If it stalls again, the Etsy Sales Bottleneck experiment looks at exactly this.":"If it stalls again, the Email-to-Sale experiment tests the offer with a list you already have.";}
+ else if(l==="Traffic but no sales"){t="Improve the offer or page, then repeat";b="People arrived but did not buy, so the weak point is probably after the click.";f="Look at your page, price and offer through a buyer's eyes, change one thing, then repeat.";x=etsy?"If it stalls again, the Etsy Sales Bottleneck experiment looks at exactly this. It is coming soon and is not open yet.":"If it stalls again, the Email-to-Sale experiment tests the offer with a list you already have. It is coming soon and is not open yet.";}
  else if(l==="Interest not yet converted"){t="Repeat Partnership-to-Sales and turn the interest into a run";b="There is real interest. The next job is to turn it into a small, specific collaboration.";f="Send the proposal or run what was agreed, and record your numbers.";}
  else if(l==="Mixed or unclear"){t="Repeat once, with one visible way to count orders";b="Some of what happened is not visible to you, so there is not yet a clear read.";f="Check your store for orders that used your link or code, enter them, then decide.";}
- else if(l==="Approach needs reviewing"){t="Change one thing, then try again";b="The pattern points to reviewing who you contact and how you ask, not to giving up.";f="Choose one change (partner type, offer or ask) and try the next partner.";x="If your buyer is hard to reach this way, Find Your Buyers may be a better next experiment.";}
+ else if(l==="Approach needs reviewing"){t="Change one thing, then try again";b="The pattern points to reviewing who you contact and how you ask, not to giving up.";f="Choose one change (partner type, offer or ask) and try the next partner.";x="If your buyer is hard to reach this way, Find Your Buyers may be a better next experiment. It is coming soon and is not open yet.";}
  else{t="Make first contact, or repeat with another partner";b="There is not enough evidence yet to choose a direction, which is normal after one sprint.";f=v.rule==="R1"?"Send one message to a partner you already know.":"Message the next partner and wait for the follow-up window.";}
  if(low)x=(x?x+" ":"")+"You said contacting people felt hard. Bring this to the group session and choose the gentlest next step.";
- return {t:t,b:b,first:f,extra:x,provisional:!!(S.col&&S.col.runEnd&&S.col.runEnd>=today()&&S.w4.ran!=="no")};
+ var bs={"Promising":"You recorded at least one sale linked to this work.","Traffic but no sales":"You confirmed zero orders after people clicked through.","Interest not yet converted":"At least one partner showed real interest, with no sales recorded yet.","Mixed or unclear":"Some of what happened is not visible to you, so the evidence is incomplete.","Approach needs reviewing":"Several partners declined, or did not reply after follow-ups.","Insufficient evidence":"There is not enough recorded yet to read."};
+ var as={"Promising":"We are assuming the sale came from this partnership rather than other activity. Your numbers cannot prove that.","Traffic but no sales":"We are assuming the page and offer, rather than the partner, are the weak point. Your numbers cannot confirm that.","Interest not yet converted":"We are assuming the interest is genuine. A yes is encouraging but it is not a sale.","Mixed or unclear":"We are assuming nothing sold, or that something did. We cannot tell which until you can see the orders.","Approach needs reviewing":"We are assuming the approach, rather than timing or busy inboxes, is the cause. That is a guess.","Insufficient evidence":"We are not assuming anything yet. One sprint is a small sample."};
+ return {t:t,b:b,first:f,basis:bs[l]||"",assume:as[l]||"",extra:x,provisional:!!(S.col&&S.col.runEnd&&S.col.runEnd>=today()&&S.w4.ran!=="no")};
 }
 function week3Done(){return STEPS3.filter(function(s){return S.w3.steps[s.n];}).length===6||S.w3.dec==="ready";}
 function w4NextAction(){
@@ -1723,12 +1733,12 @@ function w4NumRow(k,money){
 }
 function w4s3(){
  var ct=w4Ctr(),h=LC("w4s3.lesson");
- h+='<div class="card"><h2>Already counted for you</h2><div class="row"><div class="stat"><b>'+ct.msgs+'</b>Messages sent</div><div class="stat"><b>'+ct.resp+'</b>Responses received</div><div class="stat"><b>'+ct.opp+'</b>Collaborations agreed</div></div><p class="mute">From your Weeks 2 and 3 logs. You do not type these again.</p></div>';
+ h+=rvPostNote()+'<div class="card"><h2>Already counted for you</h2><div class="row"><div class="stat"><b>'+ct.msgs+'</b>Messages sent</div><div class="stat"><b>'+ct.resp+'</b>Responses received</div><div class="stat"><b>'+ct.opp+'</b>Collaborations agreed</div></div><p class="mute">From your Weeks 2 and 3 logs. You do not type these again.</p></div>';
  h+='<div class="card"><h2>What you can see</h2><p class="mute">Everything here is optional. If you cannot see a number, say so: unknown is kept as unknown and is never turned into zero.</p>';
  ["clicks","orders","value","enq","hours"].forEach(function(k){h+=w4NumRow(k,k==="value");});
  h+='<label>One line about what the partner or audience said (optional)</label><textarea maxlength="600" style="min-height:70px" data-w4="say" aria-label="What the partner or audience said">'+esc(S.w4.say)+'</textarea>';
- var full=S.w4.hist.length>=W4MAXLOG;h+='<p><button type="button" class="btn ghost" data-a="w4-snap"'+(full?' disabled':'')+'>Save a dated entry</button> <span class="mute">'+S.w4.hist.length+' of '+W4MAXLOG+' saved</span></p>'+(full?'<div class="note warn">Your log is full. Nothing has been lost. Delete an older entry below to make room.</div>':'')+'</div>';
- if(S.w4.hist.length){h+='<div class="card"><h2>Your dated entries</h2><p class="mute">Each entry is a snapshot of the numbers on that day. The numbers above can always be changed. To correct an entry, delete it and save a new one.</p>'+S.w4.hist.map(function(e,i){return '<div class="crow"><span><strong>'+esc(dayLab(e.d)||e.d)+'</strong><br><span class="mute">Clicks '+esc(w4Val(e.clicks))+', orders '+esc(w4Val(e.orders))+', enquiries '+esc(w4Val(e.enq))+'</span></span><button type="button" class="chip sm" data-a="w4-hdel" data-i="'+i+'" aria-label="Delete the entry for '+esc(dayLab(e.d)||e.d)+'">Delete</button></div>';}).join("")+'</div>';}
+ var full=S.w4.hist.length>=W4MAXLOG;h+='<p><button type="button" class="btn ghost" data-a="w4-snap"'+(full?' disabled':'')+'>'+(rvPhase()==="window"?"Save a post-sprint update":"Save a dated entry")+'</button> <span class="mute">'+S.w4.hist.length+' of '+W4MAXLOG+' saved</span></p>'+(full?'<div class="note warn">Your log is full. Nothing has been lost. Delete an older entry below to make room.</div>':'')+'</div>';
+ if(S.w4.hist.length){h+='<div class="card"><h2>Your dated entries</h2><p class="mute">Each entry is a snapshot of the numbers on that day. The numbers above can always be changed. To correct an entry, delete it and save a new one.</p>'+S.w4.hist.map(function(e,i){return '<div class="crow"><span><strong>'+esc(dayLab(e.d)||e.d)+'</strong>'+rvPostTag(e.d)+'<br><span class="mute">Clicks '+esc(w4Val(e.clicks))+', orders '+esc(w4Val(e.orders))+', enquiries '+esc(w4Val(e.enq))+'</span></span><button type="button" class="chip sm" data-a="w4-hdel" data-i="'+i+'" aria-label="Delete the entry for '+esc(dayLab(e.d)||e.d)+'">Delete</button></div>';}).join("")+'</div>';}
  var chk=[["Link clicks",S.w4.res.clicks],["Orders",S.w4.res.orders],["Order value",S.w4.res.value],["Enquiries",S.w4.res.enq],["Hours",S.w4.res.hours]];
  h+='<div class="card"><h2>What is recorded, and what is not</h2>'+chk.map(function(x){var s=vstate(x[1]);return '<p style="margin:4px 0">'+(s==="unk"?(x[1].s==="unknown"?"&#9744; ":"&#9744; "):"&#10003; ")+esc(x[0])+': <strong>'+esc(x[0]==="Order value"?w4Val(x[1],true):w4Val(x[1]))+'</strong>'+(s==="unk"?' <span class="mute">('+(x[1].s==="unknown"?"unknown":"not recorded")+')</span>':'')+'</p>';}).join("")+'</div>';
  h+='<div class="card"><h2>Is there anything you could not see that you wish you could? (optional)</h2>'+w4Chips("saw",W4SAW)+'</div>';
@@ -1803,23 +1813,11 @@ function w4fix(o){
 var RVMAX=20;
 var RVDIS=[["very","Very disappointed"],["some","Somewhat disappointed"],["not","Not disappointed"],["unsure","Not sure"]];
 var RVMISS=[["next","The guidance on what to do next"],["builder","The Message Builder"],["checks","The checks on my messages"],["results","Reading my results"],["none","Not sure"]];
-var RVDEF=function(){return {start:"",done:false,at:"",snap:null,upd:[],fb:{learned:"",miss:[],dis:[]},testi:{want:"",text:"",contact:false,at:"",wd:""},consent:{anon:false,at:"",wd:""}};};
+var RVDEF=function(){return {start:"",done:false,at:"",snap:null,upd:[],fb:{learned:"",miss:[],dis:[]},testi:{want:"",text:"",contact:false,at:"",wd:"",hist:[]},consent:{anon:false,at:"",wd:"",hist:[]}};};
 
 /* ===== RV LOGIC START: pure rules, checked by dev/m5c_logic_tests.js ===== */
-function rvStart(){
- if(S.rv.start&&parseYmd(S.rv.start)!=null)return S.rv.start;
- var d=[];if(S.w2.openedAt)d.push(S.w2.openedAt);
- Object.keys(S.out||{}).forEach(function(k){if(S.out[k]&&S.out[k].sentAt)d.push(S.out[k].sentAt);});
- if(S.col&&S.col.sentAt)d.push(S.col.sentAt);
- d=d.filter(function(x){return parseYmd(x)!=null;}).sort();
- return d[0]||today();
-}
-function rvDay(){var a=parseYmd(rvStart()),b=parseYmd(today());return Math.max(1,Math.floor((b-a)/86400000)+1);}
-function rvDay30(){return addDays(rvStart(),29);}
-function rvEnd(){return addDays(rvDay30(),14);}
-function rvPhase(){var d=rvDay();if(d<30)return "during";return today()<=rvEnd()?"window":"closed";}
-function rvClock(){var p=rvPhase(),d=rvDay();if(p==="during")return "Day "+d+" of 30";if(p==="window")return "Day 30 reached. Update window open until "+dayLab(rvEnd());return "Sprint complete. Update window closed on "+dayLab(rvEnd());}
-function rvSnap(){var v=w4Verdict(w4Inputs()),c=w4Ctr(),r=S.w4.res,x={};Object.keys(r).forEach(function(k){x[k]={s:r[k].s,v:r[k].v};});return {at:today(),label:v.label,rule:v.rule,ctr:{msgs:c.msgs,resp:c.resp,opp:c.opp},res:x};}
+function rvHistWords(o){var h=(o&&o.hist)||[];if(!h.length)return "";return " History: "+h.map(function(x){return (x.a==="given"?"given on ":"withdrawn on ")+dayLab(x.d);}).join(", ")+".";}
+function rvSnapWords(s){if(!s)return "";var w=s.label+".";if(s.kind==="update")return w;if(s.prov)return "Provisional reading when saved: "+s.label+".";if(s.late)return "Saved late. "+w+" You had no dated entry on or before Day 30, so this uses the numbers recorded when you saved.";return "Day 30 position: "+w+(s.asOf?" Numbers as dated "+dayLab(s.asOf)+".":"");}
 function rvWorked(){
  var sent=w2Sent(),c=CL(),r=S.w4.res,out=[],resp=sent.filter(function(e){return e.o.reply&&e.o.reply!=="noreply";}).length,yes=sent.filter(function(e){return e.o.reply==="yes";}).length;
  var dr=sent.filter(function(e){return e.o.draft;}),avg=dr.length?dr.reduce(function(a,e){return a+w2PitchScore(e.c);},0)/dr.length:null;
@@ -1843,15 +1841,9 @@ function rvCmp(){
 /* ===== RV LOGIC END ===== */
 
 function rvChips(path,opts,max){return chipsHtml(path,opts,max);}
-function rvHead(){
- var ph=rvPhase(),h='<div class="row" style="justify-content:space-between"><strong>'+esc(rvClock())+'</strong></div>';
- h+='<p class="mute">Sprint started '+esc(dayLab(rvStart()))+'. Day 30 is '+esc(dayLab(rvDay30()))+', and your results update window runs to '+esc(dayLab(rvEnd()))+'. Until the Start my 30-day sprint feature exists, the start is counted from your first logged activity. You can correct it below.</p>';
- h+='<label for="rvs">My sprint started on</label><input id="rvs" type="date" data-rv="start" value="'+esc(S.rv.start||rvStart())+'" max="'+esc(today())+'" style="max-width:200px">';
- return h;
-}
 function reviewPage(){
  var v=w4Verdict(w4Inputs()),rec=w4Rec(v),ph=rvPhase(),prov=ph==="during"||rec.provisional,h='<a class="back" href="#/results">&larr; Results</a><h1>Your Day 30 review</h1><p class="mute">Partnership-to-Sales. A look at where you started, what you did, what the evidence suggests, and what to focus on next.</p>';
- h+='<div class="card">'+rvHead()+'</div>';
+ h+=sprintBar(true);
  h+='<div class="card"><h2>1. Where you started, and where you are now</h2><p class="mute">Your starting numbers cover the 30 days before your sprint. Your sprint numbers cover this sprint only. We show them side by side and we do not label the difference as better or worse, because the two are not like for like.</p>';
  rvCmp().forEach(function(x){h+='<div class="crow" style="display:block"><p style="margin:0"><strong>'+esc(x[0])+'</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(x[1])+'. This sprint: '+esc(x[2])+'.</p></div>';});
  h+='<p class="mute">Confidence in Week 1: '+(S.base.confidence?S.base.confidence+' out of 5':'not set')+'. Now: '+(S.w4.conf[0]==="more"?"more confident":(S.w4.conf[0]==="same"?"about the same":(S.w4.conf[0]==="less"?"less confident":"not said")))+'.</p></div>';
@@ -1864,23 +1856,24 @@ function reviewPage(){
  if(vstate(S.w4.res.orders)!=="pos")h+='<div class="note ok">No sale yet is a normal result for a first sprint. It tells you something about the idea, the partner or the timing, and you now know what to change.</div>';
  h+='</div>';
  h+='<div class="card"><h2>4. Complete your review</h2>';
- if(!S.rv.done)h+='<p class="mute">'+(ph==="during"?"You can complete your review now. It will be marked provisional, and you can update it after Day 30.":"Saving keeps a record of your sprint as it stands today.")+'</p><button type="button" class="btn" data-a="rv-done">Save my Day 30 review</button>';
- else h+='<div class="note ok"><strong>Saved on '+esc(dayLab(S.rv.at))+'.</strong> At that point: '+esc(S.rv.snap?S.rv.snap.label:"")+'.</div><p><button type="button" class="btn ghost" data-a="rv-undo">Undo, I want to change it</button></p>';
+ if(ph==="notstarted")h+='<p class="mute">Your review is available once your sprint has started.</p>';
+ else if(!S.rv.done)h+='<p class="mute">'+(ph==="during"?"You can complete your review now. It will be marked provisional, and you can save the final Day 30 version after Day 30.":(ph==="window"?"Saving now records your Day 30 position from your dated entries. It does not change your update window.":"Your update window has ended. You can still save a late review, which records your Day 30 position from your dated entries."))+'</p><button type="button" class="btn" data-a="rv-done">Save my Day 30 review</button>';
+ else h+='<div class="note ok"><strong>Saved on '+esc(dayLab(S.rv.at))+'.</strong> '+esc(rvSnapWords(S.rv.snap))+'</div>'+((S.rv.snap&&S.rv.snap.prov&&ph!=="during")?'<div class="note info">This was saved before Day 30, so it is provisional. You can save the final Day 30 version now. It will not change your update window.</div><p><button type="button" class="btn" data-a="rv-final">Save the final Day 30 version</button></p>':'')+'<p><button type="button" class="btn ghost" data-a="rv-undo">Undo, I want to change it</button></p>';
  h+='</div>';
  h+='<div class="card"><h2>5. Results that arrive after Day 30</h2><p>Your sprint ends on Day 30 and stays that way. If a result arrives later, you can add it for 14 days after Day 30, and your sprint record updates without extending the sprint.</p>';
  if(!S.rv.done)h+='<p class="mute">Save your Day 30 review first, then you can add later results here.</p>';
- else if(ph==="during")h+='<p class="mute">The update window opens on '+esc(dayLab(rvDay30()))+'.</p>';
- else if(ph==="window")h+='<p class="mute">Open until '+esc(dayLab(rvEnd()))+'. Record new numbers in <a href="#/w4/3">Week 4, step 3</a>, then update your record.</p><p><button type="button" class="btn" data-a="rv-upd"'+(S.rv.upd.length>=RVMAX?' disabled':'')+'>Update my sprint record</button></p>';
+ else if(ph==="during")h+='<p class="mute">The update window opens on Day 31 ('+esc(dayLab(rvWinStart()))+') and runs to Day 44 ('+esc(dayLab(rvEnd()))+').</p>';
+ else if(ph==="window")h+='<p class="mute">Open from Day 31 to Day 44 (until '+esc(dayLab(rvEnd()))+'). Record new numbers in <a href="#/w4/3">Week 4, step 3</a>, then add them to your record as a post-sprint update.</p>'+((S.rv.snap&&S.rv.snap.prov)?'<p class="mute">Save the final Day 30 version above first.</p>':'<p><button type="button" class="btn" data-a="rv-upd"'+(S.rv.upd.length>=RVMAX?' disabled':'')+'>Add a post-sprint update</button></p>');
  else h+='<div class="note info">The update window closed on '+esc(dayLab(rvEnd()))+'. Your sprint record is kept as it is. You can still change your own numbers, but they no longer update the sprint record.</div>';
- if(S.rv.upd.length)h+='<h3>Updates</h3>'+S.rv.upd.map(function(u){return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';}).join("");
+ if(S.rv.upd.length)h+='<h3>Post-sprint updates</h3>'+S.rv.upd.map(function(u){return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';}).join("");
  h+='</div>';
- h+='<div class="card"><h2>Tell us how it went <span class="tag">optional</span></h2><p class="mute">You can skip all of this. Your answers are read by the WEN team to improve the programme. They are not shared publicly.</p><label for="rvl">What did you learn, or find most useful?</label><textarea id="rvl" maxlength="1200" style="min-height:80px" data-rv="learned" placeholder="A sentence or two is plenty">'+esc(S.rv.fb.learned)+'</textarea><label>What would you miss most if it disappeared?</label>'+rvChips("rv.fb.miss",RVMISS)+'<label>How would you feel if the Sales Lab disappeared?</label>'+rvChips("rv.fb.dis",RVDIS,1)+'</div>';
+ h+=fbCard();
  var T=S.rv.testi;
  h+='<div class="card"><h2>Sharing your experience <span class="tag">optional, off by default</span></h2><p class="mute">Some members like to share a few words. It is your choice, and saying no changes nothing. This is separate from the feedback above.</p>'+'<div class="row"><button type="button" class="chip" aria-pressed="'+(T.want==="yes")+'" data-a="rv-testi" data-v="yes">I would like to write a few words</button><button type="button" class="chip" aria-pressed="'+(T.want==="no")+'" data-a="rv-testi" data-v="no">Not for me</button></div>';
  if(T.want==="yes")h+='<label for="rvt">Your words (stays private)</label><textarea id="rvt" maxlength="1500" style="min-height:100px" data-rv="ttext">'+esc(T.text)+'</textarea><div class="note info">What you write stays private and is not used anywhere unless you give permission below. We would always send you the exact wording to approve first.</div>';
- h+='<h3>Permission to contact you about using it</h3><p><button type="button" class="chip" aria-pressed="'+!!T.contact+'" data-a="rv-contact">'+(T.contact?"&#10003; ":"")+'You may contact me about using my words as a testimonial</button></p>'+(T.contact?'<div class="note ok">Thank you. Nothing is used unless you reply yes to the exact wording. You can tap again at any time to withdraw. Given on '+esc(dayLab(T.at))+'.</div>':'<div class="note info">Not ticked, so we will not contact you about it.'+(T.wd?" Withdrawn on "+esc(dayLab(T.wd))+".":"")+'</div>')+'</div>';
+ h+='<h3>Permission to contact you about using it</h3><p><button type="button" class="chip" aria-pressed="'+!!T.contact+'" data-a="rv-contact">'+(T.contact?"&#10003; ":"")+'You may contact me about using my words as a testimonial</button></p>'+(T.contact?'<div class="note ok">Thank you. Nothing is used unless you reply yes to the exact wording, and being contacted does not mean anything will be published. You can tap again at any time to withdraw. Given on '+esc(dayLab(T.at))+'.'+rvHistWords(T)+'</div>':'<div class="note info">Not ticked, so we will not contact you about it.'+rvHistWords(T)+'</div>')+'</div>';
  var C=S.rv.consent;
- h+='<div class="card"><h2>Helping us improve the programme <span class="tag">optional, off by default</span></h2><p class="mute">This is separate from sharing your story. You can say no and nothing changes, and you can withdraw it later.</p><p><button type="button" class="chip" aria-pressed="'+!!C.anon+'" data-a="rv-anon">'+(C.anon?"&#10003; ":"")+'You may use my results, without my name, to improve the programme</button></p>'+(C.anon?'<div class="note ok">Thank you. Given on '+esc(dayLab(C.at))+'. Tap again to withdraw.</div>':(C.wd?'<div class="note info">Withdrawn on '+esc(dayLab(C.wd))+'.</div>':''))+'<div class="note warn">Draft wording. It will be checked against UK data protection requirements (what we collect, why, how long we keep it and how you withdraw) before any real use.</div></div>';
+ h+='<div class="card"><h2>Helping us improve the programme <span class="tag">optional, off by default</span></h2><p class="mute">This is separate from sharing your story. You can say no and nothing changes, and you can withdraw it later.</p><p><button type="button" class="chip" aria-pressed="'+!!C.anon+'" data-a="rv-anon">'+(C.anon?"&#10003; ":"")+'You may use my results, without my name, to improve the programme</button></p>'+(C.anon?'<div class="note ok">Thank you. Given on '+esc(dayLab(C.at))+'. Tap again to withdraw.'+rvHistWords(C)+'</div>':(C.wd?'<div class="note info">'+rvHistWords(C)+'</div>':''))+'<div class="note warn">Draft wording. It will be checked against UK data protection requirements (what we collect, why, how long we keep it and how you withdraw) before any real use.</div></div>';
  h+='<div class="card"><h2>Your record</h2><p class="mute">You can download your data or delete it from <a href="#/profile">Profile</a>.</p></div>'+helpCard();
  return h;
 }
@@ -1888,7 +1881,7 @@ function resultsPage(){
  var b=S.base,sent=w2Sent(),ct=w4Ctr(),r=S.w4.res,c=CL(),started=sent.length||week1Done();
  var h='<h1>Results</h1><p class="mute">Your numbers, what they show, and what you learned. Counts, not percentages, while samples are small.</p>';
  h+='<div class="card"><h2>Where you started</h2><p class="mute">The last 30 days before your sprint, from Week 1, step 1. "I don\'t know" stays unknown. It is never turned into zero.</p><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.orders))+'</b>Orders</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.revenue,true))+'</b>Revenue</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.partner))+'</b>Sales from partners</div></div></div>';
- h+='<div class="card"><h2>Your sprint so far</h2><p class="mute">'+esc(started?rvClock():"Your sprint clock starts when you first log some activity.")+'</p>';
+ h+='<div class="card"><h2>Your sprint so far</h2><p class="mute">'+esc(rvClock())+'</p>';
  if(started){h+=w4Counts();if(c.status==="proposed")h+='<p style="margin-top:10px">Collaboration: '+esc(W3PATHN[w3Path()])+'.</p>';
   var any=["clicks","orders","value","enq","hours"].some(function(k){return !!r[k].s;});
   if(any)h+='<div class="row" style="margin-top:6px"><div class="stat"><b style="font-size:18px">'+esc(w4Val(r.clicks))+'</b>Link clicks</div><div class="stat"><b style="font-size:18px">'+esc(w4Val(r.orders))+'</b>Orders</div><div class="stat"><b style="font-size:18px">'+esc(w4Val(r.value,true))+'</b>Order value</div><div class="stat"><b style="font-size:18px">'+esc(w4Val(r.enq))+'</b>Enquiries</div></div><p class="mute">Each number keeps its own state: seen, unknown or confirmed zero.</p>';
@@ -1903,34 +1896,332 @@ function resultsPage(){
  if(S.w4.saw.length&&S.w4.saw.indexOf("none")<0)learn.push("What you could not see: "+S.w4.saw.join(", "));
  h+='<div class="card"><h2>What you have learned</h2>'+(learn.length?learn.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join(""):'<p class="mute">Your own notes and choices from Weeks 2 to 4 appear here as you go.</p>')+(started?rvWorked().slice(0,3).map(function(x){return '<p style="margin:4px 0">&#10003; '+esc(x)+'</p>';}).join(""):'')+'</div>';
  h+='<div class="card"><h2>Day 30 review</h2>'+(S.rv.done?'<p>Saved on '+esc(dayLab(S.rv.at))+': '+esc(S.rv.snap?S.rv.snap.label:"")+'.</p>':'<p class="mute">'+(started?"Look back at your sprint, see what the evidence suggests, and choose what to focus on next. You can open it at any time.":"Available once your sprint has started.")+'</p>')+'<p><a class="btn'+(S.rv.done?' ghost':'')+'" href="#/review">'+(S.rv.done?"Open my review":"Open my Day 30 review")+'</a></p></div>';
- h+='<div class="card"><h2>Past sprints</h2><p class="mute">'+(S.rv.done?"Partnership-to-Sales, started "+esc(dayLab(rvStart()))+": "+esc(S.rv.snap?S.rv.snap.label:"")+".":"Your first sprint will appear here once you save your Day 30 review.")+'</p></div>';
+ h+='<div class="card"><h2>Past sprints</h2>'+rvPastHtml()+'</div>';
  return h;
 }
+function rvHist(o,ev){var d=today();if(ev==="given")o.at=d;else o.wd=d;o.hist=o.hist||[];if(o.hist.length<50)o.hist.push({a:ev,d:d});}
 function rvAction(a,d,t){
  var R=S.rv;
- if(a==="rv-done"){R.done=true;R.at=today();R.snap=rvSnap();R.upd=[];save();}
- else if(a==="rv-undo"){R.done=false;R.at="";R.snap=null;R.upd=[];save();}
- else if(a==="rv-upd"){if(!rvCanUpdate()||R.upd.length>=RVMAX&&R.upd[R.upd.length-1].at!==today())return;var u=rvSnap();if(R.upd.length&&R.upd[R.upd.length-1].at===u.at)R.upd[R.upd.length-1]=u;else R.upd.push(u);save();}
- else if(a==="rv-testi"){R.testi.want=R.testi.want===d.v?"":d.v;if(R.testi.want!=="yes"&&R.testi.want!==""){}save();}
- else if(a==="rv-contact"){R.testi.contact=!R.testi.contact;if(R.testi.contact){R.testi.at=today();R.testi.wd="";}else{R.testi.at="";R.testi.wd=today();}save();}
- else if(a==="rv-anon"){R.consent.anon=!R.consent.anon;if(R.consent.anon){R.consent.at=today();R.consent.wd="";}else{R.consent.at="";R.consent.wd=today();}save();}
+ if(a==="rv-done"||a==="rv-final"){
+  if(rvPhase()==="notstarted")return;
+  if(a==="rv-done"&&R.done)return;
+  if(a==="rv-final"&&!(R.done&&R.snap&&R.snap.prov&&rvPhase()!=="during"))return;
+  R.snap=rvSnap("day30");R.done=true;R.at=today();save();
+ }
+ else if(a==="rv-undo"){R.done=false;R.at="";R.snap=null;save();}
+ else if(a==="rv-upd"){if(!rvCanUpdate()||(R.snap&&R.snap.prov))return;var u=rvSnap("update");if(R.upd.length&&R.upd[R.upd.length-1].at===u.at)R.upd[R.upd.length-1]=u;else if(R.upd.length>=RVMAX)return;else R.upd.push(u);save();}
+ else if(a==="rv-testi"){R.testi.want=R.testi.want===d.v?"":d.v;save();}
+ else if(a==="rv-contact"){R.testi.contact=!R.testi.contact;rvHist(R.testi,R.testi.contact?"given":"withdrawn");save();}
+ else if(a==="rv-anon"){R.consent.anon=!R.consent.anon;rvHist(R.consent,R.consent.anon?"given":"withdrawn");save();}
  else return;
  render();
 }
-function rvInput(t){var k=t.dataset.rv,R=S.rv;if(k==="learned"){R.fb.learned=t.value;save();}else if(k==="ttext"){R.testi.text=t.value;save();}}
+function rvInput(t){var k=t.dataset.rv,R=S.rv;if(k==="learned"){fbDraft().learned=t.value.slice(0,1200);}else if(k==="ttext"){R.testi.text=t.value;save();}}
 function rvDateChange(t){var v=String(t.value||"");if(v===""||(parseYmd(v)!=null&&v<=today())){S.rv.start=v;save();}render();}
+function rvCleanHist(h){var o=[];if(Array.isArray(h))h.slice(0,50).forEach(function(x){if(x&&typeof x==="object"&&(x.a==="given"||x.a==="withdrawn")&&typeof x.d==="string"&&parseYmd(x.d)!=null)o.push({a:x.a,d:x.d});});return o;}
 function rvfix(o){
  var b=RVDEF(),w=(o.rv&&typeof o.rv==="object"&&!Array.isArray(o.rv))?o.rv:{},r=b;
  var ok=function(x,y){return x!==undefined&&x!==null&&typeof x===typeof y&&Array.isArray(x)===Array.isArray(y);};
  if(typeof w.start==="string"&&(w.start===""||parseYmd(w.start)!=null))r.start=w.start;
  if(typeof w.done==="boolean")r.done=w.done;if(typeof w.at==="string"&&(w.at===""||parseYmd(w.at)!=null))r.at=w.at;
- var cleanSnap=function(s){if(!s||typeof s!=="object"||Array.isArray(s)||typeof s.label!=="string"||typeof s.at!=="string"||typeof s.rule!=="string")return null;var x={at:s.at.slice(0,10),label:s.label.slice(0,40),rule:s.rule.slice(0,4),ctr:{msgs:0,resp:0,opp:0},res:{}};if(s.ctr&&typeof s.ctr==="object")["msgs","resp","opp"].forEach(function(k){x.ctr[k]=(typeof s.ctr[k]==="number"&&isFinite(s.ctr[k]))?s.ctr[k]:0;});["clicks","orders","value","enq","hours"].forEach(function(k){var y=s.res&&s.res[k];x.res[k]=(y&&typeof y.s==="string"&&W4VS[y.s]&&typeof y.v==="string")?{s:y.s,v:w4Clean(k,y.v)}:{s:"",v:""};});return x;};
+ var cleanSnap=function(s){if(!s||typeof s!=="object"||Array.isArray(s)||typeof s.label!=="string"||typeof s.at!=="string"||typeof s.rule!=="string")return null;var x={at:s.at.slice(0,10),label:s.label.slice(0,40),rule:s.rule.slice(0,4),ctr:{msgs:0,resp:0,opp:0},res:{},kind:(s.kind==="update"?"update":"day30"),asOf:(typeof s.asOf==="string"&&parseYmd(s.asOf)!=null?s.asOf:""),late:s.late===true,prov:s.prov===true};if(s.ctr&&typeof s.ctr==="object")["msgs","resp","opp"].forEach(function(k){x.ctr[k]=(typeof s.ctr[k]==="number"&&isFinite(s.ctr[k]))?s.ctr[k]:0;});["clicks","orders","value","enq","hours"].forEach(function(k){var y=s.res&&s.res[k];x.res[k]=(y&&typeof y.s==="string"&&W4VS[y.s]&&typeof y.v==="string")?{s:y.s,v:w4Clean(k,y.v)}:{s:"",v:""};});return x;};
  r.snap=cleanSnap(w.snap);if(!r.snap&&r.done){r.done=false;r.at="";}
  r.upd=[];if(Array.isArray(w.upd))w.upd.slice(-RVMAX).forEach(function(u){var c=cleanSnap(u);if(c)r.upd.push(c);});
  if(w.fb&&typeof w.fb==="object"&&!Array.isArray(w.fb)){if(typeof w.fb.learned==="string")r.fb.learned=w.fb.learned.slice(0,1200);if(Array.isArray(w.fb.miss))r.fb.miss=w.fb.miss.filter(function(x){return typeof x==="string";}).slice(0,8);if(Array.isArray(w.fb.dis))r.fb.dis=w.fb.dis.filter(function(x){return typeof x==="string";}).slice(0,1);}
- if(w.testi&&typeof w.testi==="object"&&!Array.isArray(w.testi)){var T=w.testi;if(T.want==="yes"||T.want==="no"||T.want==="")r.testi.want=T.want;if(typeof T.text==="string")r.testi.text=T.text.slice(0,1500);if(typeof T.contact==="boolean")r.testi.contact=T.contact;["at","wd"].forEach(function(k){if(typeof T[k]==="string"&&(T[k]===""||parseYmd(T[k])!=null))r.testi[k]=T[k];});}
- if(w.consent&&typeof w.consent==="object"&&!Array.isArray(w.consent)){var C=w.consent;if(typeof C.anon==="boolean")r.consent.anon=C.anon;["at","wd"].forEach(function(k){if(typeof C[k]==="string"&&(C[k]===""||parseYmd(C[k])!=null))r.consent[k]=C[k];});}
+ if(w.testi&&typeof w.testi==="object"&&!Array.isArray(w.testi)){var T=w.testi;if(T.want==="yes"||T.want==="no"||T.want==="")r.testi.want=T.want;if(typeof T.text==="string")r.testi.text=T.text.slice(0,1500);if(typeof T.contact==="boolean")r.testi.contact=T.contact;r.testi.hist=rvCleanHist(T.hist);["at","wd"].forEach(function(k){if(typeof T[k]==="string"&&(T[k]===""||parseYmd(T[k])!=null))r.testi[k]=T[k];});}
+ if(w.consent&&typeof w.consent==="object"&&!Array.isArray(w.consent)){var C=w.consent;if(typeof C.anon==="boolean")r.consent.anon=C.anon;r.consent.hist=rvCleanHist(C.hist);["at","wd"].forEach(function(k){if(typeof C[k]==="string"&&(C[k]===""||parseYmd(C[k])!=null))r.consent[k]=C[k];});}
  o.rv=r;return o;
+}
+
+/* ---------- M5d: explicit sprint start (server record), one clock, Day 31 to 44 window, sales check and experiment chooser ---------- */
+var SPR={loaded:false,err:"",serverDay:"",serverNow:"",sprints:[],feedback:{}};
+var CHKQ=[
+ ["aud","Do you have an audience today?",[["none","Not really"],["small","A small one"],["some","A good size"]]],
+ ["list","Do you have an email list?",[["none","No"],["small","A small one"],["yes","Yes"]]],
+ ["reach","How do you feel about contacting people directly?",[["low","Nervous"],["ok","Okay"],["high","Comfortable"]]],
+ ["cam","How do you feel about being on camera or live?",[["no","Not for me"],["some","Maybe"],["yes","Happy to"]]],
+ ["bot","What feels like the biggest bottleneck?",[["findit","Few people find my product"],["nosales","People visit but do not buy"],["noaud","I have no audience yet"],["unsure","I am not sure"]]]
+];
+var CHKALLOWED={aud:{none:1,small:1,some:1},list:{none:1,small:1,yes:1},reach:{low:1,ok:1,high:1},cam:{no:1,some:1,yes:1},bot:{findit:1,nosales:1,noaud:1,unsure:1}};
+var CHKDEF=function(){return {done:false,at:"",q:{aud:"",list:"",reach:"",cam:"",bot:""}};};
+var EXPOPEN={part:true};
+var SPRMSG={sprint_active:"You already have a sprint running. You can start your next one once it has finished.",not_entitled:"Your membership does not currently allow starting a sprint.",experiment_not_available:"That experiment is not open yet.",bad_day:"That date is not allowed.",not_signed_in:"Please sign in again.",undo_window_over:"The 24 hour undo period has passed.",work_logged:"Undo is not available once you have logged messages, a proposal or results.",correction_window_over:"The 3 day correction period has passed. Please contact support if the date is wrong.",already_corrected:"You have already used your one correction. Please contact support.",bad_reason:"Please choose a reason.",repeat_sprint:"Undo is not available for a repeat sprint. Please contact support if it was a mistake."};
+
+/* ===== SPRINT CLOCK LOGIC START: pure rules, checked by dev/m5d_logic_tests.js ===== */
+function rvCur(){var a=SPR.sprints||[];return a.length?a[a.length-1]:null;}
+function rvStart(){var c=rvCur();return c?c.start_day:"";}
+function rvDay(){var c=rvCur();if(!c)return 0;var a=parseYmd(c.start_day),b=parseYmd(today());if(a==null||b==null)return 0;return Math.max(1,Math.floor((b-a)/86400000)+1);}
+function rvDay30(){return rvCur()?addDays(rvStart(),29):"";}
+function rvWinStart(){return rvCur()?addDays(rvStart(),30):"";}
+function rvEnd(){return rvCur()?addDays(rvStart(),43):"";}
+function rvPhase(){if(!rvCur())return "notstarted";var t=today();if(t<=rvDay30())return "during";if(t<=rvEnd())return "window";return "closed";}
+function rvClock(){var p=rvPhase();if(p==="notstarted")return "Sprint not started. Your 30 days begin only when you choose.";if(p==="during")return "Day "+rvDay()+" of 30";if(p==="window")return "Sprint complete. Results update window open until "+dayLab(rvEnd())+" (Day 44)";return "Sprint complete. Update window closed on "+dayLab(rvEnd());}
+function rvDay30Res(){var d30=rvDay30(),best=null;S.w4.hist.forEach(function(e){if(e.d<=d30&&(!best||e.d>=best.d))best=e;});return best;}
+function rvSnap(kind){
+ var ph=rvPhase(),asOf=null,res=S.w4.res,late=false,prov=false,eff="";
+ if(kind==="day30"){
+  if(ph==="during")prov=true;
+  else{asOf=rvDay30();var b=rvDay30Res();if(b){res=b;eff=b.d;}else late=true;}
+ }
+ var inp=w4Inputs(asOf,res),v=w4Verdict(inp),x={};
+ ["clicks","orders","value","enq","hours"].forEach(function(k){x[k]={s:res[k]?res[k].s:"",v:res[k]?res[k].v:""};});
+ return {at:today(),label:v.label,rule:v.rule,ctr:{msgs:inp.msgs,resp:inp.yes+inp.maybe+inp.no,opp:inp.agreed?1:0},res:x,kind:kind==="day30"?"day30":"update",asOf:eff,late:late,prov:prov};
+}
+function rvPostTag(d){return (rvCur()&&d>rvDay30())?' <span class="tag">post-sprint update</span>':'';}
+function rvPostNote(){
+ var p=rvPhase();
+ if(p==="window")return '<div class="note info"><strong>Your sprint ended on Day 30 ('+esc(dayLab(rvDay30()))+').</strong> Numbers you save now are post-sprint updates. They are kept separate from your Day 30 position, and you can add them until '+esc(dayLab(rvEnd()))+'.</div>';
+ if(p==="closed")return '<div class="note info">Your update window closed on '+esc(dayLab(rvEnd()))+'. You can still keep your own numbers here, but they no longer update your sprint record.</div>';
+ return "";
+}
+function sprHasWork(){
+ var any=Object.keys(S.out||{}).some(function(k){return S.out[k]&&S.out[k].status==="sent";});
+ if(any||(S.col&&S.col.status==="proposed"))return true;
+ return Object.keys(S.w4.res).some(function(k){return !!S.w4.res[k].s;});
+}
+function sprHours(){var c=rvCur();if(!c)return 9999;var t=Date.parse(c.started_at);if(isNaN(t))return 9999;return (nowMs()-t)/3600000;}
+function sprCanUndo(){var c=rvCur();return !!c&&rvPhase()==="during"&&(SPR.sprints||[]).length===1&&sprHours()<=24&&!sprHasWork();}
+function sprCanCorrect(){var c=rvCur();return !!c&&rvPhase()==="during"&&sprHours()<=72&&(!c.corrections||c.corrections.length===0);}
+function chkRec(){
+ var q=S.chk.q,w=(S.focus.where||""),etsy=/etsy/i.test(w),sc={part:1,etsy:0,email:0,show:0,find:0,live:0},ev={part:[],etsy:[],email:[],show:[],find:[],live:[]};
+ var add=function(k,n,t){sc[k]+=n;ev[k].push(t);};
+ if(etsy)add("etsy",3,"You sell on Etsy.");
+ if(etsy&&q.bot==="nosales")add("etsy",3,"You said people visit but do not buy.");
+ if(etsy&&q.bot==="findit")add("etsy",2,"You said few people find your product.");
+ if(q.list==="yes")add("email",3,"You have an email list.");
+ if(q.list==="small")add("email",1,"You have a small email list.");
+ if(q.bot==="nosales")add("email",1,"You said people visit but do not buy.");
+ if(q.cam==="yes")add("show",2,"You are happy to be on camera.");
+ if(q.cam==="some")add("show",1,"You might be willing to be on camera.");
+ if(q.aud==="none"&&(q.bot==="noaud"||q.bot==="findit"))add("find",3,"You have no audience and said people are not finding you.");
+ if(q.bot==="noaud")add("find",2,"You said you have no audience yet.");
+ if(q.cam==="yes"&&q.aud!=="none"&&q.aud!=="")add("live",3,"You are happy to be on camera and have some audience.");
+ if(q.reach==="ok"||q.reach==="high")add("part",3,"You are okay contacting people directly.");
+ if(q.aud==="none")add("part",2,"You have no audience of your own, and partners already have one.");
+ if(q.reach==="low")ev.part.push("You said contacting people feels nervous. The experiment starts with one warm contact.");
+ var AS={part:"We are assuming you can think of a few people who reach your buyer.",etsy:"We are assuming your listing is live and you can see its numbers.",email:"We are assuming the people on your list agreed to hear from you.",show:"We are assuming your product is easy to show in use.",find:"We are assuming your buyers gather in places you can join.",live:"We are assuming you have LIVE access on TikTok or YouTube."};
+ var list=EXPX.map(function(x){return {key:x[0],name:x[1],score:sc[x[0]],evidence:ev[x[0]],assume:AS[x[0]],open:!!EXPOPEN[x[0]]};});
+ list.sort(function(a,b){return b.score-a.score||(a.key==="part"?-1:(b.key==="part"?1:0));});
+ return {top:list[0],list:list};
+}
+/* ===== SPRINT CLOCK LOGIC END ===== */
+
+function sprFmtDay(d){return d?dayLab(d):"";}
+function sprintBar(full){
+ if(!SPR.loaded)return '<div class="note warn" role="status">We could not check your sprint start just now, so the clock is not shown. Please refresh the page. Nothing has been changed.</div>';
+ var ph=rvPhase(),cur=rvCur(),pn=pastOpenNote(),err=UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'';
+ if(!full)return '<div class="note info"><strong>'+esc(rvClock())+'</strong>'+(ph==="notstarted"?' <a href="#/sprint">My Sprint</a>':'')+'</div>'+pn;
+ var h=pn+'<div class="card"><h2>Your 30-day sprint</h2><p><strong>'+esc(rvClock())+'</strong></p>'+err;
+ if(ph==="notstarted"){
+  h+='<p class="mute">Browsing, the sales check, choosing an experiment and preparing do not start the clock. It starts only when you press the button below.</p>'+sprConfirm("Start my 30-day sprint");
+ }else{
+  h+='<p class="mute">Day 1 was '+esc(sprFmtDay(rvStart()))+'. Day 30 is '+esc(sprFmtDay(rvDay30()))+'. The results update window runs from Day 31 to Day 44 ('+esc(sprFmtDay(rvEnd()))+').</p>';
+  if(cur.corrections&&cur.corrections.length)h+='<p class="mute">Your start date was corrected once, from '+esc(sprFmtDay(cur.corrections[0].from))+'. The original is kept on record.</p>';
+  if(sprCanUndo())h+='<p><button type="button" class="chip" data-a="spr-undo">I started by mistake, undo</button> <span class="mute">Available for 24 hours, only before you log any messages or results.</span></p>';
+  if(sprCanCorrect()){
+   h+='<p><button type="button" class="chip" data-a="spr-corr-open" aria-expanded="'+!!(UI.sprCorr&&UI.sprCorr.open)+'">I actually began earlier</button></p>';
+   if(UI.sprCorr&&UI.sprCorr.open)h+='<div class="note info"><label for="spc">The day you really began</label><input id="spc" type="date" data-spr="cday" value="'+esc(UI.sprCorr.day||"")+'" max="'+esc(rvStart())+'" min="'+esc(addDays(rvStart(),-7))+'" style="max-width:200px"><label for="spr">Reason</label><select id="spr" data-spr="creason"><option value="started_earlier"'+(UI.sprCorr.reason==="started_earlier"?" selected":"")+'>I began earlier</option><option value="misclick"'+(UI.sprCorr.reason==="misclick"?" selected":"")+'>I pressed it too late</option><option value="other"'+(UI.sprCorr.reason==="other"?" selected":"")+'>Something else</option></select><p class="mute">You can do this once, within 3 days, and not more than 7 days earlier. Your original date is kept on record. After that, please contact support.</p><p><button type="button" class="btn" data-a="spr-corr-go">Correct my start date</button></p></div>';
+  }
+ }
+ return h+'</div>';
+}
+function sprConfirm(label){
+ var again=rvPhase()!=="notstarted";
+ if(UI.sprBusy)return '<p class="mute">Starting...</p>';
+ if(!UI.sprConf)return '<p><button type="button" class="btn" data-a="spr-ask">'+esc(label)+'</button></p>';
+ return '<div class="note ok" role="alertdialog" aria-label="Confirm starting your sprint"><p><strong>Begin Day 1 today ('+esc(dayLab(today()))+')?</strong></p><p>Day 30 would be '+esc(dayLab(addDays(today(),29)))+'. You can finish early, but you cannot pause the clock. After Day 30 you will have 14 more days to add late results, which does not extend your sprint.'+(again?' Your current sprint will be saved to Past sprints, and your outreach and results will start fresh.':'')+' If you press this by mistake, you can undo it within 24 hours before logging any messages or results.</p><p class="row"><button type="button" class="btn" data-a="spr-go">Yes, start Day 1 today</button><button type="button" class="btn ghost" data-a="spr-cancel">Not yet</button></p></div>';
+}
+async function sprLoad(){
+ var r=await sb.rpc("sprint_status");
+ if(r.error){SPR.err=r.error.message||"error";SPR.loaded=false;return false;}
+ var fb={};var f=await sb.rpc("get_sprint_feedback");if(!f.error&&Array.isArray(f.data))f.data.forEach(function(x){fb[x.sprint_id]=x;});
+ SPR={loaded:true,err:"",serverDay:r.data.server_day,serverNow:r.data.server_now,sprints:r.data.sprints||[],feedback:fb};
+ await fbMigrate();return true;
+}
+function sprMsg(m){m=String(m||"");for(var k in SPRMSG){if(m.indexOf(k)>-1)return SPRMSG[k];}return "Something went wrong, and nothing was changed. Please try again.";}
+function sprArchive(prev){
+ var snap=S.rv.snap,auto=false;
+ if(!snap){snap=rvSnap("day30");auto=true;}
+ var inp=w4Inputs(),c=w4Ctr(),b0=S.base||{};
+ var e={exp:"partnership",sid:prev.id,start:prev.start_day,archivedAt:today(),label:snap.label,rule:snap.rule,review:!!S.rv.done,auto:auto,ctr:{msgs:c.msgs,resp:c.resp,opp:c.opp},res:clone(S.w4.res),hist:S.w4.hist.slice(0,20),snap:snap,upd:S.rv.upd.slice(0,20),
+  inp:{partners:inp.partners,msgs:inp.msgs,yes:inp.yes,maybe:inp.maybe,no:inp.no,noreply:inp.noreply,fuSent:inp.fuSent,agreed:inp.agreed,ran:inp.ran,daysSinceSend:inp.daysSinceSend},
+  partners:(S.cands||[]).slice(0,12).map(function(x){return String(x.name||"").slice(0,60);}),
+  base:{orders:clone(b0.orders||{s:"",v:""}),revenue:clone(b0.revenue||{s:"",v:""}),partner:clone(b0.partner||{s:"",v:""})},
+  steps:{w1:STEPS.filter(function(s){return S.steps[s.n];}).length,w2:STEPS2.filter(function(s){return S.w2.steps[s.n];}).length,w3:STEPS3.filter(function(s){return S.w3.steps[s.n];}).length,w4:STEPS4.filter(function(s){return S.w4.steps[s.n];}).length}};
+ S.past=(S.past||[]);if(S.past.length>=10)S.past.shift();S.past.push(e);
+ /* the new experiment starts with its own answers and completion status. Only the business profile, offer and buyer carry forward. */
+ var b=blank(),keep={testi:S.rv.testi,consent:S.rv.consent};
+ S.steps={};S.decision="";S.cands=[];S.sketch={};S.nextId=1;S.base=b.base;S.refl="";S.types=b.types;S.cdraft=b.cdraft;S.cmsg="";S.fitIndex=0;S.newType="";
+ S.w2=b.w2;S.out={};S.w3=b.w3;S.col=clone(W3DEF);S.w4=W4DEF();S.rv=RVDEF();S.rv.testi=keep.testi;S.rv.consent=keep.consent;S.week=1;
+}
+async function sprGo(){
+ if(UI.sprBusy)return;UI.sprBusy=true;UI.sprErr="";render();
+ var prev=rvCur(),ph=rvPhase();
+ var r=await sb.rpc("start_sprint",{p_experiment:"partnership",p_day:today()});
+ UI.sprBusy=false;UI.sprConf=false;
+ if(r.error){UI.sprErr=sprMsg(r.error.message);render();return;}
+ if(prev&&(ph==="window"||ph==="closed"))sprArchive(prev);
+ await sprLoad();
+ save();toast("Day 1 begins today. Good luck.");render();
+}
+async function sprUndo(){
+ var c=rvCur();if(!c||!sprCanUndo())return;
+ var r=await sb.rpc("undo_sprint_start",{p_id:c.id});
+ if(r.error){UI.sprErr=sprMsg(r.error.message);render();return;}
+ UI.sprErr="";await sprLoad();toast("Your sprint start was undone. The clock has not started.");render();
+}
+async function sprCorrect(){
+ var c=rvCur(),x=UI.sprCorr||{};if(!c||!sprCanCorrect())return;
+ if(!x.day||parseYmd(x.day)==null){UI.sprErr="Please choose the day you really began.";render();return;}
+ var r=await sb.rpc("correct_sprint_start",{p_id:c.id,p_new_day:x.day,p_reason:x.reason||"started_earlier"});
+ if(r.error){UI.sprErr=sprMsg(r.error.message);render();return;}
+ UI.sprErr="";UI.sprCorr=null;await sprLoad();toast("Your start date was corrected. The original is kept on record.");render();
+}
+function sprAction(a,d,t){
+ if(a==="spr-ask"){UI.sprConf=true;UI.sprErr="";render();}
+ else if(a==="spr-cancel"){UI.sprConf=false;render();}
+ else if(a==="spr-go"){sprGo();}
+ else if(a==="spr-undo"){sprUndo();}
+ else if(a==="spr-corr-open"){UI.sprCorr=(UI.sprCorr&&UI.sprCorr.open)?null:{open:true,day:"",reason:"started_earlier"};render();}
+ else if(a==="spr-corr-go"){sprCorrect();}
+ else if(a==="chk-set"){if(CHKALLOWED[d.q]&&CHKALLOWED[d.q][d.v]){S.chk.q[d.q]=S.chk.q[d.q]===d.v?"":d.v;S.chk.done=false;save();render();}}
+ else if(a==="chk-run"){S.chk.done=true;S.chk.at=today();save();render();}
+ else if(a==="fb-miss"){var dm=fbDraft(),ix=dm.miss.indexOf(d.v);if(ix>-1)dm.miss.splice(ix,1);else if(dm.miss.length<8)dm.miss.push(d.v);render();}
+ else if(a==="fb-dis"){var dd=fbDraft();dd.dis=dd.dis===d.v?"":d.v;render();}
+ else if(a==="fb-save"){fbSave();}
+ else if(a==="fb-del"){fbDelete();}
+ else if(a==="chk-redo"){S.chk.done=false;save();render();}
+}
+function sprInputChange(t){var k=t.dataset.spr;UI.sprCorr=UI.sprCorr||{open:true,day:"",reason:"started_earlier"};if(k==="cday")UI.sprCorr.day=String(t.value||"");else if(k==="creason")UI.sprCorr.reason=String(t.value||"started_earlier");}
+function rvRemindNote(){
+ if(rvPhase()==="notstarted")return '<p class="mute">Sprint reminders begin when you start your sprint.</p>';
+ var s=rvStart();return '<p class="mute">Your sprint reminders follow your start date: around Day 7 ('+esc(dayLab(addDays(s,6)))+'), Day 14, Day 21, Day 28, Day 30 ('+esc(dayLab(rvDay30()))+') and the end of your update window ('+esc(dayLab(rvEnd()))+'). Monthly group coaching stays on its shared schedule.</p>';
+}
+function chkCard(){
+ var h='<div class="card"><h2>A short sales check</h2><p class="mute">Five quick questions. Your answers stay private and only shape a suggestion. You can choose any experiment, and you do not have to follow it.</p>';
+ CHKQ.forEach(function(q){h+='<div class="q"><strong>'+esc(q[1])+'</strong><div class="row">'+q[2].map(function(o){return '<button type="button" class="chip sm" aria-pressed="'+(S.chk.q[q[0]]===o[0])+'" data-a="chk-set" data-q="'+q[0]+'" data-v="'+o[0]+'">'+esc(o[1])+'</button>';}).join("")+'</div></div>';});
+ h+=S.chk.done?'<p><button type="button" class="btn ghost" data-a="chk-redo">Change my answers</button></p>':'<p><button type="button" class="btn" data-a="chk-run">Show my suggestion</button></p>';
+ h+='</div>';
+ if(S.chk.done){
+  var r=chkRec(),t=r.top,alt=r.list.filter(function(x){return x.key!==t.key;}).slice(0,2);
+  h+='<div class="card" style="border-color:var(--acc)"><h2>Our suggestion: '+esc(t.name)+'</h2>';
+  h+='<h3>What you told us</h3>'+(t.evidence.length?t.evidence.map(function(x){return '<p style="margin:4px 0">&#10003; '+esc(x)+'</p>';}).join(""):'<p class="mute">You gave us little to go on, so this is our default starting point.</p>');
+  h+='<h3>What we are assuming</h3><p style="margin:4px 0">'+esc(t.assume)+'</p>';
+  h+=t.open?'<p><strong>This experiment is open now.</strong></p>':'<div class="note info"><strong>Coming soon, and not open yet.</strong> You cannot start it today. Partnership-to-Sales is the one experiment you can start now.</div>';
+  h+='<h3>Other options</h3>'+alt.map(function(x){return '<p style="margin:4px 0"><strong>'+esc(x.name)+'</strong>'+(x.evidence.length?': '+esc(x.evidence[0]):'')+' <span class="mute">('+(x.open?"open now":"coming soon, not open yet")+')</span></p>';}).join("");
+  h+='<p class="mute">This is advice, not a rule. You are free to choose a different experiment.</p></div>';
+ }
+ return h;
+}
+function experimentsPage(){
+ var ph=rvPhase(),h='<h1>Experiments</h1><p class="mute">Six experiments, four weeks each, about 3 to 5 hours a week. You run one sprint at a time, and you choose when the next one starts. Nothing starts automatically.</p>'+sprintBar(false);
+ h+='<div class="note warn"><strong>Temporary test limitation.</strong> In this test build only Partnership-to-Sales can be started. The other five will become available as they are built. You will always be able to choose any experiment that is open.</div>';
+ if(UI.sprErr&&ph==="notstarted")h+='<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>';
+ h+=chkCard()+'<div class="xgrid">';
+ EXPX.forEach(function(x,i){
+  var cur=x[0]==="part";
+  h+='<div class="xp"><div class="xh2"><span class="xi'+((x[0]==="show"||x[0]==="live")?' dk':'')+'" style="background:'+x[5]+'">'+x[6]+'</span><div><div class="xk">Experiment '+(i+1)+'</div><div class="xt">'+esc(x[1])+'</div></div></div><p class="xs">'+esc(x[2])+'</p><div class="xo"><b>Your outcome</b><span>'+esc(x[3])+'</span></div><div class="xm">4 weeks &middot; 3 to 5 hours a week &middot; Best for: '+esc(x[4])+'</div>';
+  if(!cur)h+='<div class="xm"><strong>Coming soon.</strong> Not open yet, so it cannot be started.</div>';
+  else if(!SPR.loaded)h+='<div class="xm">We could not check your sprint just now. Please refresh the page.</div>';
+  else if(ph==="during")h+='<div class="xm"><strong>Your current experiment.</strong> '+esc(rvClock())+'. Find it under <a href="#/sprint">My Sprint</a>. You can start your next sprint after Day 30.</div>';
+  else h+=(ph==="notstarted"?'<div class="xm">Ready when you are. Your 30 days begin only when you press the button.</div>':'<div class="xm">Your last sprint is complete. You can choose when to start another, and it will not start by itself.</div>')+sprConfirm(ph==="notstarted"?"Start my 30-day sprint":"Start another sprint");
+  h+='</div>';
+ });
+ return h+'</div>';
+}
+function d5fix(o){
+ var okd=function(x){return (typeof x==="string"&&(x===""||parseYmd(x)!=null))?x:"";},st=function(x,n){return typeof x==="string"?x.slice(0,n):"";},nm=function(x){return (typeof x==="number"&&isFinite(x)&&x>=0&&x<100000)?Math.floor(x):0;};
+ var past=[];if(Array.isArray(o.past))o.past.slice(-10).forEach(function(x){
+  if(!x||typeof x!=="object"||Array.isArray(x))return;
+  var w4t=w4fix({w4:{res:x.res,hist:x.hist}}).w4,rvt=rvfix({rv:{snap:x.snap,upd:x.upd,done:!!x.snap}}).rv,fb=(x.fb&&typeof x.fb==="object")?x.fb:{};
+  var ip=(x.inp&&typeof x.inp==="object")?x.inp:{},bs=(x.base&&typeof x.base==="object")?x.base:{},w1t=w4fix({w4:{res:{orders:bs.orders,value:bs.revenue,enq:bs.partner}}}).w4.res;
+  past.push({exp:"partnership",sid:nm(x.sid),auto:x.auto===true,inp:{partners:nm(ip.partners),msgs:nm(ip.msgs),yes:nm(ip.yes),maybe:nm(ip.maybe),no:nm(ip.no),noreply:nm(ip.noreply),fuSent:nm(ip.fuSent),agreed:ip.agreed===true,ran:ip.ran===true,daysSinceSend:nm(ip.daysSinceSend)},partners:Array.isArray(x.partners)?x.partners.filter(function(y){return typeof y==="string";}).slice(0,12).map(function(y){return y.slice(0,60);}):[],base:{orders:w1t.orders,revenue:w1t.value,partner:w1t.enq},start:okd(x.start),archivedAt:okd(x.archivedAt),label:st(x.label,40),rule:st(x.rule,4),review:x.review===true,ctr:{msgs:nm(x.ctr&&x.ctr.msgs),resp:nm(x.ctr&&x.ctr.resp),opp:nm(x.ctr&&x.ctr.opp)},res:w4t.res,hist:w4t.hist,snap:rvt.snap,upd:rvt.upd,fb:{learned:st(fb.learned,1200),miss:Array.isArray(fb.miss)?fb.miss.filter(function(y){return typeof y==="string";}).slice(0,8):[]},steps:{w1:nm(x.steps&&x.steps.w1),w2:nm(x.steps&&x.steps.w2),w3:nm(x.steps&&x.steps.w3),w4:nm(x.steps&&x.steps.w4)}});
+ });
+ o.past=past;
+ var c=(o.chk&&typeof o.chk==="object"&&!Array.isArray(o.chk))?o.chk:{},n=CHKDEF();
+ n.done=c.done===true;n.at=okd(c.at);
+ Object.keys(n.q).forEach(function(k){var v=c.q&&c.q[k];if(typeof v==="string"&&CHKALLOWED[k][v])n.q[k]=v;});
+ o.chk=n;return o;
+}
+
+function pastWinOpen(p){return !!(p&&p.start&&today()>addDays(p.start,29)&&today()<=addDays(p.start,43));}
+function pastEndDay(p){return addDays(p.start,43);}
+function puDraft(){if(!UI.pu)UI.pu={i:-1,res:{clicks:{s:"",v:""},orders:{s:"",v:""},value:{s:"",v:""},enq:{s:"",v:""},hours:{s:"",v:""}}};return UI.pu;}
+function puRow(k,money){
+ var o=puDraft().res[k],opts=k==="hours"?[["value","A number"],["unknown","I am not sure"]]:[["value","A number"],["zero","Zero, I checked"],["unknown","I can't see this"]];
+ return '<div class="q"><strong>'+esc(W4NUM[k]+(money?" ("+sym(S.focus.currency).trim()+")":""))+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="pu-vs" data-k="'+k+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="12" data-pu="'+k+'" value="'+esc(o.v)+'" aria-label="'+esc(W4NUM[k])+'" style="max-width:160px">':'')+'</div>';
+}
+function rvPastHtml(){
+ var rows=[];
+ (S.past||[]).forEach(function(p,i){
+  var open=pastWinOpen(p),h='<div class="card" style="box-shadow:none;border:1px solid var(--line)"><p style="margin:0"><strong>Partnership-to-Sales</strong> <span class="tag">Day 30 position: '+esc(p.label||"Not reviewed")+'</span></p><p class="mute" style="margin:2px 0 6px">Started '+esc(dayLab(p.start))+'.'+(p.auto?' Your Day 30 position was recorded automatically from your dated entries when you started your next sprint.':'')+'</p>';
+  (p.upd||[]).forEach(function(u){h+='<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';});
+  if(open){
+   h+='<div class="note info">The update window for this earlier sprint is open until '+esc(dayLab(pastEndDay(p)))+'. Results you add here belong to this sprint only. They do not change your current sprint or your Day 30 position.</div>';
+   if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
+   else h+='<p><button type="button" class="btn ghost" data-a="pu-open" data-i="'+i+'">Add a late result to this sprint</button></p>';
+  } else if(today()>pastEndDay(p))h+='<p class="mute">The update window for this sprint closed on '+esc(dayLab(pastEndDay(p)))+'.</p>';
+  rows.push(h+'</div>');
+ });
+ if(S.rv.done&&S.rv.snap)rows.push('<div class="crow"><span><strong>Partnership-to-Sales</strong><br><span class="mute">Started '+esc(dayLab(rvStart()))+'. Current sprint</span></span><span class="tag">'+esc(S.rv.snap.label)+'</span></div>');
+ return rows.length?rows.join(""):'<p class="mute">Your first sprint will appear here once you save your Day 30 review.</p>';
+}
+function pastOpenNote(){
+ var o=(S.past||[]).filter(pastWinOpen)[0];
+ return o?'<div class="note info"><strong>Your earlier sprint is still in its update window</strong> (until '+esc(dayLab(pastEndDay(o)))+'). Add late results under <a href="#/results">Results</a>, Past sprints. This does not affect your new sprint.</div>':"";
+}
+function puAction(a,d,t){
+ var u=puDraft();
+ if(a==="pu-open"){var i=+d.i;if(!(S.past||[])[i]||!pastWinOpen(S.past[i]))return;UI.pu=null;u=puDraft();u.i=i;render();}
+ else if(a==="pu-cancel"){UI.pu=null;render();}
+ else if(a==="pu-vs"){if(!u.res[d.k]||!W4VS[d.v])return;u.res[d.k].s=u.res[d.k].s===d.v?"":d.v;if(u.res[d.k].s!=="value")u.res[d.k].v="";render();}
+ else if(a==="pu-save"){
+  var p=(S.past||[])[u.i];if(!p||!pastWinOpen(p))return;
+  var any=Object.keys(u.res).some(function(k){return !!u.res[k].s;});if(!any)return;
+  var res={};Object.keys(u.res).forEach(function(k){res[k]={s:u.res[k].s,v:u.res[k].s==="value"?w4Clean(k,u.res[k].v):""};});
+  var v=w4Verdict(Object.assign({},p.inp,{clicks:res.clicks,orders:res.orders,enq:res.enq}));
+  var e={at:today(),label:v.label,rule:v.rule,ctr:p.ctr,res:res,kind:"update",asOf:"",late:false,prov:false};
+  p.upd=p.upd||[];if(p.upd.length&&p.upd[p.upd.length-1].at===e.at)p.upd[p.upd.length-1]=e;else if(p.upd.length<RVMAX)p.upd.push(e);else return;
+  UI.pu=null;save();render();
+ }
+}
+function puInput(t){var k=t.dataset.pu,u=puDraft();if(u.res[k]&&u.res[k].s==="value"){var c=w4Clean(k,t.value);u.res[k].v=c;if(c!==t.value)t.value=c;}}
+
+/* ---------- feedback in its own table (design and development only: no deletion job, no retention setting) ---------- */
+function fbDraft(){
+ var c=rvCur(),sv=(c&&SPR.feedback&&SPR.feedback[c.id])||null;
+ if(!UI.fbd||UI.fbd.sid!==(c?c.id:0))UI.fbd={sid:c?c.id:0,learned:sv?sv.learned:"",miss:sv?(sv.miss||[]).slice():[],dis:sv?(sv.dis||""):"",busy:false,msg:""};
+ return UI.fbd;
+}
+function fbCard(){
+ var c=rvCur();
+ if(!c)return '<div class="card"><h2>Tell us how it went <span class="tag">optional</span></h2><p class="mute">Available once your sprint has started.</p></div>';
+ var d=fbDraft(),sv=SPR.feedback&&SPR.feedback[c.id];
+ var h='<div class="card"><h2>Tell us how it went <span class="tag">optional</span></h2><p class="mute">You can skip all of this. Your answers are private, kept separately from your sprint work, and read by the WEN team to improve the programme. They are not shared publicly. You can delete them at any time.</p><label for="rvl">What did you learn, or find most useful?</label><textarea id="rvl" maxlength="1200" style="min-height:80px" data-rv="learned" placeholder="A sentence or two is plenty">'+esc(d.learned)+'</textarea><label>What would you miss most if it disappeared?</label><div class="row">'+RVMISS.map(function(o){return '<button type="button" class="chip" aria-pressed="'+(d.miss.indexOf(o[0])>-1)+'" data-a="fb-miss" data-v="'+o[0]+'">'+esc(o[1])+'</button>';}).join("")+'</div><label>How would you feel if the Sales Lab disappeared?</label><div class="row">'+RVDIS.map(function(o){return '<button type="button" class="chip" aria-pressed="'+(d.dis===o[0])+'" data-a="fb-dis" data-v="'+o[0]+'">'+esc(o[1])+'</button>';}).join("")+'</div>';
+ h+='<p class="row"><button type="button" class="btn" data-a="fb-save"'+(d.busy?' disabled':'')+'>'+(sv?"Update my feedback":"Save my feedback")+'</button>'+(sv?'<button type="button" class="btn ghost" data-a="fb-del">Delete my feedback</button>':'')+'</p>'+(d.msg?'<div class="note ok" role="status">'+esc(d.msg)+'</div>':'')+(sv?'<p class="mute">Saved on '+esc(dayLab(String(sv.submitted_at).slice(0,10)))+'.</p>':'')+'</div>';
+ return h;
+}
+async function fbSave(){
+ var c=rvCur(),d=fbDraft();if(!c||d.busy)return;
+ d.busy=true;d.msg="";render();
+ var r=await sb.rpc("save_sprint_feedback",{p_sprint_id:c.id,p_learned:d.learned,p_miss:d.miss,p_dis:d.dis});
+ d.busy=false;
+ if(r.error){d.msg="We could not save that just now. Nothing was lost on this page, please try again.";render();return;}
+ await sprLoad();var d2=fbDraft();d2.msg="Thank you. Your feedback is saved.";render();
+}
+async function fbDelete(){
+ var c=rvCur();if(!c)return;
+ var r=await sb.rpc("delete_sprint_feedback",{p_sprint_id:c.id});
+ if(r.error){fbDraft().msg="We could not delete that just now. Please try again.";render();return;}
+ await sprLoad();UI.fbd=null;fbDraft().msg="Your feedback has been deleted.";render();
+}
+async function fbMigrate(){
+ /* feedback written before it had its own table lives in saved work: move it across once, then clear it from saved work */
+ var c=rvCur(),f=S&&S.rv&&S.rv.fb;
+ if(!c||!f||!(f.learned||(f.miss&&f.miss.length)||(f.dis&&f.dis.length)))return;
+ if(SPR.feedback&&SPR.feedback[c.id])return;
+ var r=await sb.rpc("save_sprint_feedback",{p_sprint_id:c.id,p_learned:f.learned||"",p_miss:(f.miss||[]).slice(0,8),p_dis:(f.dis&&f.dis[0])||""});
+ if(!r.error){S.rv.fb={learned:"",miss:[],dis:[]};save();var g=await sb.rpc("get_sprint_feedback");if(!g.error&&Array.isArray(g.data)){SPR.feedback={};g.data.forEach(function(x){SPR.feedback[x.sprint_id]=x;});}}
 }
 
 /* ---------- H1: navigation shell (14 Nov 2026). Home, My Sprint, Experiments, Results, Community (when switched on), Profile. ---------- */
@@ -1981,7 +2272,7 @@ function shellNav(){
 }
 function heroHtml(kick,title,text,pct,line,href,label){return '<div class="hero"><div class="kicker">'+esc(kick)+'</div><h2>'+esc(title)+'</h2><p>'+esc(text)+'</p>'+(pct!=null?'<div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><p style="font-size:14px">'+line+'</p>':'')+'<a class="btn" href="'+href+'">'+label+'</a></div>';}
 function homeHub(){
- var h='<h1>Home</h1><p class="mute">Your Sales Lab sprint: Partnership-to-Sales</p>';
+ var h='<h1>Home</h1><p class="mute">Your Sales Lab sprint: Partnership-to-Sales</p>'+sprintBar(false);
  if(!doneCount()&&!S.cands.length&&!(S.focus.product||"").trim())h+='<div class="card"><h2>Welcome to the Sales Lab</h2><p>In this test build you will run Partnership-to-Sales: four weeks, about 3 to 5 hours a week, to get other people who reach your buyer to recommend your product. Go at your own pace. Everything saves as you go, and your next step is always on this page.</p></div>';
  if(!week1Done()){
   var ns=nextStep(),d=doneCount(),left=STEPS.filter(function(x){return !S.steps[x.n];}).reduce(function(a,x){return a+x.m;},0);
@@ -1996,7 +2287,7 @@ function homeHub(){
  if(FLAGS.community===true)h+=comHomeCard();
  return h+helpCard();
 }
-function experimentsPage(){
+function experimentsPageOld(){
  var h='<h1>Experiments</h1><p class="mute">Six experiments, four weeks each, about 3 to 5 hours a week. You run one at a time.</p><div class="note warn"><strong>Temporary test limitation.</strong> In this test build only Partnership-to-Sales is open. In the full Sales Lab you will complete a short sales check, see an explained recommendation, and choose any of the six experiments. You will not be required to start with Partnership-to-Sales.</div><div class="xgrid">';
  EXPX.forEach(function(x,i){
   var cur=x[0]==="part";
@@ -2056,6 +2347,8 @@ document.addEventListener("click",function(e){
  if(a.indexOf("w3-")===0){w3Action(a,d,t);return;}
  if(a.indexOf("w4-")===0){w4Action(a,d,t);return;}
  if(a.indexOf("rv-")===0){rvAction(a,d,t);return;}
+ if(a.indexOf("spr-")===0||a.indexOf("chk-")===0||a.indexOf("fb-")===0){sprAction(a,d,t);return;}
+ if(a.indexOf("pu-")===0){puAction(a,d,t);return;}
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
  if(a==="exportdata"){exportData();return;}
@@ -2095,11 +2388,12 @@ document.addEventListener("input",function(e){
  else if(t.dataset.col){w3Input(t);}
  else if(t.dataset.w4){w4Input(t);}
  else if(t.dataset.rv){rvInput(t);}
+ else if(t.dataset.pu){puInput(t);}
  else if(t.dataset.sk){S.sketch[t.dataset.sk]=S.sketch[t.dataset.sk]||{};S.sketch[t.dataset.sk].note=t.value;save();}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="signin"&&e.target.dataset&&e.target.dataset.auth){e.preventDefault();if(e.target.dataset.auth==="email")sendCode();else if(e.target.dataset.auth==="code")verifyCode();else if(e.target.dataset.auth==="pw")pwLogin();}});
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t.tagName==="SELECT"&&t.dataset.bind){setPath(t.dataset.bind,t.value);render();}});
-document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.dataset&&t.dataset.out==="sentAt")w2DateChange(t);else if(PHASE==="app"&&t&&t.dataset&&(t.dataset.col==="runStart"||t.dataset.col==="runEnd"))w3DateChange(t);else if(PHASE==="app"&&t&&t.dataset&&t.dataset.rv==="start")rvDateChange(t);});
+document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.dataset&&t.dataset.out==="sentAt")w2DateChange(t);else if(PHASE==="app"&&t&&t.dataset&&(t.dataset.col==="runStart"||t.dataset.col==="runEnd"))w3DateChange(t);else if(PHASE==="app"&&t&&t.dataset&&t.dataset.spr)sprInputChange(t);});
 window.addEventListener("hashchange",function(){if(PHASE!=="app"&&!(PHASE==="adminonly"&&/^#\/(admin|community)/.test(location.hash||"")))return;route=location.hash||"#/";render();});
 
 /* ---------- Community (M3C-b). Shown only while the community switch is ON. Text only, escaped, never run as HTML. ---------- */
@@ -2545,7 +2839,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
