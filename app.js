@@ -555,10 +555,10 @@ function adminRestrictPanel(){
   else{
    h+='<div class="note bad" role="alertdialog" aria-label="Confirm restriction"><p><strong>Restrict '+esc(pv.display_name)+'?</strong></p>';
    h+=pv.via_report?'<p>You are restricting <strong>'+esc(pv.display_name)+'</strong>, the person who <strong>wrote</strong> the reported '+kind+' &ldquo;'+esc(pv.item_title||"")+'&rdquo;. This is <strong>not</strong> the person who sent the report.</p>':'<p>You are restricting <strong>'+esc(pv.display_name)+'</strong>, the person who wrote this '+kind+': &ldquo;'+esc(pv.item_title||"")+'&rdquo;.</p>';
-   h+='<p>They will be able to read and report, but not post or reply. You can lift this later.</p><label for="ac-rwhy">Reason for the restriction (5 to 200 characters, private to administrators)</label><input id="ac-rwhy" type="text" maxlength="200" autocomplete="off"><p class="row"><button type="button" class="btn" data-a="ac-rconfirm2">Yes, restrict '+esc(pv.display_name)+'</button><button type="button" class="btn ghost" data-a="ac-rcancel">Cancel</button></p></div>';
+   h+='<p>They will be able to read and report, but not post or reply. You can lift this later.</p><label for="ac-rwhy">Reason for the restriction (5 to 200 characters, private to administrators)</label><input id="ac-rwhy" type="text" maxlength="200" autocomplete="off" aria-describedby="ac-rerr">'+(D.err?'<p class="note bad" id="ac-rerr" role="alert">'+esc(D.err)+'</p>':'')+'<p class="row"><button type="button" class="btn" data-a="ac-rconfirm2">Yes, restrict '+esc(pv.display_name)+'</button><button type="button" class="btn ghost" data-a="ac-rcancel">Cancel</button></p></div>';
   }
  }
- if(L){h+='<div class="note warn" role="alertdialog" aria-label="Confirm lifting a restriction"><p><strong>Lift the restriction on '+esc(L.name)+'?</strong></p><p>They will be able to post and reply again.</p><label for="ac-lwhy">Reason for lifting (5 to 200 characters)</label><input id="ac-lwhy" type="text" maxlength="200" autocomplete="off"><p class="row"><button type="button" class="btn" data-a="ac-lconfirm">Yes, lift it</button><button type="button" class="btn ghost" data-a="ac-lcancel">Cancel</button></p></div>';}
+ if(L){h+='<div class="note warn" role="alertdialog" aria-label="Confirm lifting a restriction"><p><strong>Lift the restriction on '+esc(L.name)+'?</strong></p><p>They will be able to post and reply again.</p><label for="ac-lwhy">Reason for lifting (5 to 200 characters)</label><input id="ac-lwhy" type="text" maxlength="200" autocomplete="off" aria-describedby="ac-lerr">'+(L.err?'<p class="note bad" id="ac-lerr" role="alert">'+esc(L.err)+'</p>':'')+'<p class="row"><button type="button" class="btn" data-a="ac-lconfirm">Yes, lift it</button><button type="button" class="btn ghost" data-a="ac-lcancel">Cancel</button></p></div>';}
  return h;
 }
 function adminModHtml(){
@@ -604,17 +604,23 @@ async function adminComAct(a,d){
  else if(a==="ac-rcancel"){ADMIN.rdraft=null;renderSafe();return;}
  else if(a==="ac-rconfirm2"){
   var D2=ADMIN.rdraft;if(!D2)return;var why=(document.getElementById("ac-rwhy").value||"").trim();
-  if(why.length<5||why.length>200){toast(COMERR.reason_required);return;}
+  if(why.length<5||why.length>200){D2.err=COMERR.reason_required;render();var re1=document.getElementById("ac-rwhy");if(re1)re1.focus();return;}
+  D2.err="";
   r=await comCall("admin_community_restrict_item",{p_source:D2.src,p_id:D2.id,p_expected_name:D2.pv.display_name,p_reason:why});
-  if(!(r&&r.err))ADMIN.rdraft=null;
+  if(r&&r.err){D2.err=r.err;render();return;}
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  ADMIN.rdraft=null;
  }
  else if(a==="ac-liftopen"){ADMIN.rdraft=null;ADMIN.liftDraft={ref:d.ref,name:d.name};renderSafe();return;}
  else if(a==="ac-lcancel"){ADMIN.liftDraft=null;renderSafe();return;}
  else if(a==="ac-lconfirm"){
   var L2=ADMIN.liftDraft;if(!L2)return;var lw=(document.getElementById("ac-lwhy").value||"").trim();
-  if(lw.length<5||lw.length>200){toast(COMERR.reason_required);return;}
+  if(lw.length<5||lw.length>200){L2.err=COMERR.reason_required;render();var re2=document.getElementById("ac-lwhy");if(re2)re2.focus();return;}
+  L2.err="";
   r=await comCall("admin_community_lift_restriction",{p_ref:L2.ref,p_reason:lw});
-  if(!(r&&r.err))ADMIN.liftDraft=null;
+  if(r&&r.err){L2.err=r.err;render();return;}
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  ADMIN.liftDraft=null;
  }
  else if(a==="ac-hold"){
   var hid=+(document.getElementById("ac-holdid").value||0),hw=(document.getElementById("ac-holdwhy").value||"").trim(),hd=document.getElementById("ac-holddate").value||null;
@@ -956,7 +962,7 @@ var COMERR={
  need_profile:"Please choose your community name first.",bad_title:"A title needs 3 to 120 characters.",bad_body:"Please write something (up to the length limit).",
  bad_bio:"Your short bio can be up to 280 characters.",contains_email:"Please leave email addresses out, to keep everyone's details private.",
  name_taken:"That name is already in use. Please choose another.",name_cooldown:"You can change your name once every 7 days.",
- name_mismatch:"The member behind this item has changed. Please close this box and try again.",reason_required:"Please give a reason of 5 to 200 characters.",no_member:"This content no longer has a member (Former member), so there is no one to restrict.",not_active_member:"This member’s access has ended, so there is nothing to restrict.",already_restricted:"This member is already restricted.",cannot_restrict_admin:"Administrator accounts cannot be restricted.",hold_needs_reason_and_review_date:"A legal hold needs a reason and a review date within a year.",no_rule_approved:"No retention rule has been approved yet, so nothing was deleted.",still_a_member:"That person still has access. Members delete their own data from their profile.",is_admin_account:"That is an administrator account.",no_such_backup:"That backup is no longer available.",bad_mode:"Please choose a restore type.",
+ name_mismatch:"The member behind this item has changed. Please close this box and try again.",reason_required:"Please type a reason of 5 to 200 characters before pressing the button.",no_member:"This content no longer has a member (Former member), so there is no one to restrict.",not_active_member:"This member’s access has ended, so there is nothing to restrict.",already_restricted:"This member is already restricted.",cannot_restrict_admin:"Administrator accounts cannot be restricted.",hold_needs_reason_and_review_date:"A legal hold needs a reason and a review date within a year.",no_rule_approved:"No retention rule has been approved yet, so nothing was deleted.",still_a_member:"That person still has access. Members delete their own data from their profile.",is_admin_account:"That is an administrator account.",no_such_backup:"That backup is no longer available.",bad_mode:"Please choose a restore type.",
  photo_choose:"Please choose a photo first.",photo_type:"Please choose a JPEG, PNG or WebP photo.",photo_size:"That photo is too large. Please choose one under 5 MB.",photo_unreadable:"We couldn't read that photo. Please try a different one.",photo_failed:"Your photo didn't upload. Please try again.",photo_missing:"Your photo didn't upload. Please try again.",
  bad_name_reserved:"That name isn't available. Names that look like WEN staff or administrators aren't allowed.",
  bad_name_characters:"Use letters, numbers, spaces, apostrophes, full stops and hyphens only.",bad_name_length:"Names need 2 to 40 characters.",
