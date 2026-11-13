@@ -232,9 +232,9 @@ function check(){
 }
 function shell(n,body){
  var s=STEPS[n-1],dn=S.steps[n];
- var h='<a class="back" href="#/" data-wk="1">&larr; My Sprint</a><h1>Week 1 &middot; Step '+n+' of 7</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p>'+glance(1,n)+'<p class="mute">You will need: '+esc(s.b)+' Everything saves automatically, so you can stop and come back any time.</p>';
+ var h='<a class="back" href="#/sprint" data-wk="1">&larr; My Sprint</a><h1>Week 1 &middot; Step '+n+' of 7</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p>'+glance(1,n)+'<p class="mute">You will need: '+esc(s.b)+' Everything saves automatically, so you can stop and come back any time.</p>';
  h+=body;
- h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="done" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<7?'<a class="btn ghost" href="#/step/'+(n+1)+'">Next step &rarr;</a>':'<a class="btn ghost" href="#/" data-wk="1">Back to My Sprint</a>')+'</div>';
+ h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="done" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<7?'<a class="btn ghost" href="#/step/'+(n+1)+'">Next step &rarr;</a>':'<a class="btn ghost" href="#/sprint" data-wk="1">Back to My Sprint</a>')+'</div>';
  return h;
 }
 function doneCount(){return STEPS.filter(function(s){return S.steps[s.n];}).length;}
@@ -470,7 +470,7 @@ async function adminLoad(){
 }
 function adminHtml(){
  var h='';
- if(PHASE==="app")h+='<a class="back" href="#/">&larr; My Sprint</a>';
+ if(PHASE==="app")h+='<a class="back" href="#/">&larr; Home</a>';
  h+='<h1>Admin</h1><p class="mute">You can see who has access and when they last saved. You cannot see anyone\'s work here.</p>';
  if(ADMIN.err)h+='<div class="note bad" role="status">Couldn’t load the admin tools. '+esc(ADMIN.err)+'</div>';
  if(!ADMIN.members)return h+'<p class="mute">Loading...</p>';
@@ -826,15 +826,7 @@ function home(){
  if(wk===1)h+=w2Banner();
  if(S.focus.product&&S.focus.format)h+='<div class="note ok"><strong>Your product:</strong> '+esc(productLine())+'</div>';
  if(wk===2)h+=home2();else{if(week1Done())h+='<div class="note ok"><strong>Week 2 is open.</strong> This is where you write to the partners you chose, and send the messages yourself. <button type="button" class="btn" data-a="w2-week" data-val="2">Open Week 2</button></div>';h+=home1();}
- h+='<div class="card"><h2>Your account</h2><p>Signed in as <strong>'+esc(ME?ME.email:"")+'</strong>.</p><p class="row"><button type="button" class="btn ghost" data-a="signout">Sign out</button> <button type="button" class="btn ghost" data-a="signoutall">Sign out of all devices</button></p>'+(FRAMED?'<p class="mute"><a href="'+esc(location.href.split("#")[0])+'" target="_blank" rel="noopener">Open the Sales Lab on its own page</a></p>':'')+'</div>';
- if(FLAGS.community===true)h+=comHomeCard();
- if(ME&&ME.admin)h+='<div class="card"><h2>Admin</h2><p class="mute">Manage who has access and the on and off switches.</p><p><a class="btn ghost" href="#/admin">Open admin tools</a></p></div>';
- h+='<div class="card"><h2>Your data</h2><p class="mute">Your work belongs to you. You can download a copy at any time, or delete it.</p><div class="row">'+(FLAGS.exports===false?'<p class="mute">Downloading your data is switched off at the moment.</p>':'<button type="button" class="btn ghost" data-a="exportdata">Download my data</button>')+'<button type="button" class="btn ghost" data-a="deletedata">Delete my saved work</button></div></div>';
- h+='<div class="card"><h2>Earlier saved versions</h2><p class="mute">Your work saves automatically. If something was overwritten by mistake, for example from another tab or device, you can bring an earlier version back.</p>';
- if(UI.versions===null)h+='<button type="button" class="chip" data-a="showversions">Show earlier versions</button>';
- else if(!UI.versions.length)h+='<p class="mute">No earlier versions yet.</p>';
- else h+=UI.versions.slice(0,8).map(function(v){var d=new Date(v.saved_at);return '<div class="crow"><span>'+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+' at '+pad(d.getHours())+':'+pad(d.getMinutes())+'</span><button type="button" class="chip sm" data-a="restorev" data-id="'+v.id+'">Restore</button></div>';}).join("");
- return h+'</div>';
+ return h;
 }
 /* ---------- keyboard and screen reader helpers (Group A) ---------- */
 function a11ySig(e){
@@ -880,10 +872,10 @@ function render(){
   var m=(route||"#/").match(/^#\/step\/(\d)/),m2=(route||"#/").match(/^#\/w2\/([1-6])$/);
   if(route==="#/admin"&&ME&&ME.admin){html=adminHtml();if(!ADMIN.members&&!ADMIN.busy)adminLoad();}
   else if(/^#\/community/.test(route)&&FLAGS.community===true)html=communityHtml();
-  else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else html=home();
+  else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/profile")html=profilePage();else html=homeHub();
   html=topbar()+html;
  }
- var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);try{comPhotoFill();}catch(e){}
+ var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);try{shellNav();}catch(e){}try{comPhotoFill();}catch(e){}
  if(PHASE==="app"||PHASE==="adminonly"){if(/^#\/community/.test(route)&&(FLAGS.community===true||PHASE==="adminonly")){if(COM.loadedFor!==route){COM.loadedFor=route;comLeave();setTimeout(comEnter,0);}}else COM.loadedFor="";}
  if(PHASE==="app"){var r=document.querySelector("[data-bind=refl]");if(r)r.value=S.refl||"";}
  a11yGroups();
@@ -1101,9 +1093,9 @@ function w2Touch(){if(S&&S.w2&&!S.w2.openedAt){S.w2.openedAt=today();save();}}
 function w2Chips(path,opts,max){return chipsHtml(path,opts,max);}
 function shell2(n,body){
  var s=STEPS2[n-1],dn=S.w2.steps[n];
- var h='<a class="back" href="#/" data-a="w2-week" data-val="2">&larr; My Sprint</a><h1>Week 2 &middot; Step '+n+' of 6</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p>'+glance(2,n)+'<p class="mute">You will need: '+esc(s.b)+' Everything saves automatically. Do the steps in any order that suits you.</p>';
+ var h='<a class="back" href="#/sprint" data-a="w2-week" data-val="2">&larr; My Sprint</a><h1>Week 2 &middot; Step '+n+' of 6</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p>'+glance(2,n)+'<p class="mute">You will need: '+esc(s.b)+' Everything saves automatically. Do the steps in any order that suits you.</p>';
  h+=body;
- h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="w2-done" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<6?'<a class="btn ghost" href="#/w2/'+(n+1)+'">Next step &rarr;</a>':'<a class="btn ghost" href="#/" data-a="w2-week" data-val="2">Back to My Sprint</a>')+'</div>';
+ h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="w2-done" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<6?'<a class="btn ghost" href="#/w2/'+(n+1)+'">Next step &rarr;</a>':'<a class="btn ghost" href="#/sprint" data-a="w2-week" data-val="2">Back to My Sprint</a>')+'</div>';
  return h;
 }
 function w2Stuck(inStep){
@@ -1289,7 +1281,7 @@ async function w2Copy(t){
 }
 function w2Action(a,d,t){
  var c,o,keep=false;
- if(a==="w2-week"){S.week=+d.val===2&&week1Done()?2:1;route="#/";save();window.scrollTo(0,0);}
+ if(a==="w2-week"){S.week=+d.val===2&&week1Done()?2:1;route="#/sprint";save();window.scrollTo(0,0);}
  else if(a==="w2-done"){S.w2.steps[d.n]=!S.w2.steps[d.n];save();}
  else if(a==="w2-mark1"){S.w2.quiz1done=true;save();}
  else if(a==="w2-prac"){S.w2.practiceDone=!S.w2.practiceDone;save();}
@@ -1334,6 +1326,104 @@ function w2fix(o){
  Object.keys(out).forEach(function(id){var x=out[id];if(!x||typeof x!=="object"||Array.isArray(x))return;var n=clone(W2DEF);Object.keys(n).forEach(function(k){if(x[k]!==undefined&&x[k]!==null&&typeof x[k]===typeof n[k]&&Array.isArray(x[k])===Array.isArray(n[k]))n[k]=x[k];});fixed[id]=n;});
  o.out=fixed;
  return o;
+}
+
+/* ---------- H1: navigation shell (14 Nov 2026). Home, My Sprint, Experiments, Results, Community (when switched on), Profile. ---------- */
+var NAVI={
+ home:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg>',
+ sprint:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10h4v10zm6 0V4h4v16zm6 0v-7h4v7z"/></svg>',
+ exp:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v6l-5 9a3 3 0 0 0 2.6 4.5h10.8A3 3 0 0 0 20 17l-5-9V2zm2 2h2v5.2l1 1.8h-4l1-1.8z"/></svg>',
+ res:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h14a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 11v4h2v-4zm4-6v10h2V8zm4 3v7h2v-7z"/></svg>',
+ comm:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-5 4V5a1 1 0 0 1 1-1z"/></svg>',
+ profile:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0z"/></svg>'
+};
+var EXPX=[
+ ["part","Partnership-to-Sales","Get other people who reach your buyer to recommend your product.","A shortlist of partners that fit, real messages sent, and a small collaboration tested, with the sales it brings.","No audience yet, or comfortable contacting people","#00C2CB",'<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.6"/><path d="M2 20a6 6 0 0 1 12 0zm11 0a5 5 0 0 1 9 0z"/></svg>'],
+ ["etsy","Etsy Sales Bottleneck","Find out whether your listing has a visibility or a conversion problem, then fix one thing.","A clear diagnosis of your listing and one tested change, with before and after numbers.","Sellers with a live Etsy listing","#F2C21D",'<svg viewBox="0 0 24 24"><path d="M10 3a7 7 0 1 0 4.2 12.6l5.1 5.1 1.4-1.4-5.1-5.1A7 7 0 0 0 10 3zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/></svg>'],
+ ["email","Email-to-Sale","Turn a relevant list into sales with a three email sequence.","A three email sequence sent to a relevant list, with clicks, orders and revenue measured.","Anyone with a small opted-in list","#FCE9EC",'<svg viewBox="0 0 24 24"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm9 7L4 7v2l8 5 8-5V7z"/></svg>'],
+ ["show","Show-to-Sell","Show your product in use and see which demo sells.","Three short demos published, and a clear view of which one sells.","Products that are easy to show in use","#967E61",'<svg viewBox="0 0 24 24"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm6 4v8l7-4z"/></svg>'],
+ ["find","Find Your Buyers","Find where your buyers already spend time and join the conversation.","A map of where your buyers spend time, and a first set of helpful contributions that bring visitors.","Starting with no audience","#DDF6F7",'<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>'],
+ ["live","LIVE Sales","Sell live on TikTok or YouTube, step by step.","Two to four live sessions run, a repeatable run sheet, and orders traced to them.","People happy on camera with LIVE access","#4a4a4a",'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M5.6 5.6a9 9 0 0 0 0 12.8l1.4-1.4a7 7 0 0 1 0-10zm12.8 0-1.4 1.4a7 7 0 0 1 0 10l1.4 1.4a9 9 0 0 0 0-12.8z"/></svg>']
+];
+var SHELLCSS='body.hasnav main{padding-bottom:96px}#mnav{display:none}'
++'body.hasnav #mnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0)}'
++'#mnav a{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 9px;font:600 11px "Open Sans",system-ui,sans-serif;color:var(--mute);text-decoration:none;position:relative}'
++'#mnav a span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#mnav svg{width:22px;height:22px;fill:currentColor}'
++'#mnav a[aria-current=page]{color:#000;font-weight:700;box-shadow:inset 0 3px 0 var(--acc)}#mnav a:focus-visible{outline:3px solid #000;outline-offset:-3px}'
++'#mnav .com-dot{position:absolute;top:6px;right:calc(50% - 20px);margin:0}'
++'@media(min-width:900px){body.hasnav #mnav{top:var(--bh,40px);bottom:0;right:auto;width:228px;flex-direction:column;gap:4px;padding:16px 12px;border-top:0;border-right:1px solid var(--line);background:#FBF9F6}'
++'#mnav a{flex:none;flex-direction:row;gap:12px;padding:11px 12px;border-radius:10px;font-size:15px;color:#333}#mnav a[aria-current=page]{background:#000;color:#fff;box-shadow:none}#mnav .com-dot{position:static;margin-left:auto}'
++'body.hasnav main{margin:0 0 0 228px;max-width:none;padding:20px 32px 56px}body.hasnav main>*{max-width:980px}}'
++'.xgrid{display:grid;grid-template-columns:1fr;gap:0 16px}@media(min-width:900px){.xgrid{grid-template-columns:1fr 1fr}}'
++'.xp{background:#111;color:#fff;border-radius:20px;padding:22px 20px 20px;margin:12px 0}.xh2{display:flex;gap:14px;align-items:center;margin-bottom:8px}'
++'.xk{font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#fff}.xt{font:700 22px/1.25 Poppins,system-ui,sans-serif;color:#fff;margin:2px 0 0}'
++'.xs{color:#F5F2EE;margin:0 0 12px;font-size:16px;max-width:none}.xo{background:#000;border-left:4px solid #00C2CB;border-radius:8px;padding:12px 14px;margin:8px 0}.xo b{display:block;color:#00C2CB;font:700 11px Montserrat,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}.xo span{color:#fff;font:400 14px/1.4 "Open Sans",system-ui,sans-serif}'
++'.xm{color:#cfc7bb;font-size:13px;margin:8px 0 0;max-width:none}.xi{display:flex;width:54px;height:54px;border-radius:50%;border:2px solid #fff;align-items:center;justify-content:center;flex:none}.xi svg{width:28px;height:28px;fill:#000}.xi.dk svg{fill:#fff}'
++'.btn.teal{background:#00C2CB;color:#000;border-color:#00C2CB}.btn.teal:hover{background:#00AEB6}.xp .btn{display:block;text-align:center;margin-top:14px}';
+function effRoute(){var r=route||"#/";if(/^#\/community/.test(r)&&FLAGS.community!==true)return "#/";return r;}
+function tabsFor(){var t=[["home","Home","#/"],["sprint","My Sprint","#/sprint"],["exp","Experiments","#/experiments"],["res","Results","#/results"]];if(FLAGS.community===true)t.push(["comm","Community","#/community"]);t.push(["profile","Profile","#/profile"]);return t;}
+function tabOf(r){r=r||"#/";if(r==="#/sprint"||/^#\/(step|w2)\/\d$/.test(r))return "sprint";if(r==="#/experiments")return "exp";if(r==="#/results")return "res";if(/^#\/community/.test(r))return "comm";if(r==="#/profile")return "profile";return "home";}
+function navHtml(){var cur=tabOf(effRoute());return tabsFor().map(function(t){return '<a href="'+t[2]+'"'+(t[0]===cur?' aria-current="page"':'')+'>'+NAVI[t[0]]+'<span>'+t[1]+'</span>'+(t[0]==="comm"?comDot():'')+'</a>';}).join("");}
+function shellNav(){
+ var show=PHASE==="app"&&route!=="#/admin";
+ if(!document.getElementById("shellcss")){var st=document.createElement("style");st.id="shellcss";st.textContent=SHELLCSS;document.head.appendChild(st);}
+ var nv=document.getElementById("mnav");
+ if(!nv){nv=document.createElement("nav");nv.id="mnav";nv.setAttribute("aria-label","Main");document.body.appendChild(nv);}
+ nv.innerHTML=show?navHtml():"";
+ document.body.classList.toggle("hasnav",show);
+ var bn=document.querySelector(".banner");if(bn)document.documentElement.style.setProperty("--bh",bn.offsetHeight+"px");
+}
+function heroHtml(kick,title,text,pct,line,href,label){return '<div class="hero"><div class="kicker">'+esc(kick)+'</div><h2>'+esc(title)+'</h2><p>'+esc(text)+'</p>'+(pct!=null?'<div class="bar" aria-hidden="true"><i style="width:'+pct+'%"></i></div><p style="font-size:14px">'+line+'</p>':'')+'<a class="btn" href="'+href+'">'+label+'</a></div>';}
+function homeHub(){
+ var h='<h1>Home</h1><p class="mute">Your Sales Lab sprint: Partnership-to-Sales</p>';
+ if(!doneCount()&&!S.cands.length&&!(S.focus.product||"").trim())h+='<div class="card"><h2>Welcome to the Sales Lab</h2><p>In this test build you will run Partnership-to-Sales: four weeks, about 3 to 5 hours a week, to get other people who reach your buyer to recommend your product. Go at your own pace. Everything saves as you go, and your next step is always on this page.</p></div>';
+ if(!week1Done()){
+  var ns=nextStep(),d=doneCount(),left=STEPS.filter(function(x){return !S.steps[x.n];}).reduce(function(a,x){return a+x.m;},0);
+  h+=heroHtml(d===0?"Start here":"Your next step","Step "+ns.n+": "+ns.t,"About "+ns.m+" minutes. "+(d===0?"You can stop at any time and come back. Everything saves as you go.":"Pick up where you left off."),Math.round(d/7*100),d+" of 7 steps done &middot; about "+hm(left)+" left","#/step/"+ns.n,(d===0?"Start step ":"Continue with step ")+ns.n+" &rarr;");
+ }else{
+  var d2=STEPS2.filter(function(x){return S.w2.steps[x.n];}).length,na=w2NextAction(),left2=STEPS2.filter(function(x){return !S.w2.steps[x.n];}).reduce(function(a,x){return a+x.m;},0);
+  if(d2>=6)h+=heroHtml("Week 2 complete","Well done, Week 2 is finished","Anything still open, like follow-ups and replies, carries forward. Weeks 3 and 4 are not part of this test build yet.",null,"","#/sprint","Open My Sprint &rarr;");
+  else h+=heroHtml("Week 2: your next step",na.t,na.m?"About "+na.m+" minutes. Pick up where you left off.":"Pick up where you left off.",Math.round(d2/6*100),d2+" of 6 steps done &middot; about "+hm(left2)+" left",na.link,"Continue &rarr;");
+  h+=w2Banner();
+ }
+ h+=sprintGlance();
+ if(FLAGS.community===true)h+=comHomeCard();
+ return h+helpCard();
+}
+function experimentsPage(){
+ var h='<h1>Experiments</h1><p class="mute">Six experiments, four weeks each, about 3 to 5 hours a week. You run one at a time.</p><div class="note warn"><strong>Temporary test limitation.</strong> In this test build only Partnership-to-Sales is open. In the full Sales Lab you will complete a short sales check, see an explained recommendation, and choose any of the six experiments. You will not be required to start with Partnership-to-Sales.</div><div class="xgrid">';
+ EXPX.forEach(function(x,i){
+  var cur=x[0]==="part";
+  h+='<div class="xp"><div class="xh2"><span class="xi'+((x[0]==="show"||x[0]==="live")?' dk':'')+'" style="background:'+x[5]+'">'+x[6]+'</span><div><div class="xk">Experiment '+(i+1)+'</div><div class="xt">'+esc(x[1])+'</div></div></div><p class="xs">'+esc(x[2])+'</p><div class="xo"><b>Your outcome</b><span>'+esc(x[3])+'</span></div><div class="xm">4 weeks &middot; 3 to 5 hours a week &middot; Best for: '+esc(x[4])+'</div>';
+  h+=cur?'<div class="xm">Open in this test build. Your progress: '+(week1Done()?"Week 2":"Week 1")+' of 4. Find it under My Sprint.</div>':'<div class="xm"><strong>Coming soon.</strong> Not open in this test build.</div>';
+  h+='</div>';
+ });
+ return h+'</div>';
+}
+function nvTxt(o,money){o=o||{};if(o.s==="value"&&String(o.v||"").trim()!=="")return (money?sym(S.focus.currency):"")+o.v;if(o.s==="zero")return (money?sym(S.focus.currency):"")+"0";if(o.s==="unknown")return "I don't know";return "Not set";}
+function resultsPage(){
+ var b=S.base,sent=w2Sent(),replies=sent.filter(function(e){return e.o.reply&&e.o.reply!=="noreply";}).length,due=w2Pending().filter(function(e){return w2Due(e);}).length;
+ var h='<h1>Results</h1><p class="mute">Your numbers, and what they show.</p>';
+ h+='<div class="card"><h2>Where you started</h2><p class="mute">The last 30 days before your sprint, from Week 1, step 1. "I don\'t know" stays unknown. It is never turned into zero.</p><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.orders))+'</b>Orders</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.revenue,true))+'</b>Revenue</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.partner))+'</b>Sales from partners</div></div><p><a class="btn ghost" href="#/step/1">Update my starting numbers</a></p></div>';
+ h+='<div class="card"><h2>Your outreach so far</h2>';
+ if(sent.length||week1Done())h+='<div class="tiles"><div class="tile"><span class="ti" aria-hidden="true">'+ICO.people+'</span><b>'+sent.length+'</b>Messages sent</div><div class="tile"><span class="ti" aria-hidden="true">'+ICO.chat+'</span><b>'+replies+'</b>Replies</div><div class="tile"><span class="ti" aria-hidden="true">'+ICO.bell+'</span><b>'+due+'</b>Follow-ups due</div></div><p class="mute">From your Week 2 outreach list. "No reply yet" is never counted as a no.</p>';
+ else h+='<p class="mute">This starts in Week 2, once you have finished Week 1 and sent your first message.</p>';
+ h+='</div><div class="card"><h2>Coming next</h2><p>The weekly results log (reach, enquiries, orders, revenue and costs), your Day 30 review, and your past sprints are not part of this test build yet. They will appear here.</p></div>';
+ return h;
+}
+function profilePage(){
+ var h='<h1>Profile</h1><p class="mute">Your account, reminders and data in one place.</p>';
+ h+='<div class="card"><h2>Your account</h2><p>Signed in as <strong>'+esc(ME?ME.email:"")+'</strong>.</p><p class="row"><button type="button" class="btn ghost" data-a="signout">Sign out</button> <button type="button" class="btn ghost" data-a="signoutall">Sign out of all devices</button></p>'+(FRAMED?'<p class="mute"><a href="'+esc(location.href.split("#")[0])+'" target="_blank" rel="noopener">Open the Sales Lab on its own page</a></p>':'')+'</div>';
+ if(FLAGS.community===true)h+='<div class="card"><h2>Community profile</h2><p class="mute">Your display name, short bio and optional photo in the community.</p><p><a class="btn ghost" href="#/community/me">Open my community profile</a></p></div>';
+ h+=remindCard();
+ h+='<div class="card"><h2>Your data</h2><p class="mute">Your work belongs to you. You can download a copy at any time, or delete it.</p><div class="row">'+(FLAGS.exports===false?'<p class="mute">Downloading your data is switched off at the moment.</p>':'<button type="button" class="btn ghost" data-a="exportdata">Download my data</button>')+'<button type="button" class="btn ghost" data-a="deletedata">Delete my saved work</button></div></div>';
+ h+='<div class="card"><h2>Earlier saved versions</h2><p class="mute">Your work saves automatically. If something was overwritten by mistake, for example from another tab or device, you can bring an earlier version back.</p>';
+ if(UI.versions===null)h+='<button type="button" class="chip" data-a="showversions">Show earlier versions</button>';
+ else if(!UI.versions.length)h+='<p class="mute">No earlier versions yet.</p>';
+ else h+=UI.versions.slice(0,8).map(function(v){var d=new Date(v.saved_at);return '<div class="crow"><span>'+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})+' at '+pad(d.getHours())+':'+pad(d.getMinutes())+'</span><button type="button" class="chip sm" data-a="restorev" data-id="'+v.id+'">Restore</button></div>';}).join("");
+ h+='</div>'+helpCard();
+ if(ME&&ME.admin)h+='<div class="card"><h2>Admin</h2><p class="mute">Manage who has access and the on and off switches.</p><p><a class="btn ghost" href="#/admin">Open admin tools</a></p></div>';
+ return h;
 }
 
 /* ---------- events ---------- */
@@ -1448,7 +1538,7 @@ function comHomeCard(){
  return h+'<p><a class="btn" href="#/community">Open the community</a></p></div>';
 }
 function comNav(on){
- return '<a class="back" href="'+(PHASE==="adminonly"?"#/admin":"#/")+'">&larr; '+(PHASE==="adminonly"?"Admin":"My Sprint")+'</a><h1>Community</h1><div class="row" role="navigation" aria-label="Community sections">'
+ return '<a class="back" href="'+(PHASE==="adminonly"?"#/admin":"#/")+'">&larr; '+(PHASE==="adminonly"?"Admin":"Home")+'</a><h1>Community</h1><div class="row" role="navigation" aria-label="Community sections">'
   +[["#/community","Discussions","d"],["#/community/coaching","Coaching and events","c"],["#/community/people","People","p"],["#/community/guidelines","Guidelines","g"],["#/community/me","Your profile","m"]].map(function(x){return '<a class="chip" href="'+x[0]+'" aria-pressed="'+(on===x[2])+'">'+x[1]+'</a>';}).join("")+'</div>'
   +(COM.err?'<div class="note bad" role="alert">'+esc(COM.err)+'</div>':"")+(COM.ok?'<div class="note ok" role="status">'+esc(COM.ok)+'</div>':"");
 }
@@ -1843,7 +1933,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
