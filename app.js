@@ -546,15 +546,31 @@ function adminDataHtml(){
  h+='<label for="ac-retconfirm">Type RUN COMMUNITY RETENTION to run the approved rules now</label><input id="ac-retconfirm" type="text" autocomplete="off"><p><button type="button" class="btn ghost" data-a="ac-retrun"'+(any?'':' disabled')+'>Run approved rules</button></p>';
  return h+'</div>';
 }
+function adminRestrictPanel(){
+ var h="",D=ADMIN.rdraft,L=ADMIN.liftDraft;
+ if(D){
+  var pv=D.pv,kind=pv.item_kind==="reply"?"reply":"post";
+  if(pv.blocked){h+='<div class="note warn" role="alert"><p><strong>Cannot restrict.</strong> '+esc(COMERR[pv.blocked]||"This member cannot be restricted.")+'</p><p><button type="button" class="btn ghost" data-a="ac-rcancel">Close</button></p></div>';}
+  else if(pv.already_restricted){h+='<div class="note warn" role="alert"><p><strong>'+esc(pv.display_name||"This member")+'</strong> is already restricted.</p><p><button type="button" class="btn ghost" data-a="ac-rcancel">Close</button></p></div>';}
+  else{
+   h+='<div class="note bad" role="alertdialog" aria-label="Confirm restriction"><p><strong>Restrict '+esc(pv.display_name)+'?</strong></p>';
+   h+=pv.via_report?'<p>You are restricting <strong>'+esc(pv.display_name)+'</strong>, the person who <strong>wrote</strong> the reported '+kind+' &ldquo;'+esc(pv.item_title||"")+'&rdquo;. This is <strong>not</strong> the person who sent the report.</p>':'<p>You are restricting <strong>'+esc(pv.display_name)+'</strong>, the person who wrote this '+kind+': &ldquo;'+esc(pv.item_title||"")+'&rdquo;.</p>';
+   h+='<p>They will be able to read and report, but not post or reply. You can lift this later.</p><label for="ac-rwhy">Reason for the restriction (5 to 200 characters, private to administrators)</label><input id="ac-rwhy" type="text" maxlength="200" autocomplete="off"><p class="row"><button type="button" class="btn" data-a="ac-rconfirm2">Yes, restrict '+esc(pv.display_name)+'</button><button type="button" class="btn ghost" data-a="ac-rcancel">Cancel</button></p></div>';
+  }
+ }
+ if(L){h+='<div class="note warn" role="alertdialog" aria-label="Confirm lifting a restriction"><p><strong>Lift the restriction on '+esc(L.name)+'?</strong></p><p>They will be able to post and reply again.</p><label for="ac-lwhy">Reason for lifting (5 to 200 characters)</label><input id="ac-lwhy" type="text" maxlength="200" autocomplete="off"><p class="row"><button type="button" class="btn" data-a="ac-lconfirm">Yes, lift it</button><button type="button" class="btn ghost" data-a="ac-lcancel">Cancel</button></p></div>';}
+ return h;
+}
 function adminModHtml(){
  var C=ADMIN.com;if(!C)return '<div class="card"><h2>Community moderation</h2><div class="note warn" role="status">Couldn’t load the moderation tools.</div></div>';
  var h='<div class="card"><h2>Community moderation</h2><p class="mute">'+C.counts.open_reports+' open report'+(C.counts.open_reports===1?'':'s')+' &middot; '+C.counts.held+' waiting for approval &middot; '+C.counts.restricted+' restricted &middot; '+(C.counts.hotseat_new||0)+' new hot-seat question'+((C.counts.hotseat_new||0)===1?'':'s')+'. Reports never hide anything by themselves.</p>';
+ h+=adminRestrictPanel();
  h+='<h3>Waiting for approval (links from new members, and any risky link)</h3>';
- h+=C.held.length?C.held.map(function(x){return '<div class="crow" style="display:block"><p><strong>'+esc(x.title||"Reply")+'</strong> &middot; '+esc(x.author||"")+' &middot; '+esc(comWhen(x.created_at))+((x.link_flags&&x.link_flags.length)?' &middot; <span class="pill warn">'+esc(x.link_flags.join(", ").replace(/_/g," "))+'</span>':'')+'</p><p class="com-body">'+comLink(x.body)+'</p><p class="row"><button type="button" class="chip sm" data-a="ac-mod" data-t="'+x.type+'" data-id="'+x.id+'" data-act="approve">Approve</button><button type="button" class="chip sm" data-a="ac-mod" data-t="'+x.type+'" data-id="'+x.id+'" data-act="hide">Hide</button><button type="button" class="chip sm" data-a="ac-mod" data-t="'+x.type+'" data-id="'+x.id+'" data-act="remove">Remove</button><a class="chip sm" href="#/community/post/'+x.post_id+'">Open</a></p></div>';}).join(""):'<p class="mute">Nothing waiting.</p>';
+ h+=C.held.length?C.held.map(function(x){return '<div class="crow" style="display:block"><p><strong>'+esc(x.title||"Reply")+'</strong> &middot; '+esc(x.author||"")+' &middot; '+esc(comWhen(x.created_at))+((x.link_flags&&x.link_flags.length)?' &middot; <span class="pill warn">'+esc(x.link_flags.join(", ").replace(/_/g," "))+'</span>':'')+'</p><p class="com-body">'+comLink(x.body)+'</p><p class="row"><button type="button" class="chip sm" data-a="ac-mod" data-t="'+x.type+'" data-id="'+x.id+'" data-act="approve">Approve</button><button type="button" class="chip sm" data-a="ac-mod" data-t="'+x.type+'" data-id="'+x.id+'" data-act="hide">Hide</button><button type="button" class="chip sm" data-a="ac-mod" data-t="'+x.type+'" data-id="'+x.id+'" data-act="remove">Remove</button><button type="button" class="chip sm" data-a="ac-rpreview" data-src="'+x.type+'" data-id="'+x.id+'">Restrict this member</button><a class="chip sm" href="#/community/post/'+x.post_id+'">Open</a></p></div>';}).join(""):'<p class="mute">Nothing waiting.</p>';
  h+='<h3>Open reports</h3>';
- h+=C.reports.length?C.reports.map(function(x){return '<div class="crow" style="display:block"><p><strong>'+esc(x.target_type==="post"?"Post":"Reply")+'</strong> by '+esc(x.author||"")+' &middot; reported by '+esc(x.reporter||"")+' &middot; '+esc(comWhen(x.created_at))+' &middot; now '+esc(x.current_status||"gone")+'</p>'+(x.reason?'<p>“'+esc(x.reason)+'”</p>':'')+'<p class="mute com-body">'+esc(x.snapshot)+'</p><p class="row"><button type="button" class="chip sm" data-a="ac-resolve" data-id="'+x.id+'" data-act="keep">Keep</button><button type="button" class="chip sm" data-a="ac-resolve" data-id="'+x.id+'" data-act="hide">Hide</button><button type="button" class="chip sm" data-a="ac-resolve" data-id="'+x.id+'" data-act="remove">Remove</button><a class="chip sm" href="#/community/post/'+x.post_id+'">Open</a></p></div>';}).join(""):'<p class="mute">No open reports.</p>';
+ h+=C.reports.length?C.reports.map(function(x){return '<div class="crow" style="display:block"><p><strong>'+esc(x.target_type==="post"?"Post":"Reply")+'</strong> by '+esc(x.author||"")+' &middot; reported by '+esc(x.reporter||"")+' &middot; '+esc(comWhen(x.created_at))+' &middot; now '+esc(x.current_status||"gone")+'</p>'+(x.reason?'<p>“'+esc(x.reason)+'”</p>':'')+'<p class="mute com-body">'+esc(x.snapshot)+'</p><p class="row"><button type="button" class="chip sm" data-a="ac-resolve" data-id="'+x.id+'" data-act="keep">Keep</button><button type="button" class="chip sm" data-a="ac-resolve" data-id="'+x.id+'" data-act="hide">Hide</button><button type="button" class="chip sm" data-a="ac-resolve" data-id="'+x.id+'" data-act="remove">Remove</button><button type="button" class="chip sm" data-a="ac-rpreview" data-src="report" data-id="'+x.id+'">Restrict the reported member</button><a class="chip sm" href="#/community/post/'+x.post_id+'">Open</a></p></div>';}).join(""):'<p class="mute">No open reports.</p>';
  h+='<h3>Restricted members</h3>';
- h+=C.restr.length?C.restr.map(function(x){return '<div class="crow"><span><strong>'+esc(x.name||"No community name")+'</strong><br><span class="mute">'+esc(x.email)+(x.reason?' &middot; '+esc(x.reason):'')+'</span></span><button type="button" class="chip sm" data-a="ac-unrestrict" data-email="'+esc(x.email)+'">Lift</button></div>';}).join(""):'<p class="mute">No one is restricted.</p>';
+ h+=C.restr.length?C.restr.map(function(x){return '<div class="crow"><span><strong>'+esc(x.name||"No community name")+'</strong><br><span class="mute">'+esc(x.email)+(x.reason?' &middot; '+esc(x.reason):'')+'<br>Restricted '+esc(comWhen(x.restricted_at))+(x.set_by?' by '+esc(x.set_by):'')+'</span></span><button type="button" class="chip sm" data-a="ac-liftopen" data-ref="'+esc(x.ref)+'" data-name="'+esc(x.name||"this member")+'">Lift restriction</button></div>';}).join(""):'<p class="mute">No one is restricted.</p>';
  h+='<label for="ac-email">Restrict a member (they can read and report but not post)</label><input id="ac-email" type="email" autocomplete="off" placeholder="Their email address"><label for="ac-why">Reason (private)</label><input id="ac-why" type="text" maxlength="200"><p><button type="button" class="btn ghost" data-a="ac-restrict">Restrict</button></p>';
  h+='<label for="ac-pemail">Remove a member’s photo (if it breaks the guidelines)</label><input id="ac-pemail" type="email" autocomplete="off" placeholder="Their email address"><p><button type="button" class="btn ghost" data-a="ac-rmphoto">Remove their photo</button></p>';
  h+='<h3>Recent moderation actions</h3>';
@@ -580,6 +596,26 @@ async function adminComAct(a,d){
  else if(a==="ac-resolve")r=await comCall("admin_community_resolve_report",{p_report_id:+d.id,p_action:d.act,p_note:null});
  else if(a==="ac-restrict"){var em=(document.getElementById("ac-email").value||"").trim();if(!em){toast("Please type an email address first.");return;}r=await comCall("admin_community_restrict",{p_email:em,p_restricted:true,p_reason:(document.getElementById("ac-why").value||"")});}
  else if(a==="ac-rmphoto"){var pe=(document.getElementById("ac-pemail").value||"").trim();if(!pe){toast("Please type an email address first.");return;}r=await comCall("admin_community_remove_photo",{p_email:pe});if(r&&r.data&&r.data.path){try{await sb.storage.from("community-photos").remove([r.data.path]);}catch(e){}}}
+ else if(a==="ac-rpreview"){
+  var pr=await comCall("admin_community_restrict_preview",{p_source:d.src,p_id:+d.id});
+  if(pr.err){toast(pr.err);return;}
+  ADMIN.liftDraft=null;ADMIN.rdraft={src:d.src,id:+d.id,pv:pr.data};renderSafe();return;
+ }
+ else if(a==="ac-rcancel"){ADMIN.rdraft=null;renderSafe();return;}
+ else if(a==="ac-rconfirm2"){
+  var D2=ADMIN.rdraft;if(!D2)return;var why=(document.getElementById("ac-rwhy").value||"").trim();
+  if(why.length<5||why.length>200){toast(COMERR.reason_required);return;}
+  r=await comCall("admin_community_restrict_item",{p_source:D2.src,p_id:D2.id,p_expected_name:D2.pv.display_name,p_reason:why});
+  if(!(r&&r.err))ADMIN.rdraft=null;
+ }
+ else if(a==="ac-liftopen"){ADMIN.rdraft=null;ADMIN.liftDraft={ref:d.ref,name:d.name};renderSafe();return;}
+ else if(a==="ac-lcancel"){ADMIN.liftDraft=null;renderSafe();return;}
+ else if(a==="ac-lconfirm"){
+  var L2=ADMIN.liftDraft;if(!L2)return;var lw=(document.getElementById("ac-lwhy").value||"").trim();
+  if(lw.length<5||lw.length>200){toast(COMERR.reason_required);return;}
+  r=await comCall("admin_community_lift_restriction",{p_ref:L2.ref,p_reason:lw});
+  if(!(r&&r.err))ADMIN.liftDraft=null;
+ }
  else if(a==="ac-hold"){
   var hid=+(document.getElementById("ac-holdid").value||0),hw=(document.getElementById("ac-holdwhy").value||"").trim(),hd=document.getElementById("ac-holddate").value||null;
   if(!hid){toast("Please type a report number.");return;}
@@ -920,7 +956,7 @@ var COMERR={
  need_profile:"Please choose your community name first.",bad_title:"A title needs 3 to 120 characters.",bad_body:"Please write something (up to the length limit).",
  bad_bio:"Your short bio can be up to 280 characters.",contains_email:"Please leave email addresses out, to keep everyone's details private.",
  name_taken:"That name is already in use. Please choose another.",name_cooldown:"You can change your name once every 7 days.",
- hold_needs_reason_and_review_date:"A legal hold needs a reason and a review date within a year.",no_rule_approved:"No retention rule has been approved yet, so nothing was deleted.",still_a_member:"That person still has access. Members delete their own data from their profile.",is_admin_account:"That is an administrator account.",no_such_backup:"That backup is no longer available.",bad_mode:"Please choose a restore type.",
+ name_mismatch:"The member behind this item has changed. Please close this box and try again.",reason_required:"Please give a reason of 5 to 200 characters.",no_member:"This content no longer has a member (Former member), so there is no one to restrict.",not_active_member:"This member’s access has ended, so there is nothing to restrict.",already_restricted:"This member is already restricted.",cannot_restrict_admin:"Administrator accounts cannot be restricted.",hold_needs_reason_and_review_date:"A legal hold needs a reason and a review date within a year.",no_rule_approved:"No retention rule has been approved yet, so nothing was deleted.",still_a_member:"That person still has access. Members delete their own data from their profile.",is_admin_account:"That is an administrator account.",no_such_backup:"That backup is no longer available.",bad_mode:"Please choose a restore type.",
  photo_choose:"Please choose a photo first.",photo_type:"Please choose a JPEG, PNG or WebP photo.",photo_size:"That photo is too large. Please choose one under 5 MB.",photo_unreadable:"We couldn't read that photo. Please try a different one.",photo_failed:"Your photo didn't upload. Please try again.",photo_missing:"Your photo didn't upload. Please try again.",
  bad_name_reserved:"That name isn't available. Names that look like WEN staff or administrators aren't allowed.",
  bad_name_characters:"Use letters, numbers, spaces, apostrophes, full stops and hyphens only.",bad_name_length:"Names need 2 to 40 characters.",
