@@ -58,8 +58,8 @@ async function signOutAll(){
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function keysOf(o){var m={};Object.keys(o).forEach(function(k){m[k]=JSON.stringify(o[k]);});return m;}
 function changedKeys(){var out=[];if(!S)return out;Object.keys(S).forEach(function(k){if(SYNC.bk[k]!==JSON.stringify(S[k]))out.push(k);});return out;}
-function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:""};}
-function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return o;}
+function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{}};}
+function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return w2fix(o);}
 
 /* ---------- local mirror: survives a closed tab or a dropped connection ---------- */
 function mirrorKey(){return ME?"wsl_mirror_"+ME.id:null;}
@@ -358,7 +358,7 @@ function step7(){
  [["ready","Ready for Week 2"],["more","I\'d like to add more candidates first"],["change","I want to change product or partner type"],["help","I\'d like help in the group session"]].forEach(function(o){h+='<p><button type="button" class="chip" aria-pressed="'+(S.decision===o[0])+'" data-a="dec" data-val="'+o[0]+'">'+o[1]+'</button></p>';});
  if(S.decision==="ready"&&!sl.length)h+='<div class="note warn">Week 2 needs at least one partner to talk to. Add one to your shortlist, or choose "add more candidates".</div>';
  if(S.decision==="ready"&&sl.length>0&&sl.length<3)h+='<div class="note info">With a smaller pool you\'ll have fewer chances to test your approach. That\'s fine. You can add partners as you go.</div>';
- if(S.decision==="ready"&&sl.length>=1)h+='<div class="note ok"><strong>Week 1 is complete.</strong> Weeks 2 to 4 are not part of this test build. Your Week 1 work stays saved.</div>';
+ if(S.decision==="ready"&&sl.length>=1)h+='<div class="note ok"><strong>Week 1 is complete.</strong> Week 2 is now open on My Sprint. Weeks 3 and 4 are not part of this test build. Your Week 1 work stays saved.</div>';
  h+='</div><div class="card"><h2>Optional: what surprised you this week?</h2><textarea rows="3" style="min-height:80px" data-bind="refl" aria-label="What surprised you this week (optional)" placeholder="Skip this if you like"></textarea></div>';
  return shell(7,h);
 }
@@ -785,7 +785,7 @@ function home1(){
  if(ns){
   h+='<div class="hero"><div class="kicker">'+(d===0?"Start here":"Your next step")+'</div><h2>Step '+ns.n+': '+esc(ns.t)+'</h2><p>About '+ns.m+' minutes. '+(d===0?"You can stop at any time and come back. Everything saves as you go.":"Pick up where you left off.")+'</p><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/7*100)+'%"></i></div><p style="font-size:14px">'+d+' of 7 steps done &middot; about '+hm(left)+' left</p><a class="btn" href="#/step/'+ns.n+'">'+(d===0?"Start step 1":"Continue with step "+ns.n)+' &rarr;</a></div>';
  }else{
-  h+='<div class="hero"><div class="kicker">Week 1 complete</div><h2>Well done, Week 1 is finished</h2><p>All seven steps are done. Weeks 2 to 4 are not part of this test build, and your Week 1 work stays saved.</p></div>';
+  h+='<div class="hero"><div class="kicker">Week 1 complete</div><h2>Well done, Week 1 is finished</h2><p>All seven steps are done. Week 2 is open from the Week 2 tab, and your Week 1 work stays saved.</p></div>';
  }
  var GROUPS={1:["g1","Get set up"],3:["g2","Find your partners"],6:["g3","Make your offer"]};
  h+='<div class="card"><h2>The seven steps</h2>'+STEPS.map(function(s){var dn=S.steps[s.n],isNext=ns&&ns.n===s.n,gp=s.n<3?"g1":(s.n<6?"g2":"g3"),gh=GROUPS[s.n]?'<h3 class="grp '+GROUPS[s.n][0]+'l">'+GROUPS[s.n][1]+'</h3>':"";return gh+'<a class="step '+gp+(dn?" done":"")+(isNext?" next":"")+'" href="#/step/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(dn?"Done":(isNext?"Next":"Open"))+'</span></a>';}).join("")+'<p class="mute">Total about '+hm(mins(STEPS))+'. Do them in the order that suits you.</p></div>';
@@ -819,10 +819,13 @@ function remindCard(){
 }
 function topbar(){return '<div class="topbar"><span class="mute">Signed in as '+esc(ME?ME.email:"")+'</span>'+pillHtml()+'</div>'+(UI.toast?'<div id="toast" class="note info" role="status">'+esc(UI.toast)+'</div>':'');}
 function home(){
- var h='<h1>My Sprint</h1><p class="mute">Partnership-to-Sales &middot; Week 1 of 4</p>';
- h+='<div class="tabs"><button type="button" class="chip" aria-pressed="true">Week 1'+(week1Done()?' &#10003;':'')+'</button><button type="button" class="chip" disabled>Week 2</button><button type="button" class="chip" disabled>Week 3</button><button type="button" class="chip" disabled>Week 4</button></div>';
+ var wk=(S.week===2&&week1Done())?2:1;
+ var h='<h1>My Sprint</h1><p class="mute">Partnership-to-Sales &middot; Week '+wk+' of 4</p>';
+ h+='<div class="tabs"><button type="button" class="chip" aria-pressed="'+(wk===1)+'" data-a="w2-week" data-val="1">Week 1'+(week1Done()?' &#10003;':'')+'</button><button type="button" class="chip" aria-pressed="'+(wk===2)+'" data-a="w2-week" data-val="2"'+(week1Done()?'':' disabled title="Opens when you finish Week 1"')+'>Week 2</button><button type="button" class="chip" disabled>Week 3</button><button type="button" class="chip" disabled>Week 4</button></div>';
+ if(!week1Done())h+='<p class="mute">Week 2 opens when you finish Week 1 (choose "Ready for Week 2" in the last step).</p>';
+ if(wk===1)h+=w2Banner();
  if(S.focus.product&&S.focus.format)h+='<div class="note ok"><strong>Your product:</strong> '+esc(productLine())+'</div>';
- h+=home1();
+ if(wk===2)h+=home2();else{if(week1Done())h+='<div class="note ok"><strong>Week 2 is open.</strong> This is where you write to the partners you chose, and send the messages yourself. <button type="button" class="btn" data-a="w2-week" data-val="2">Open Week 2</button></div>';h+=home1();}
  h+='<div class="card"><h2>Your account</h2><p>Signed in as <strong>'+esc(ME?ME.email:"")+'</strong>.</p><p class="row"><button type="button" class="btn ghost" data-a="signout">Sign out</button> <button type="button" class="btn ghost" data-a="signoutall">Sign out of all devices</button></p>'+(FRAMED?'<p class="mute"><a href="'+esc(location.href.split("#")[0])+'" target="_blank" rel="noopener">Open the Sales Lab on its own page</a></p>':'')+'</div>';
  if(FLAGS.community===true)h+=comHomeCard();
  if(ME&&ME.admin)h+='<div class="card"><h2>Admin</h2><p class="mute">Manage who has access and the on and off switches.</p><p><a class="btn ghost" href="#/admin">Open admin tools</a></p></div>';
@@ -874,10 +877,10 @@ function render(){
  else if(PHASE==="error")html=errorHtml();
  else if(PHASE==="adminonly"){if(/^#\/community/.test(route))html=adminTop()+communityHtml();else{route="#/admin";html=adminTop()+adminHtml();}}
  else{
-  var m=(route||"#/").match(/^#\/step\/(\d)/);
+  var m=(route||"#/").match(/^#\/step\/(\d)/),m2=(route||"#/").match(/^#\/w2\/([1-6])$/);
   if(route==="#/admin"&&ME&&ME.admin){html=adminHtml();if(!ADMIN.members&&!ADMIN.busy)adminLoad();}
   else if(/^#\/community/.test(route)&&FLAGS.community===true)html=communityHtml();
-  else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else html=home();
+  else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else html=home();
   html=topbar()+html;
  }
  var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);try{comPhotoFill();}catch(e){}
@@ -900,6 +903,439 @@ function render(){
  window.scrollTo(0,y);
 }
 
+/* ---------- M4: Week 2, the first real contact (14 Nov 2026). Template based: no AI, nothing is ever sent by the app. ---------- */
+var STEPS2=[
+ {n:1,t:"Learn what makes a first message get a reply",m:35,b:"Your Week 1 shortlist."},
+ {n:2,t:"Draft your first message with the Message Builder",m:50,b:"Your Week 1 offer sketch (it pre-fills the builder)."},
+ {n:3,t:"Pre-send check, send, and log it",m:45,b:"A draft from step 2."},
+ {n:4,t:"Learn how to read and answer replies",m:30,b:"Nothing. You can do it while you wait."},
+ {n:5,t:"Follow up once, then log what happened",m:45,b:"A sent message. Follow-ups open about five days after sending."},
+ {n:6,t:"Review Week 2 and decide what's next",m:15,b:"Whatever you've done so far."}
+];
+var W2CH=[["email","Email"],["dm","Direct message"],["form","Contact form"],["person","In person"]];
+var W2TONES=[["warm","Warm"],["brief","Brief"],["formal","A bit more formal"]];
+var W2REPLIES=[["yes","Yes or tell me more"],["maybe","Maybe later"],["no","No"],["noreply","No reply yet"]];
+var W2FUV=["A short extra idea","A useful link","A quick example"];
+var W2PRE=[["a","I chose this partner for a reason I can state"],["b","The message is personal to them, not copied to others"],["c","It has no private details about anyone"],["d","I am using a normal way to reach them"],["e","If I will earn money from this, I have said so"]];
+var W2STUCK=[["nerv","I felt nervous"],["write","I wasn't sure what to write"],["partner","I couldn't find the right partner"],["time","I ran out of time"]];
+var W2COLLAB={
+ "A mention to their audience":["a short mention to your audience","a short mention to your audience. I would write the wording and supply the link, so it would only take you a few minutes"],
+ "An introduction":["an introduction to anyone in your network who might find it useful","an introduction to anyone in your network who might find it useful. I would write a short note you could forward, so it takes you almost no effort"],
+ "A guest slot":["a guest slot for your audience","a guest slot, where I would share one short, practical piece with your audience"],
+ "A shared link":["sharing a link to it with a line about who it is for","sharing a link to it with a line about who it is for. I would write the line, so you do not have to"],
+ "A short chat first":["a short chat first, to see whether it would suit your audience","a short chat first, just to see whether it would be useful to your audience at all"]
+};
+var W2REL={known:"You know the people I am trying to help, so I wanted to ask you first.",teaches:"Your audience already comes to you to learn about this, so it felt like a natural fit.",host:"Your community is full of the people I made it for, so it felt like a natural fit.",next:"Your customers are at a stage right next to where mine are, so it felt like a natural fit.",service:"You already help the same people, so it felt like a natural fit.",tool:"The people who use your tool are the people I made this for, so it felt like a natural fit."};
+var W2GAIN={"Saves them time":"it could save you time","A new resource for their audience":"it gives your audience a useful new resource at no cost to you","Content for their channel":"it gives you something fresh to share with your audience","Other":"it should be genuinely useful to your audience"};
+var W2CONTR=[["I would","I'd"],["I have","I've"],["It is","It's"],["it is","it's"],["is not","isn't"],["do not","don't"],["I am","I'm"],["would not","wouldn't"]];
+var W2DEF={channel:"",noticed:"",tone:"warm",draft:"",prevDraft:"",v:0,status:"",sentAt:"",reply:"",repliedAt:"",answered:false,ans:"",fuSent:false,fuAt:"",fuDraft:"",fuValue:[],judge:{},name:"",ackAsk:false};
+var W2OUTKEYS={draft:1,noticed:1,ans:1,fuDraft:1};
+
+/* ===== W2 LOGIC START: pure rules, checked by dev/m4_logic_tests.js ===== */
+function nowMs(){return window.__slNow||Date.now();}
+function ymd(ms){var d=new Date(ms);return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function parseYmd(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||""));return m?new Date(+m[1],+m[2]-1,+m[3]).getTime():null;}
+function addDays(s,n){var t=parseYmd(s);if(t==null)return "";var d=new Date(t);d.setDate(d.getDate()+n);return ymd(d.getTime());}
+function today(){return ymd(nowMs());}
+function dayLab(s){var t=parseYmd(s);if(t==null)return "";return new Date(t).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});}
+function w2J(k){var v=CONTENT[k];if(!v)return null;try{return JSON.parse(v);}catch(e){return null;}}
+function w2Nm(c){return (String((c&&c.name)||"").replace(/\s*\(.*$/,"").replace(/,.*$/,"").trim())||"them";}
+function w2Cand(id){var c=cand(id);if(c)return c;var o=(S.out||{})[id]||{};return {id:+id,name:o.name||"Partner",type:"host",short:false};}
+function O(c){return (S.out&&S.out[c.id])||W2DEF;}
+function OW(c){var o=S.out[c.id];if(!o){o=clone(W2DEF);o.name=w2Nm(c);S.out[c.id]=o;}return o;}
+function w2Words(t){var b=String(t||"").replace(/^Subject:.*$/m,"").trim();return b?b.split(/\s+/).length:0;}
+function w2Limit(ch){return {email:180,dm:95,form:120,person:9999}[ch]||180;}
+function w2Suggest(c){
+ if(c.type==="known")return ["person","You know them, so an in-person chat or a short direct message will feel most natural."];
+ if(c.type==="teaches")return ["dm","Creators often prefer a short, friendly direct message to a formal email."];
+ if(c.type==="host")return ["email","Newsletter and community hosts usually publish an address for enquiries, and a clear email suits them."];
+ if(c.type==="next")return ["form","Shops often route partnership enquiries through a contact form, so keep it clear and brief."];
+ if(c.type==="tool")return ["form","Tools usually have a partnerships or contact form."];
+ return ["email","An email to a published address usually works for a service provider."];
+}
+function w2Offered(c){var sk=S.sketch[c.id]||{};return (sk.offer||[]).filter(function(k){return S.focus.inc.indexOf(k)>-1;});}
+function w2IncPhrases(c,sh){var f=S.focus,out=[];w2Offered(c).forEach(function(k){var dt=lc(f.incd[k]||"");
+ if(k==="free")out.push(sh?"a free copy":"a free copy or free access, so you can try it yourself first");
+ else if(k==="disc")out.push("a discount for your audience"+(dt?" ("+dt+")":""));
+ else if(k==="trial")out.push("a longer free trial for your audience");
+ else if(k==="comm")out.push("a commission on any sales that come through your link"+(dt?" ("+dt+")":""));
+ else if(k==="give")out.push("a giveaway we could run together");});return out;}
+function w2GainText(sk,n){var g=(sk.gain||[]).map(function(k){return W2GAIN[k];}).filter(Boolean).slice(0,n||2);return g.length?joinAnd(g):"it should be genuinely useful to your audience";}
+function w2Pieces(c){
+ var f=S.focus,sk=S.sketch[c.id]||{},o=O(c);
+ var pn=f.product||"my product",fmtp=FMTP[f.format]||"",buyer=lc(S.buyer.who),problem=lc(f.problem),outcome=lc(f.outcome),pt=priceText();
+ var ask=(sk.ask||[])[0]||"",cl=W2COLLAB[ask]||null,incs=w2IncPhrases(c);
+ var P={name:w2Nm(c),pn:pn,n:(o.noticed||"").trim(),person:c.type==="known",
+  intro:"I make "+pn+(fmtp?", "+fmtp:"")+(buyer?" for "+buyer:"")+".",
+  solves:problem?(buyer?"Many of them":"Many of its customers")+" struggle with "+problem+".":"",
+  gets:outcome?"After using it, they "+outcome+".":"",
+  cost:pt?"It costs "+pt+".":"",
+  url:(f.url||"").trim(),rel:W2REL[c.type]||W2REL.host,
+  collabShort:cl?cl[0]:"",collabLong:cl?cl[1]:"",incText:joinAnd(incs),incTextS:joinAnd(w2IncPhrases(c,true)),
+  gain:w2GainText(sk),gain1:w2GainText(sk,1),introS:"I make "+pn+(fmtp?", "+fmtp:"")+".",comm:w2Offered(c).indexOf("comm")>-1,link:(sk.measure||[]).indexOf("A unique link")>-1};
+ return P;
+}
+function w2Greet(P,tone){var who=P.person?P.name:"there";return tone==="formal"?(P.person?"Dear "+P.name+",":"Dear "+P.name+" team,"):"Hi "+who+",";}
+function w2Sign(tone){return tone==="formal"?"Kind regards,\n[Your name]":(tone==="brief"?"Thanks,\n[Your name]":"Warmly,\n[Your name]");}
+function w2Contract(t,tone){if(tone==="formal")return t;W2CONTR.forEach(function(p){t=t.split(p[0]).join(p[1]);});return t;}
+function w2Outline(P,n){return "Conversation outline (no script, just a guide)\n\n1. Opener: say what you noticed. \"I really enjoyed "+n+".\"\n2. Why them: "+P.rel+"\n3. What it is: "+P.intro+(P.gets?" "+P.gets:"")+"\n   What is in it for them: "+P.gain+"."+"\n4. What you would like to suggest: "+(P.collabLong||"[choose the collaboration you want to suggest]")+(P.incText?"\n5. What you would offer: "+P.incText+(P.comm?" (and say clearly that it earns you a commission)":""):"")+"\n"+(P.incText?"6":"5")+". An easy way out: \"No worries at all if it's not the right fit.\"\n\nAfterwards, offer to send a short note so they have it in writing. Listen more than you pitch.";}
+function w2Compose(c,o,v,brief){
+ var P=w2Pieces(c),g=w2Greet(P,o.tone),n=P.n||"[something specific you noticed]",s=w2Sign(o.tone),ch=o.channel,b=!!brief||o.tone==="brief";
+ var cap=function(x){return x.charAt(0).toUpperCase()+x.slice(1);};
+ if(ch==="person")return w2Outline(P,n);
+ var like=["I really enjoyed "+n+".",cap(n)+" stuck with me.","I have been following your work, and "+n+" was spot on."][v%3];
+ var open=["I would love to propose ","I wondered about ","Here is what I had in mind: "][v%3];
+ var prop=P.collabLong?open+P.collabLong+".":"[Choose the collaboration you want to suggest.]";
+ var propS=P.collabShort?"I wondered about "+P.collabShort:"[your suggestion]";
+ var disc=P.comm?" If you do share it, please say clearly that it earns you a commission, so your audience can trust it.":"";
+ var inc=P.incText?" To make it worthwhile, I would offer "+P.incText+"."+disc:"";
+ var incS=P.incText?", with "+P.incText:"";
+ var gainS=cap(P.gain)+".",gain1S=cap(P.gain1)+".";
+ var meas=P.link?" I would give you a link only your audience uses, so we can both see what happens.":"";
+ var t;
+ if(ch==="dm"){
+  var dmEnd=" "+propS+incS+(P.comm?" (please say clearly that it earns you a commission)":"")+". Would you be open to that? No pressure at all if it is not a fit.";
+  t=g+" "+like+" "+P.intro+" "+P.rel+" "+gainS+dmEnd;
+  if(b||w2Words(t)>w2Limit("dm"))t=g+" "+like+" "+P.intro+" "+gainS+dmEnd;
+  if(w2Words(t)>w2Limit("dm"))t=g+" "+like+" "+P.intro+" "+gain1S+dmEnd;
+  if(w2Words(t)>w2Limit("dm"))t=g+" "+like+" "+P.introS+" "+gain1S+dmEnd;
+  if(w2Words(t)>w2Limit("dm")){var dmEndS=" "+propS+(P.incTextS?", with "+P.incTextS:"")+(P.comm?" (please say clearly that it earns you a commission)":"")+". Would you be open to that? No pressure at all if it is not a fit.";t=g+" I enjoyed "+n+". "+P.introS+" "+gain1S+dmEndS;}
+ }else if(ch==="form"){
+  var fEnd=" Would you be open to that? No problem at all if it is not a fit. Thank you for your time.",fHead="Hello, I am [Your name]. "+like+" "+P.intro;
+  var fTry=[fHead+(P.gets&&!b?" "+P.gets:"")+" "+P.rel+" "+gainS+" "+prop+inc+fEnd,fHead+" "+P.rel+" "+gainS+" "+prop+inc+fEnd,fHead+" "+gainS+" "+prop+inc+fEnd,fHead+" "+gainS+" "+propS+incS+"."+fEnd,"Hello, I am [Your name]. I enjoyed "+n+". "+P.introS+" "+gain1S+" "+propS+(P.incTextS?", with "+P.incTextS:"")+(P.comm?" (please say clearly that it earns you a commission)":"")+"."+fEnd];
+  t=fTry[0];for(var fi=1;fi<fTry.length&&w2Words(t)>w2Limit("form");fi++)t=fTry[fi];
+ }else{
+  var subj=["Something that might help your audience","An idea for your readers","Could "+P.pn+" help your audience?"][v%3];
+  if(b)t="Subject: "+subj+"\n\n"+g+"\n\n"+like+" "+P.intro+" "+P.rel+" "+gainS+" "+prop+inc+"\n\nWould you be open to that? No pressure at all if it is not a fit.\n\n"+s;
+  else{
+   var eTop="Subject: "+subj+"\n\n"+g+"\n\n"+like+" "+P.intro,eEnd="\n\n"+P.rel+" "+gainS+" "+prop+inc+meas+"\n\nWould you be open to that? No worries at all if it is not the right fit.\n\n"+s,eUrl=(P.url?" You can see it here: "+P.url:"");
+   var eTry=[eTop+(P.solves?" "+P.solves:"")+(P.gets?" "+P.gets:"")+(P.cost?" "+P.cost:"")+eUrl+eEnd,eTop+(P.gets?" "+P.gets:"")+(P.cost?" "+P.cost:"")+eUrl+eEnd,eTop+(P.cost?" "+P.cost:"")+eUrl+eEnd,eTop+eUrl+eEnd,eTop+eEnd,eTop+"\n\n"+gainS+" "+prop+inc+"\n\nWould you be open to that? No worries at all if it is not the right fit.\n\n"+s,eTop+"\n\n"+gainS+" "+propS+incS+"."+"\n\nWould you be open to that? No worries at all if it is not the right fit.\n\n"+s];
+   t=eTry[0];for(var ei=1;ei<eTry.length&&w2Words(t)>w2Limit("email");ei++)t=eTry[ei];
+  }
+ }
+ return w2Contract(t,o.tone);
+}
+/* Safeguards: things that must not go out without the member knowing. They are separate from the six learning ticks. */
+function w2Guard(c){
+ var o=O(c),t=String(o.draft||""),low=t.toLowerCase(),res=[],f=S.focus,off=w2Offered(c);
+ if(!t.trim())return res;
+ if(/\[[^\]]{2,}\]/.test(t))res.push({k:"placeholder",t:"There is still text in [square brackets] to fill in or remove, such as your name or what you noticed."});
+ var l2=low.replace(/feel free/g,"");
+ var unl=[];
+ if((/\bfree (copy|access|trial|gift|download|sample|template|month|week|session)/.test(l2)||/\bfor free\b/.test(l2)||/\bcomplimentary\b/.test(l2))&&off.indexOf("free")<0&&off.indexOf("trial")<0)unl.push("a free copy or free access");
+ if(/(discount|% off|percent off|voucher|promo code|coupon|money off)/.test(l2)&&off.indexOf("disc")<0)unl.push("a discount");
+ if(/(commission|affiliate|revenue share|kickback)/.test(l2)&&off.indexOf("comm")<0)unl.push("a commission");
+ if(/giveaway/.test(l2)&&off.indexOf("give")<0)unl.push("a giveaway");
+ var allowed=(priceText()+" "+(f.incd.disc||"")+" "+(f.incd.comm||"")).replace(/\s+/g,"");
+ var amts=(t.match(/[£$€]\s?\d[\d.,]*/g)||[]).map(function(x){return x.replace(/\s+/g,"");});
+ if(amts.some(function(x){return allowed.indexOf(x)<0;}))unl.push("an amount of money that is not in your product details");
+ var pcts=(t.match(/\d+(\.\d+)?\s?%/g)||[]).map(function(x){return x.replace(/\s+/g,"");});
+ if(pcts.some(function(x){return allowed.indexOf(x)<0;}))unl.push("a percentage you have not listed");
+ if(unl.length)res.push({k:"offer",t:"Your message mentions "+joinAnd(unl)+", which you have not chosen to offer this partner. Remove it, or add it to your offer in Week 1 so it is yours to promise."});
+ if(/(guarantee|guaranteed|proven|best[- ]?sell|number one|#1|thousands of|everyone loves|customers say|reviews say|testimonial|rated |sold out|\d+\s?(x|times) more|(make|earn|earned|made)\s+(an extra\s+)?[£$€]?\d|passive income|double your|triple your|\d+%\s+(more|increase|growth|boost))/.test(l2))res.push({k:"claims",t:"It makes a claim about results, income, sales or what other people say. Only keep it if it is true and you can show it."});
+ if(/(only today|today only|last chance|hurry|don't miss|act now|limited (time|spots|places|offer)|offer ends|expires|before it's gone|before it is gone|\d+\s+(spots|places) left|reply (by|before)|need an answer)/.test(l2))res.push({k:"urgency",t:"It uses urgency or pressure. Calm and honest earns more trust, so take it out."});
+ if(/(commission|affiliate|revenue share)/.test(l2)&&!/(say clearly|open about|disclos|make clear|state clearly|be clear that|transparent|tell your audience|say so|says so)/.test(l2))res.push({k:"disclosure",t:"Money is involved, so add a clear line saying that a commission is paid, and ask them to be open about it with their audience."});
+ if(/[\w.+-]+@[\w-]+\.[\w.-]+/.test(t)||/(\+?\d[\d\s()-]{9,}\d)/.test(t))res.push({k:"private",t:"There is an email address or phone number in the message. Only keep it if it is your own business contact."});
+ Object.keys(S.out||{}).forEach(function(id){if(id==c.id)return;var x=S.out[id];if(x&&x.draft&&x.draft.trim().length>40&&x.draft.trim()===t.trim())res.push({k:"copy",t:"This message is word for word the same as the one for "+(x.name||"another partner")+". Make each message personal to the person you are writing to."});});
+ return res;
+}
+function w2Pitch(c){
+ var o=O(c),t=o.draft||"",low=t.toLowerCase(),res=[];
+ var nw=(o.noticed||"").toLowerCase().split(/[^a-z0-9']+/).filter(function(w){return w.length>3;});
+ var hit=nw.filter(function(w){return low.indexOf(w)>-1;}).length;
+ var spec=nw.length>=3&&hit>=Math.min(3,nw.length)&&(o.noticed||"").trim().length>0;
+ res.push({k:"A specific reason for choosing them",ok:spec,looked:"Whether your own \"what I noticed\" line appears in the message.",tip:"Add something real you noticed about their work. Specific beats flattering."});
+ var iA=low.search(/(would you|could you|are you open|be open to|might you|consider|happy to chat|quick chat|be of interest)/),iG=low.search(/(your (audience|readers|community|followers|customers|listeners|people)|for you\b|you'd|you could|saves? you)/);
+ res.push({k:"Their benefit comes before your ask",ok:iG>-1&&(iA<0||iG<iA),looked:"Whether something in it for them appears before the ask.",tip:"Say what they or their audience gain before you ask for anything."});
+ var asks=t.split(/[.!?]+/).filter(function(s){return /(would you|could you|are you open|be open to|might you|would it be|be of interest|would [a-z ]+ be something)/i.test(s);}).length,qm=(t.match(/\?/g)||[]).length;
+ res.push({k:"One clear, small ask",ok:asks>=1&&asks<=1&&qm<=2,looked:"How many separate requests the message makes.",tip:asks<1?"Add one clear, small ask.":"Keep to one ask. Choose the most useful and drop the rest."});
+ res.push({k:"An easy way out",ok:/(no worries|no pressure|no problem|totally fine|completely fine|if it's not|if it is not|not the right fit|understand if)/.test(low),looked:"Whether the message makes it easy to say no.",tip:"Add a warm line like \"No worries at all if it's not a fit\"."});
+ var wc=w2Words(t),lim=w2Limit(o.channel),formal=/(dear |kind regards|yours sincerely)/.test(low),styleBad=(o.channel==="dm"&&formal);
+ res.push({k:"The right length and style for this channel",ok:(o.channel==="person"||wc<=lim)&&!styleBad&&wc>0,looked:"Length against this channel's guide ("+(o.channel==="person"?"no limit":lim+" words")+") and whether the style suits it. You have "+wc+" words.",tip:styleBad?"A direct message should feel conversational, so drop the formal wording.":"Trim it. Cut anything that isn't the reason, the benefit or the ask."});
+ var bad=w2Guard(c).some(function(g){return g.k==="offer"||g.k==="claims"||g.k==="urgency";});
+ res.push({k:"Honest and free of pressure",ok:t.length>0&&!bad,looked:"Whether there is false urgency, big promises, income claims, or an offer you have not chosen.",tip:"Remove urgency and promises you can't back up. Calm and honest earns more trust."});
+ return res;
+}
+function w2PitchScore(c){return w2Pitch(c).filter(function(i){return i.ok;}).length;}
+function w2Sent(){var out=[];Object.keys(S.out||{}).forEach(function(id){var o=S.out[id];if(o&&o.status==="sent")out.push({id:+id,o:o,c:w2Cand(id),name:o.name||w2Nm(w2Cand(id))});});out.sort(function(a,b){return a.o.sentAt<b.o.sentAt?-1:(a.o.sentAt>b.o.sentAt?1:a.id-b.id);});return out;}
+function w2Pending(){return w2Sent().filter(function(e){return !e.o.fuSent&&(!e.o.reply||e.o.reply==="noreply");});}
+function w2FuOpens(o){return addDays(o.sentAt,5);}
+function w2Due(e,now){return w2FuOpens(e.o)<=(now||today());}
+function w2End(){return S.w2.openedAt?addDays(S.w2.openedAt,7):"";}
+function w2Late(d){var e=w2End();return !!e&&d>e;}
+function w2NeedsAnswer(){return w2Sent().filter(function(e){return e.o.reply==="yes"&&!e.o.answered;});}
+function w2Waiting(now){
+ var p=w2Pending();if(!p.length)return null;
+ if(p.some(function(e){return w2Due(e,now);}))return null;
+ var next=p.map(function(e){return {e:e,d:w2FuOpens(e.o)};}).sort(function(a,b){return a.d<b.d?-1:1;})[0];
+ return "Waiting for replies. The follow-up with "+next.e.name+" opens on "+dayLab(next.d)+(w2Late(next.d)?". That falls in Week 3 and carries forward automatically, so you have not fallen behind.":".");
+}
+function w2Issues(c){
+ var iss=w2Guard(c).map(function(g){return g.t;}),o=O(c);
+ if((S.w2.pre||[]).length<W2PRE.length)iss.push("The pre-send checklist is not fully ticked yet.");
+ if(!(o.draft||"").trim()&&o.channel!=="person")iss.push("There is no draft yet. You can still log that you sent something you wrote yourself.");
+ return iss;
+}
+function w2Rec(){
+ var sent=w2Sent(),replied=sent.filter(function(e){var r=e.o.reply;return r&&r!=="noreply";}),yes=sent.filter(function(e){return e.o.reply==="yes";}),maybe=sent.filter(function(e){return e.o.reply==="maybe";});
+ if(!sent.length)return {c:"info",t:"Nothing sent yet",b:"That is okay. Tell us what got in the way and we will point you to the right help. Starting with a warm contact, or practising with a friend, often makes the first one easier."};
+ if(yes.length)return {c:"ok",t:"Recommended: shape a small collaboration in Week 3",b:"You have at least one partner who said yes or asked for more. Week 3 helps you agree a small, specific collaboration with them."};
+ if(maybe.length)return {c:"info",t:"Keep the door open and message your next partner",b:"A \"maybe later\" is a soft yes. Set a check-back reminder, and use what you have learned for your next message."};
+ if(replied.length)return {c:"info",t:"Learn from the replies, then try another partner",b:"A polite no is useful information. Change one thing, such as the opening observation, the ask or the partner type, and try the next partner."};
+ if(sent.length<3)return {c:"info",t:"Too early to judge",b:"With only "+sent.length+" message"+(sent.length>1?"s":"")+" sent and no replies yet, there is not enough to learn from. Wait for the follow-up window, then change one thing and try another partner."};
+ return {c:"warn",t:"No replies yet. Check before sending more",b:"Look at your Pitch Check ticks and your partners' fit scores before sending more. Quality and fit come first."};
+}
+function w2FuDraft(c){
+ var o=O(c),P=w2Pieces(c),v=(o.fuValue||[])[0]||"A short extra idea",extra={"A short extra idea":"one more thought for your audience: [add one true, specific tip about "+P.pn+"]","A useful link":"a link that may help your audience: [paste the link]","A quick example":"a quick example of how someone might use "+P.pn+": [add a real example you are happy to share]"}[v]||"[something useful]";
+ return w2Greet(P,o.tone)+" following up on my earlier message. I wanted to add "+extra+". No worries at all if it is not a fit.";
+}
+function w2AnswerDraft(c){
+ var o=O(c),P=w2Pieces(c),g=w2Greet(P,o.tone);
+ if(o.reply==="yes")return g+" thank you, that is great to hear. Would a short chat this week suit you, so we can agree the details? Whatever works for you is fine.";
+ if(o.reply==="maybe")return g+" thanks for letting me know, that is completely fine. Would it be okay if I check back in a month or two?";
+ return g+" thank you for letting me know. I appreciate you taking the time, and I wish you all the best.";
+}
+/* ===== W2 LOGIC END ===== */
+
+function w2Touch(){if(S&&S.w2&&!S.w2.openedAt){S.w2.openedAt=today();save();}}
+function w2Chips(path,opts,max){return chipsHtml(path,opts,max);}
+function shell2(n,body){
+ var s=STEPS2[n-1],dn=S.w2.steps[n];
+ var h='<a class="back" href="#/" data-a="w2-week" data-val="2">&larr; My Sprint</a><h1>Week 2 &middot; Step '+n+' of 6</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p>'+glance(2,n)+'<p class="mute">You will need: '+esc(s.b)+' Everything saves automatically. Do the steps in any order that suits you.</p>';
+ h+=body;
+ h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="w2-done" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<6?'<a class="btn ghost" href="#/w2/'+(n+1)+'">Next step &rarr;</a>':'<a class="btn ghost" href="#/" data-a="w2-week" data-val="2">Back to My Sprint</a>')+'</div>';
+ return h;
+}
+function w2Stuck(inStep){
+ if(w2Sent().length)return "";
+ if(!inStep&&!(S.w2.openedAt&&dayDiffS(S.w2.openedAt,today())>=3))return "";
+ var h='<div class="card"><h2>Haven\'t sent your first message yet?</h2><p class="mute">That is completely normal. What got in the way? (optional)</p>'+w2Chips("w2.stuck",W2STUCK,1);
+ var s=(S.w2.stuck||[])[0],help=w2J("w2.stuck");
+ if(s&&help&&help[s])h+='<div class="note ok">'+esc(help[s])+'</div>';
+ return h+'</div>';
+}
+function dayDiffS(a,b){var x=parseYmd(a),y=parseYmd(b);return (x==null||y==null)?0:Math.round((y-x)/864e5);}
+function w2NextAction(){
+ var ans=w2NeedsAnswer()[0];if(ans)return {t:"Answer "+ans.name+"'s reply",link:"#/w2/5"};
+ var due=w2Pending().filter(function(e){return w2Due(e);})[0];if(due)return {t:"Follow up with "+due.name,link:"#/w2/5"};
+ for(var i=0;i<STEPS2.length;i++){var n=STEPS2[i].n;if(!S.w2.steps[n]){if(n===5&&w2Waiting())continue;return {t:"Step "+n+": "+STEPS2[i].t,link:"#/w2/"+n,m:STEPS2[i].m};}}
+ return {t:"Open your Week 2 review",link:"#/w2/6"};
+}
+function w2CarryCard(){
+ var p=w2Pending(),ans=w2NeedsAnswer();
+ if(!ans.length&&!p.length)return "";
+ var h='<div class="card"><h2>Carrying into Week 3</h2><p class="mute">Anything still open moves forward automatically. You have not fallen behind. Week 3 is not part of this test build yet, and your records stay saved.</p>';
+ ans.forEach(function(e){h+='<div class="crow"><span>Answer '+esc(e.name)+'</span><span class="mute">Reply needs an answer</span></div>';});
+ p.forEach(function(e){var d=w2FuOpens(e.o);h+='<div class="crow"><span>Follow up with '+esc(e.name)+'</span><span class="mute">'+(d<=today()?'Due now':'Opens '+esc(dayLab(d)))+'</span></div>';});
+ return h+'</div>';
+}
+function w2Banner(){
+ var ans=w2NeedsAnswer()[0],due=w2Pending().filter(function(e){return w2Due(e);})[0],wl=w2Waiting();
+ if(ans)return '<div class="note info"><strong>Next action:</strong> answer '+esc(ans.name)+'\'s reply. <a href="#/w2/5">Open</a></div>';
+ if(due)return '<div class="note info"><strong>Next action:</strong> follow up with '+esc(due.name)+'. <a href="#/w2/5">Open</a></div>';
+ if(wl)return '<div class="note info">&#9203; '+esc(wl)+'</div>';
+ return "";
+}
+function home2(){
+ w2Touch();
+ var d2=STEPS2.filter(function(s){return S.w2.steps[s.n];}).length,na=w2NextAction(),wl=w2Waiting();
+ var left=STEPS2.filter(function(s){return !S.w2.steps[s.n];}).reduce(function(a,s){return a+s.m;},0);
+ var h='<div class="card"><div class="row" style="justify-content:space-between"><strong>'+d2+' of 6 steps done</strong><span class="mute">About '+hm(left)+' left</span></div><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d2/6*100)+'%"></i></div>';
+ if(wl)h+='<div class="note info" style="margin-top:12px"><strong>&#9203; '+esc(wl)+'</strong><br>Nothing to do right now. If you like, learn about replies in step 4 while you wait.</div>';
+ h+='<h3>Your next action</h3><p><strong>'+esc(na.t)+'</strong>'+(na.m?' <span class="tag">'+na.m+' min</span>':'')+'</p><a class="btn" href="'+na.link+'">Continue</a></div>';
+ h+=w2Stuck(false)+w2CarryCard();
+ h+=planCard(STEPS2);
+ h+='<div class="card"><h2>The six steps</h2>'+STEPS2.map(function(s){var dn=S.w2.steps[s.n];return '<a class="step'+(dn?' done':'')+'" href="#/w2/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min &middot; builds on: '+esc(s.b)+'</span></span><span class="mute">'+(dn?"Done":"Open")+'</span></a>';}).join("")+'<p class="mute">Total about '+hm(mins(STEPS2))+', with waiting time between sending and following up. Nothing is sent by this app: you send every message yourself.</p></div>';
+ return h+remindCard()+helpCard();
+}
+function w2s1(){
+ w2Touch();
+ var ck=w2J("w2s1.check"),h=LC("w2s1.lesson")+LC("w2s1.ex");
+ h+='<div class="card"><h2>Quick check</h2>';
+ if(ck){
+  h+='<p>'+esc(ck.prompt)+'</p>'+w2Chips("w2.quiz1",ck.parts)+'<p><button type="button" class="btn ghost" data-a="w2-mark1">Check my answer</button></p>';
+  if(S.w2.quiz1done){var q=S.w2.quiz1,ok=ck.right.every(function(r){return q.indexOf(r)>-1;})&&q.length===ck.right.length;h+='<div class="note '+(ok?"ok":"info")+'" aria-live="polite">'+esc((ok?ck.yes:ck.no)+ck.explain)+'</div>';}
+ }else h+='<p class="mute">This check could not be loaded. Please refresh the page.</p>';
+ h+='<label>Which part do you find hardest to write? (optional)</label>'+w2Chips("w2.hardest",[["why","The opening observation"],["what","Explaining my product"],["gain","What's in it for them"],["ask","The ask"]],1)+'</div>';
+ return shell2(1,h);
+}
+function w2Practice(){
+ var h='<div class="card"><h2>Optional: practise with a friend first <span class="tag">optional</span></h2><p>Nervous about your first message? Try it out loud on someone you trust. <strong>It prepares you. Your real messages are what count.</strong></p><ol><li>Read your draft aloud to a friend, or record yourself on your phone.</li><li>Ask them: Is it clear what I am offering? Would you reply? What would you change?</li></ol>'+w2Chips("w2.practice",[["clear","It was clear"],["reply","They'd reply"],["change","They'd change something"]]);
+ h+='<p><button type="button" class="chip" aria-pressed="'+!!S.w2.practiceDone+'" data-a="w2-prac">I\'ve practised</button></p>';
+ if(S.w2.practiceDone)h+='<div class="note ok">Nice. Make any changes you noted, then send a real one when you are ready.</div>';
+ return h+'</div>';
+}
+function w2Proposal(c){
+ var sk=S.sketch[c.id]||{},inc=incKeys().filter(function(x){return S.focus.inc.indexOf(x[0])>-1;}),P=w2Pieces(c);
+ var h='<div class="card"><h2>3. What you are proposing</h2><p class="mute">Check this carefully. The message will only say what is ticked here, and nothing is added that you have not chosen.</p>';
+ h+='<label>The collaboration you would like to suggest (choose one)</label>'+sChips(c.id,"ask",ASK);
+ h+='<label>Anything you are happy to offer? (optional)</label>';
+ if(inc.length)h+=sChips(c.id,"offer",inc);
+ else h+='<p class="mute">You have not listed anything you are willing to offer in your product details, so this message will propose the collaboration only. <a href="#/step/1">Add something in Week 1, step 1</a> if you want to.</p>';
+ h+='<div class="note '+(P.collabShort?'info':'warn')+'" aria-live="polite"><strong>This message will:</strong> '+(P.collabShort?'suggest '+esc(P.collabShort)+'.':'not suggest anything yet. Choose a collaboration above.')+' '+(P.incText?'It will offer '+esc(P.incText)+'.':'It will not offer any discount, commission or freebie.')+'</div>';
+ var miss=[];if(!S.focus.problem)miss.push("what problem it solves");if(!S.focus.outcome)miss.push("what customers get");if(!S.buyer.who)miss.push("who your buyer is");
+ if(miss.length)h+='<div class="note info">Your draft will be more specific if you add '+miss.join(", ")+'. <a href="#/step/1">Add it to your product details</a>.</div>';
+ return h+'</div>';
+}
+function w2PitchHtml(c){
+ var o=O(c),it=w2Pitch(c),ok=it.filter(function(i){return i.ok;}).length;
+ var h='<h3 style="margin-top:0">Pitch Check <span class="tag">learning tool, not a grade</span></h3><p class="mute">'+ok+' of 6 look good. '+w2Words(o.draft)+' words'+(o.channel&&o.channel!=="person"?' (guide: under '+w2Limit(o.channel)+')':'')+'.</p>';
+ it.forEach(function(i){h+='<div class="pk">'+(i.ok?"&#10003; ":"&#9744; ")+'<strong>'+esc(i.k)+'</strong><br><span class="mute">What we looked at: '+esc(i.looked)+'</span>'+(i.ok?"":'<br>'+esc(i.tip))+'</div>';});
+ var g=w2Guard(c);
+ if(g.length)h+='<div class="note warn" role="status"><strong>Check before you send</strong><ul style="margin:6px 0 0 18px;padding:0">'+g.map(function(x){return '<li>'+esc(x.t)+'</li>';}).join("")+'</ul></div>';
+ h+='<div class="note info"><strong>What this check can\'t do.</strong> It follows simple rules about structure and tone. It can\'t tell whether this is genuinely relevant to them or good for both of you. That part is your judgement:</div>';
+ [["j1","Would their audience genuinely find this useful?"],["j2","Is it clear what's in it for them, not just for you?"],["j3","Would I be glad to receive this message?"]].forEach(function(q){var v=(o.judge||{})[q[0]];h+='<div class="q"><span>'+q[1]+'</span><div class="row"><button type="button" class="chip sm" aria-pressed="'+(v==="yes")+'" data-a="w2-judge" data-id="'+c.id+'" data-k="'+q[0]+'" data-v="yes">Yes</button><button type="button" class="chip sm" aria-pressed="'+(v==="unsure")+'" data-a="w2-judge" data-id="'+c.id+'" data-k="'+q[0]+'" data-v="unsure">Not sure</button></div></div>';});
+ if(Object.keys(o.judge||{}).some(function(k){return o.judge[k]==="unsure";}))h+='<div class="note warn">If you are not sure, it may be worth changing the offer or choosing a different partner before you send. A message that is only good for you will not land.</div>';
+ return h;
+}
+function w2Refresh(c){var b=document.getElementById("pitchbox");if(b)b.innerHTML=w2PitchHtml(c);}
+function w2s2(){
+ w2Touch();
+ var sl=shortlisted().sort(byScore);
+ var h=LC("w2s2.lesson");
+ if(!sl.length)return shell2(2,h+'<div class="note info">You need a shortlisted partner first. Choose one in <a href="#/step/5">Week 1, step 5</a>, then come back here.</div>');
+ var cur=cand(S.w2.cur);
+ if(!cur||!cur.short){cur=(S.base.comfort&&S.base.comfort<=2?(sl.filter(function(c){return c.type==="known";})[0]||sl[0]):sl[0]);}
+ var c=cur,o=O(c),sug=w2Suggest(c);
+ h+='<div class="card"><h2>1. Who is it for?</h2><div class="row">'+sl.map(function(x){var ox=S.out[x.id];return '<button type="button" class="chip" aria-pressed="'+(x.id===c.id)+'" data-a="w2-bsel" data-id="'+x.id+'">'+esc(w2Nm(x))+(ox&&ox.status==="sent"?" &#10003;":"")+'</button>';}).join("")+'</div>';
+ if(S.base.comfort&&S.base.comfort<=2)h+='<p class="mute">You said you feel less comfortable contacting people, so someone you know is listed first.</p>';
+ h+='</div>';
+ var gl=w2J("w2.channels")||{};
+ h+='<div class="card"><h2>2. How will you reach them?</h2><div class="row">'+W2CH.map(function(ch){return '<button type="button" class="chip" aria-pressed="'+(o.channel===ch[0])+'" data-a="w2-ch" data-id="'+c.id+'" data-v="'+ch[0]+'">'+ch[1]+(sug[0]===ch[0]?" &#9733;":"")+'</button>';}).join("")+'</div><div class="note info"><strong>Suggested for '+esc(w2Nm(c))+':</strong> '+esc(sug[1])+' Choose what feels right for you and them.</div>';
+ if(gl[o.channel])h+='<div class="note ok">'+gl[o.channel]+'</div>';
+ h+='</div>';
+ h+=w2Proposal(c);
+ h+='<div class="card"><h2>4. One specific thing you noticed</h2><p class="mute">This is what makes it personal. Something real about their work.</p><div class="row" id="nstarts"'+(o.noticed?' style="display:none"':'')+'>'+[["your recent post about ","A recent post or issue"],["your product, ","A product they sell"],["the question your audience keeps asking about ","Something their audience asks"]].map(function(x){return '<button type="button" class="chip sm" data-a="w2-nstart" data-id="'+c.id+'" data-v="'+esc(x[0])+'">'+x[1]+'</button>';}).join("")+'</div><input type="text" maxlength="300" data-out="noticed" data-oid="'+c.id+'" aria-label="One specific thing you noticed" value="'+esc(o.noticed)+'" placeholder="For example: your recent issue on invoicing a first client" style="margin-top:8px"><label>Tone</label><div class="row">'+W2TONES.map(function(t){return '<button type="button" class="chip sm" aria-pressed="'+(o.tone===t[0])+'" data-a="w2-tone" data-id="'+c.id+'" data-v="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div></div>';
+ h+=w2Practice();
+ var hasAsk=!!((S.sketch[c.id]||{}).ask||[]).length;
+ h+='<div class="card"><h2>5. Make your draft</h2><p class="mute">This fills a template from your own details. It is not AI, and it adds nothing you have not chosen.</p><div class="row"><button type="button" class="btn" data-a="w2-gen" data-id="'+c.id+'"'+(!o.channel||!hasAsk?" disabled":"")+'>'+(o.draft?"Make another version":"Make my draft")+'</button>'+(o.draft&&o.channel!=="person"?'<button type="button" class="btn ghost" data-a="w2-short" data-id="'+c.id+'">Make it shorter</button>':'')+'</div>';
+ if(!o.channel)h+='<p class="mute">Choose how you will reach them first.</p>';else if(!hasAsk)h+='<p class="mute">Choose the collaboration you want to suggest in section 3 first.</p>';
+ h+='</div>';
+ h+='<div class="two"><div class="card"><h2>Your draft</h2><p class="mute">Read it aloud and change anything that does not sound like you. Nothing is sent from here.</p><textarea maxlength="4000" data-out="draft" data-oid="'+c.id+'" aria-label="Your draft message" placeholder="Your draft appears here. You can also type your own.">'+esc(o.draft)+'</textarea><p class="row"><button type="button" class="chip" data-a="w2-copy">Copy</button>'+(o.prevDraft&&o.prevDraft!==o.draft?'<button type="button" class="chip" data-a="w2-restore" data-id="'+c.id+'">Switch back to my previous draft</button>':'')+'</p></div><div class="card" id="pitchbox" aria-live="polite">'+w2PitchHtml(c)+'</div></div>';
+ return shell2(2,h);
+}
+function w2s3(){
+ w2Touch();
+ var sl=shortlisted().sort(byScore),h=LC("w2s3.lesson");
+ h+='<div class="card"><h2>Pre-send check</h2><p class="mute">Tap each when it is true.</p>'+w2Chips("w2.pre",W2PRE)+'</div>';
+ h+=LC("w2s3.contact");
+ var ids={},rows=[];sl.forEach(function(c){ids[c.id]=1;rows.push(c);});
+ Object.keys(S.out||{}).forEach(function(id){if(!ids[id]&&S.out[id]&&S.out[id].status==="sent")rows.push(w2Cand(id));});
+ h+='<div class="card"><h2>Your outreach</h2>';
+ if(!rows.length)h+='<p class="mute">No shortlisted partners yet. Choose some in <a href="#/step/5">Week 1, step 5</a>.</p>';
+ rows.forEach(function(c){var o=O(c),st=o.status,chn=W2CH.filter(function(x){return x[0]===o.channel;})[0];
+  h+='<div class="crow"><span><strong>'+esc(w2Nm(c))+'</strong><br><span class="mute">'+(chn?chn[1]:"No channel chosen")+(o.draft?" &middot; draft ready (Pitch Check "+w2PitchScore(c)+" of 6)":" &middot; no draft yet")+'</span></span><span class="row">';
+  if(st==="sent")h+='<span class="tag">'+(o.channel==="person"?"Spoke to them":"Sent")+' on '+esc(dayLab(o.sentAt))+'</span><button type="button" class="chip sm" data-a="w2-unsend" data-id="'+c.id+'">Undo</button>';
+  else if(!o.draft&&o.channel!=="person")h+='<a class="chip sm" href="#/w2/2" data-a="w2-bsel" data-id="'+c.id+'">Draft it</a><button type="button" class="chip sm" data-a="w2-sent" data-id="'+c.id+'">I sent my own</button>';
+  else h+='<button type="button" class="chip sm" aria-pressed="'+(st==="scheduled")+'" data-a="w2-sched" data-id="'+c.id+'">Scheduled</button><button type="button" class="btn" style="min-height:38px;padding:6px 12px" data-a="w2-sent" data-id="'+c.id+'">I '+(o.channel==="person"?"spoke to them":"sent it")+'</button>';
+  h+='</span></div>';
+  if(o.ackAsk&&st!=="sent"){var iss=w2Issues(c);h+='<div class="note warn" role="status"><strong>Before you log this</strong> (your call, nothing is blocked):<ul style="margin:6px 0 0 18px;padding:0">'+iss.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><p><button type="button" class="btn" data-a="w2-sent" data-id="'+c.id+'">I have checked, log it anyway</button></p></div>';}
+  if(st==="sent"){h+='<p class="mute" style="margin:-2px 0 8px 8px">Follow-up opens '+esc(dayLab(w2FuOpens(o)))+(w2Late(w2FuOpens(o))?'. That falls in Week 3 and carries forward automatically.':'.')+' <label style="display:inline">Sent on <input type="date" data-out="sentAt" data-oid="'+c.id+'" value="'+esc(o.sentAt)+'" max="'+today()+'" aria-label="Date sent" style="width:auto;display:inline-block"></label></p>';}
+ });
+ h+='</div>';
+ if(w2Sent().length)h+='<div class="card"><h2>How did sending feel? (optional)</h2>'+w2Chips("w2.feel",[["easy","Easy"],["nerv","Nervous but done"],["hard","Harder than expected"]],1)+'</div>';
+ else h+=w2Stuck(true);
+ var wl=w2Waiting();if(wl)h+='<div class="note info">&#9203; '+esc(wl)+'</div>';
+ return shell2(3,h);
+}
+function w2s4(){
+ var h=LC("w2s4.lesson"),Qs=w2J("w2s4.quiz")||[];
+ h+='<div class="card"><h2>Quick practice: what would you do?</h2>';
+ if(!Qs.length)h+='<p class="mute">The practice could not be loaded. Please refresh the page.</p>';
+ Qs.forEach(function(q){var sel=S.w2.q4[q[0]];h+='<div class="q"><strong>'+esc(q[1])+'</strong><div class="row" style="flex-direction:column;align-items:stretch">'+q[2].map(function(o){return '<button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(sel===o[0])+'" data-a="w2-q4" data-q="'+esc(q[0])+'" data-v="'+esc(o[0])+'">'+esc(o[1])+'</button>';}).join("")+'</div>';
+  if(sel)h+='<div class="note '+(sel===q[3]?"ok":"info")+'" aria-live="polite">'+(sel===q[3]?"Good choice. ":"Not quite. ")+esc(q[4])+'</div>';h+='</div>';});
+ return shell2(4,h+'</div>');
+}
+function w2s5(){
+ w2Touch();
+ var sl=w2Sent(),h=LC("w2s5.lesson");
+ if(!sl.length){h+='<div class="note info">Nothing sent yet. When you have sent a message in step 3, it shows up here with its follow-up date.</div>';h+=w2Stuck(true);return shell2(5,h);}
+ sl.forEach(function(e){var c=e.c,o=e.o,op=w2FuOpens(o),due=w2Due(e),chn=W2CH.filter(function(x){return x[0]===o.channel;})[0];
+  h+='<div class="card"><h2>'+esc(e.name)+'</h2><p class="mute">'+(o.channel==="person"?"Spoke to them":"Sent")+' on '+esc(dayLab(o.sentAt))+(chn?'. '+chn[1]+'.':'.')+'</p><label>What happened?</label><div class="row">'+W2REPLIES.map(function(r){return '<button type="button" class="chip sm" aria-pressed="'+((o.reply||"noreply")===r[0])+'" data-a="w2-reply" data-id="'+c.id+'" data-v="'+r[0]+'">'+r[1]+'</button>';}).join("")+'</div>';
+  if(o.reply==="yes"||o.reply==="maybe"||o.reply==="no"){h+='<h3>A reply draft you can edit</h3><textarea maxlength="4000" style="min-height:110px" data-out="ans" data-oid="'+c.id+'" aria-label="Reply draft">'+esc(o.ans||w2AnswerDraft(c))+'</textarea><p><button type="button" class="chip sm" aria-pressed="'+!!o.answered+'" data-a="w2-answered" data-id="'+c.id+'">I have answered</button></p>';}
+  else if(o.fuSent){h+='<div class="note ok">Follow-up sent on '+esc(dayLab(o.fuAt))+'. Nothing more to do unless they reply. No reply is common, and it rarely means your idea was poor.</div>';}
+  else if(!due){h+='<div class="note info">&#9203; Waiting. The follow-up opens on <strong>'+esc(dayLab(op))+'</strong>'+(w2Late(op)?'. That is in Week 3 and it carries forward automatically.':'.')+' Nothing to do until then.</div>';}
+  else{h+='<div class="note warn">The follow-up is due. Add one new piece of value rather than "just checking in".</div><label>What will you add?</label><div class="row">'+W2FUV.map(function(f){return '<button type="button" class="chip sm" aria-pressed="'+((o.fuValue||[])[0]===f)+'" data-a="w2-fuv" data-id="'+c.id+'" data-v="'+esc(f)+'">'+f+'</button>';}).join("")+'</div><textarea maxlength="4000" style="min-height:120px;margin-top:8px" data-out="fuDraft" data-oid="'+c.id+'" aria-label="Follow-up draft">'+esc(o.fuDraft||w2FuDraft(c))+'</textarea><p class="mute">Replace anything in [square brackets] with something true and specific before you send. Nothing is sent from here.</p><p><button type="button" class="btn" data-a="w2-fusent" data-id="'+c.id+'">I sent the follow-up</button></p>';}
+  h+='</div>';});
+ h+='<div class="card"><h2>What do you think made the difference? (optional)</h2>'+w2Chips("w2.diff",[["why","The opening observation"],["gain","The offer"],["ask","The ask"],["partner","The partner choice"],["time","Timing"],["unsure","I am not sure"]],1)+'</div>';
+ return shell2(5,h);
+}
+function w2s6(){
+ w2Touch();
+ var sl=shortlisted(),sent=w2Sent(),replied=sent.filter(function(e){var r=e.o.reply;return r&&r!=="noreply";}),opp=sent.filter(function(e){return e.o.reply==="yes";}),maybe=sent.filter(function(e){return e.o.reply==="maybe";}),fu=sent.filter(function(e){return e.o.fuSent;});
+ var dr=sl.filter(function(c){return O(c).draft;}),avg=dr.length?Math.round(dr.reduce(function(a,c){return a+w2PitchScore(c);},0)/dr.length*10)/10:null;
+ var h=LC("w2s6.lesson")+'<div class="card"><h2>Your Week 2 summary</h2><div class="row"><div class="stat"><b>'+sent.length+'</b>Messages sent</div><div class="stat"><b>'+replied.length+'</b>Replies received</div><div class="stat"><b>'+opp.length+'</b>Opportunities created</div></div>';
+ h+='<p style="margin-top:10px">Follow-ups sent: '+fu.length+'. "Maybe later" replies: '+maybe.length+'.'+(avg!==null?' Average Pitch Check: '+avg+' of 6 (a learning indicator, not a grade).':'')+'</p>';
+ if(sent.length&&sent.length<10)h+='<div class="note info">This is a small sample. It tells you what happened, not what will always happen, so we show counts, not percentages.</div>';
+ var p=w2Pending(),na=w2NeedsAnswer();
+ if(p.length||na.length){h+='<h3>Carrying into Week 3</h3>';na.forEach(function(e){h+='<div class="crow"><span>Answer '+esc(e.name)+'</span><span class="mute">Reply needs an answer</span></div>';});p.forEach(function(e){var d=w2FuOpens(e.o);h+='<div class="crow"><span>Follow up with '+esc(e.name)+'</span><span class="mute">'+(d<=today()?"Due now":"Opens "+esc(dayLab(d)))+'</span></div>';});}
+ h+='</div>';
+ var rec=w2Rec();
+ h+='<div class="card"><h2>Recommended next step</h2><div class="note '+rec.c+'"><strong>'+esc(rec.t)+'</strong><br>'+esc(rec.b)+'</div>';
+ if(!sent.length)h+=w2Stuck(true);
+ h+='<h3>Your decision</h3>';
+ [["ready","Ready for Week 3"],["another","I would like to message another partner first"],["change","I want to change my approach"],["help","I would like help in the group session"],["notready","I am not ready to contact anyone yet"]].forEach(function(o){h+='<p><button type="button" class="chip" aria-pressed="'+(S.w2.dec===o[0])+'" data-a="w2-dec" data-val="'+o[0]+'">'+o[1]+'</button></p>';});
+ if(S.w2.dec==="notready")h+=LC("w2.notready");
+ h+='<label>Optional: how do you feel about contacting people now, compared with Week 1?</label>'+w2Chips("w2.comfort2",[["more","More comfortable"],["same","About the same"],["less","Less comfortable"]],1)+'</div>';
+ h+='<div class="note info"><strong>Week 3 is next, and it is not part of this test build yet.</strong> Anything still open, like follow-ups and replies, carries forward automatically and stays saved. You can come back to Week 2 at any time.</div>';
+ return shell2(6,h);
+}
+function w2Log(c){var o=OW(c);o.status="sent";o.sentAt=today();o.ackAsk=false;o.name=w2Nm(c);}
+async function w2Copy(t){
+ var ta=document.querySelector("textarea[data-out=draft]");
+ function ok(){t.textContent="Copied";}
+ function manual(){if(ta){ta.focus();ta.select();}t.textContent="Select all and copy by hand";}
+ try{if(navigator.clipboard&&navigator.clipboard.writeText&&ta){await navigator.clipboard.writeText(ta.value);ok();}else manual();}catch(e){manual();}
+}
+function w2Action(a,d,t){
+ var c,o,keep=false;
+ if(a==="w2-week"){S.week=+d.val===2&&week1Done()?2:1;route="#/";save();window.scrollTo(0,0);}
+ else if(a==="w2-done"){S.w2.steps[d.n]=!S.w2.steps[d.n];save();}
+ else if(a==="w2-mark1"){S.w2.quiz1done=true;save();}
+ else if(a==="w2-prac"){S.w2.practiceDone=!S.w2.practiceDone;save();}
+ else if(a==="w2-bsel"){S.w2.cur=+d.id;save();if(t.tagName==="A"){route="#/w2/2";window.scrollTo(0,0);}}
+ else if(a==="w2-ch"){OW(w2Cand(d.id)).channel=d.v;save();}
+ else if(a==="w2-tone"){OW(w2Cand(d.id)).tone=d.v;save();}
+ else if(a==="w2-nstart"){o=OW(w2Cand(d.id));if(!(o.noticed||"").trim())o.noticed=d.v;save();}
+ else if(a==="w2-gen"||a==="w2-short"){c=w2Cand(d.id);o=OW(c);if((o.draft||"").trim()&&o.draft!==o.prevDraft)o.prevDraft=o.draft;o.v=(a==="w2-gen"&&o.draft)?(o.v||0)+1:(o.v||0);o.draft=w2Compose(c,o,o.v,a==="w2-short");o.ackAsk=false;save();}
+ else if(a==="w2-judge"){o=OW(w2Cand(d.id));o.judge=o.judge||{};o.judge[d.k]=(o.judge[d.k]===d.v)?"":d.v;save();}
+ else if(a==="w2-copy"){w2Copy(t);return;}
+ else if(a==="w2-restore"){o=OW(w2Cand(d.id));var rt=o.draft;o.draft=o.prevDraft;o.prevDraft=rt;save();}
+ else if(a==="w2-sched"){o=OW(w2Cand(d.id));if(o.status!=="sent")o.status=(o.status==="scheduled"?"":"scheduled");save();}
+ else if(a==="w2-sent"){c=w2Cand(d.id);o=OW(c);if(w2Issues(c).length&&!o.ackAsk){o.ackAsk=true;save();}else{w2Log(c);save();}}
+ else if(a==="w2-unsend"){o=OW(w2Cand(d.id));o.status="";o.sentAt="";o.reply="";o.repliedAt="";o.fuSent=false;o.fuAt="";o.answered=false;o.ackAsk=false;save();}
+ else if(a==="w2-reply"){o=OW(w2Cand(d.id));o.reply=d.v==="noreply"?"":d.v;o.repliedAt=o.reply?today():"";o.answered=false;save();}
+ else if(a==="w2-answered"){o=OW(w2Cand(d.id));o.answered=!o.answered;save();}
+ else if(a==="w2-fuv"){o=OW(w2Cand(d.id));o.fuValue=[d.v];o.fuDraft="";save();}
+ else if(a==="w2-fusent"){o=OW(w2Cand(d.id));o.fuSent=true;o.fuAt=today();save();}
+ else if(a==="w2-q4"){S.w2.q4[d.q]=d.v;save();}
+ else if(a==="w2-dec"){S.w2.dec=S.w2.dec===d.val?"":d.val;save();}
+ else return;
+ render();
+}
+function w2Input(t){
+ var k=t.dataset.out;if(!W2OUTKEYS[k])return;
+ var c=w2Cand(t.dataset.oid),o=OW(c);o[k]=t.value;
+ if(k==="draft"||k==="noticed")o.ackAsk=false;
+ if(k==="noticed"){var nr=document.getElementById("nstarts");if(nr)nr.style.display=t.value.trim()?"none":"";}
+ save();
+ if(k==="draft"||k==="noticed")w2Refresh(c);
+}
+function w2DateChange(t){
+ var v=String(t.value||""),c=w2Cand(t.dataset.oid),o=OW(c);
+ if(parseYmd(v)!=null&&v<=today()){o.sentAt=v;save();}
+ render();
+}
+function w2fix(o){
+ var b=blank(),w=(o.w2&&typeof o.w2==="object"&&!Array.isArray(o.w2))?o.w2:{},r=clone(b.w2);
+ Object.keys(r).forEach(function(k){if(w[k]!==undefined&&w[k]!==null&&typeof w[k]===typeof r[k]&&Array.isArray(w[k])===Array.isArray(r[k]))r[k]=w[k];});
+ o.w2=r;
+ var out=(o.out&&typeof o.out==="object"&&!Array.isArray(o.out))?o.out:{},fixed={};
+ Object.keys(out).forEach(function(id){var x=out[id];if(!x||typeof x!=="object"||Array.isArray(x))return;var n=clone(W2DEF);Object.keys(n).forEach(function(k){if(x[k]!==undefined&&x[k]!==null&&typeof x[k]===typeof n[k]&&Array.isArray(x[k])===Array.isArray(n[k]))n[k]=x[k];});fixed[id]=n;});
+ o.out=fixed;
+ return o;
+}
+
 /* ---------- events ---------- */
 document.addEventListener("click",function(e){
  var lk=e.target.closest("a[href^='#/']");
@@ -920,6 +1356,7 @@ document.addEventListener("click",function(e){
  if(a==="adminadd"){adminAddMember();return;}
  if(a==="adminflag"){adminSetFlag(d.key,d.on==="1");return;}
  if(PHASE!=="app")return;
+ if(a.indexOf("w2-")===0){w2Action(a,d,t);return;}
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
  if(a==="exportdata"){exportData();return;}
@@ -955,10 +1392,12 @@ document.addEventListener("input",function(e){
  if(t.dataset.auth){AUTH[t.dataset.auth]=t.value;return;}
  if(PHASE!=="app")return;
  if(t.dataset.bind){var p=t.dataset.bind;if(p==="refl"){S.refl=t.value;save();return;}setPath(p,t.value);var gl=document.getElementById("glance");if(gl)gl.innerHTML=productDetailsHtml();}
+ else if(t.dataset.out){w2Input(t);}
  else if(t.dataset.sk){S.sketch[t.dataset.sk]=S.sketch[t.dataset.sk]||{};S.sketch[t.dataset.sk].note=t.value;save();}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="signin"&&e.target.dataset&&e.target.dataset.auth){e.preventDefault();if(e.target.dataset.auth==="email")sendCode();else if(e.target.dataset.auth==="code")verifyCode();else if(e.target.dataset.auth==="pw")pwLogin();}});
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t.tagName==="SELECT"&&t.dataset.bind){setPath(t.dataset.bind,t.value);render();}});
+document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.dataset&&t.dataset.out==="sentAt")w2DateChange(t);});
 window.addEventListener("hashchange",function(){if(PHASE!=="app"&&!(PHASE==="adminonly"&&/^#\/(admin|community)/.test(location.hash||"")))return;route=location.hash||"#/";render();});
 
 /* ---------- Community (M3C-b). Shown only while the community switch is ON. Text only, escaped, never run as HTML. ---------- */
@@ -1403,6 +1842,8 @@ document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="app
 function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;COM.view=null;COM.people=null;COM.loadedFor="";COM.keepOk=false;comLeave();}
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
+/* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
+if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
