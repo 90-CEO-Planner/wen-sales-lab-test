@@ -58,8 +58,8 @@ async function signOutAll(){
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function keysOf(o){var m={};Object.keys(o).forEach(function(k){m[k]=JSON.stringify(o[k]);});return m;}
 function changedKeys(){var out=[];if(!S)return out;Object.keys(S).forEach(function(k){if(SYNC.bk[k]!==JSON.stringify(S[k]))out.push(k);});return out;}
-function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF()};}
-function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return w4fix(w3fix(w2fix(o)));}
+function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF()};}
+function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return rvfix(w4fix(w3fix(w2fix(o))));}
 
 /* ---------- local mirror: survives a closed tab or a dropped connection ---------- */
 function mirrorKey(){return ME?"wsl_mirror_"+ME.id:null;}
@@ -886,7 +886,7 @@ function render(){
   var m=(route||"#/").match(/^#\/step\/(\d)/),m2=(route||"#/").match(/^#\/w2\/([1-6])$/),m3=(route||"#/").match(/^#\/w3\/([1-6])$/),m4=(route||"#/").match(/^#\/w4\/([1-6])$/);
   if(route==="#/admin"&&ME&&ME.admin){html=adminHtml();if(!ADMIN.members&&!ADMIN.busy)adminLoad();}
   else if(/^#\/community/.test(route)&&FLAGS.community===true)html=communityHtml();
-  else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/profile")html=profilePage();else html=homeHub();
+  else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(route==="#/profile")html=profilePage();else html=homeHub();
   html=topbar()+html;
  }
  var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);try{shellNav();}catch(e){}try{comPhotoFill();}catch(e){}
@@ -1683,7 +1683,7 @@ function home4(){
  var h='<div class="card"><div class="row" style="justify-content:space-between"><strong>'+d+' of 6 steps done</strong><span class="mute">About '+hm(left)+' left</span></div><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/6*100)+'%"></i></div>';
  h+='<div class="note info" style="margin-top:12px"><strong>Where you are:</strong> '+W3PATHN[w3Path()]+'.'+(c.runEnd?' Your run window ends on '+esc(dayLab(c.runEnd))+'.':'')+'</div>';
  h+='<h3>Your next action</h3><p><strong>'+esc(na.t)+'</strong>'+(na.m?' <span class="tag">'+na.m+' min</span>':'')+'</p><a class="btn" href="'+na.link+'">Continue</a></div>';
- h+=planCard(STEPS4);
+ h+='<div class="card"><h2>Day 30 review</h2><p class="mute">'+esc(rvClock())+'. Look back, see what the evidence suggests and choose what is next.</p><p><a class="btn ghost" href="#/review">Open my Day 30 review</a></p></div>'+planCard(STEPS4);
  h+='<div class="card"><h2>The six steps</h2>'+STEPS4.map(function(s){var dn=S.w4.steps[s.n];return '<a class="step'+(dn?' done':'')+'" href="#/w4/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min &middot; builds on: '+esc(s.b)+'</span></span><span class="mute">'+(dn?"Done":"Open")+'</span></a>';}).join("")+'<p class="mute">Total about '+hm(mins(STEPS4))+'. Step 2 can stretch over several days because a collaboration has its own timetable. Nothing is sent by this app.</p></div>';
  return h+remindCard()+helpCard();
 }
@@ -1765,7 +1765,7 @@ function w4s6(){
  h+='<div class="card"><h2>For each partner</h2>'+(list.length?list.map(function(p){return '<div class="q"><strong>'+esc(p.name)+'</strong><div class="row">'+W4PD.map(function(d){return '<button type="button" class="chip sm" aria-pressed="'+(S.w4.pdec[p.id]===d[0])+'" data-a="w4-pd" data-id="'+p.id+'" data-v="'+d[0]+'">'+d[1]+'</button>';}).join("")+'</div></div>';}).join(""):'<p class="mute">No partners to decide on yet.</p>')+'</div>';
  h+='<div class="card"><h2>For the route</h2>'+W4RD.map(function(d){return '<p><button type="button" class="chip" aria-pressed="'+(S.w4.rdec===d[0])+'" data-a="w4-rd" data-v="'+d[0]+'">'+d[1]+'</button></p>';}).join("")+'</div>';
  h+='<div class="card"><h2>Your sprint-end recommendation</h2><div class="note '+(v.cls==="warn"?"info":v.cls)+'"><strong>'+esc(rec.t)+'</strong><br>'+esc(rec.b)+'</div><p><strong>First small action:</strong> '+esc(rec.first)+'</p>'+(rec.extra?'<p>'+esc(rec.extra)+'</p>':'')+(rec.provisional?'<div class="note info">Your collaboration is still running, so this is provisional. It will be updated when you record your final numbers.</div>':'')+'<p class="mute">Based on your verdict ('+esc(v.label)+'), your comfort and your time. It is not a promise of results.</p></div>';
- h+='<div class="note info"><strong>The Day 30 review, feedback and any continuation offer are not part of this test build yet.</strong> Everything you record stays saved.</div>';
+ h+='<div class="card"><h2>Next: your Day 30 review</h2><p>Look back at where you started, see what the evidence suggests and choose what to focus on. Feedback is optional. Everything you record stays saved.</p><p><a class="btn" href="#/review">Open my Day 30 review</a></p></div>';
  return shell4(6,h);
 }
 function w4Action(a,d,t){
@@ -1797,6 +1797,140 @@ function w4fix(o){
  r.hist=[];if(Array.isArray(w.hist))w.hist.slice(-20).forEach(function(e){if(!e||typeof e!=="object"||typeof e.d!=="string")return;var n={d:e.d};Object.keys(b.res).forEach(function(k){var x=e[k];n[k]=(x&&typeof x.s==="string"&&W4VS[x.s]&&typeof x.v==="string")?{s:x.s,v:w4Clean(k,x.v)}:{s:"",v:""};});r.hist.push(n);});
  r.pdec={};if(w.pdec&&typeof w.pdec==="object"&&!Array.isArray(w.pdec))Object.keys(w.pdec).forEach(function(id){if(W4PDK[w.pdec[id]])r.pdec[id]=w.pdec[id];});
  o.w4=r;return o;
+}
+
+/* ---------- M5c: Day 30 review, 14 day update window, Results tab, optional feedback, separate permissions ---------- */
+var RVMAX=20;
+var RVDIS=[["very","Very disappointed"],["some","Somewhat disappointed"],["not","Not disappointed"],["unsure","Not sure"]];
+var RVMISS=[["next","The guidance on what to do next"],["builder","The Message Builder"],["checks","The checks on my messages"],["results","Reading my results"],["none","Not sure"]];
+var RVDEF=function(){return {start:"",done:false,at:"",snap:null,upd:[],fb:{learned:"",miss:[],dis:[]},testi:{want:"",text:"",contact:false,at:"",wd:""},consent:{anon:false,at:"",wd:""}};};
+
+/* ===== RV LOGIC START: pure rules, checked by dev/m5c_logic_tests.js ===== */
+function rvStart(){
+ if(S.rv.start&&parseYmd(S.rv.start)!=null)return S.rv.start;
+ var d=[];if(S.w2.openedAt)d.push(S.w2.openedAt);
+ Object.keys(S.out||{}).forEach(function(k){if(S.out[k]&&S.out[k].sentAt)d.push(S.out[k].sentAt);});
+ if(S.col&&S.col.sentAt)d.push(S.col.sentAt);
+ d=d.filter(function(x){return parseYmd(x)!=null;}).sort();
+ return d[0]||today();
+}
+function rvDay(){var a=parseYmd(rvStart()),b=parseYmd(today());return Math.max(1,Math.floor((b-a)/86400000)+1);}
+function rvDay30(){return addDays(rvStart(),29);}
+function rvEnd(){return addDays(rvDay30(),14);}
+function rvPhase(){var d=rvDay();if(d<30)return "during";return today()<=rvEnd()?"window":"closed";}
+function rvClock(){var p=rvPhase(),d=rvDay();if(p==="during")return "Day "+d+" of 30";if(p==="window")return "Day 30 reached. Update window open until "+dayLab(rvEnd());return "Sprint complete. Update window closed on "+dayLab(rvEnd());}
+function rvSnap(){var v=w4Verdict(w4Inputs()),c=w4Ctr(),r=S.w4.res,x={};Object.keys(r).forEach(function(k){x[k]={s:r[k].s,v:r[k].v};});return {at:today(),label:v.label,rule:v.rule,ctr:{msgs:c.msgs,resp:c.resp,opp:c.opp},res:x};}
+function rvWorked(){
+ var sent=w2Sent(),c=CL(),r=S.w4.res,out=[],resp=sent.filter(function(e){return e.o.reply&&e.o.reply!=="noreply";}).length,yes=sent.filter(function(e){return e.o.reply==="yes";}).length;
+ var dr=sent.filter(function(e){return e.o.draft;}),avg=dr.length?dr.reduce(function(a,e){return a+w2PitchScore(e.c);},0)/dr.length:null;
+ if(sent.length)out.push("You sent "+sent.length+" message"+(sent.length===1?"":"s")+" to real partners. That is the hardest part, and you did it.");
+ if(resp)out.push(resp+" partner"+(resp===1?"":"s")+" replied"+(yes?", and "+yes+" said yes or asked for more":"")+".");
+ if(avg!==null&&avg>=4)out.push("Your messages ticked most of the Pitch Check items (about "+Math.round(avg*10)/10+" of 6).");
+ if(c.status==="proposed")out.push("You sent a collaboration proposal.");
+ if(c.reply==="agreed")out.push("A partner agreed to a collaboration.");
+ if(S.w4.ran==="yes")out.push("The collaboration ran.");
+ if(vstate(r.orders)==="pos")out.push("You recorded "+r.orders.v+" sale"+(+r.orders.v===1?"":"s")+" linked to this work.");
+ if(vstate(r.enq)==="pos")out.push("You had "+r.enq.v+" enquir"+(+r.enq.v===1?"y":"ies")+".");
+ if(!out.length){var sl=shortlisted().length;if(sl)out.push("You found and shortlisted "+sl+" partner"+(sl===1?"":"s")+" who could reach your buyer.");out.push("You now have a clear first step to take, and evidence to learn from.");}
+ return out;
+}
+function rvProg(){return [["Week 1",STEPS.filter(function(s){return S.steps[s.n];}).length,7],["Week 2",STEPS2.filter(function(s){return S.w2.steps[s.n];}).length,6],["Week 3",STEPS3.filter(function(s){return S.w3.steps[s.n];}).length,6],["Week 4",STEPS4.filter(function(s){return S.w4.steps[s.n];}).length,6]];}
+function rvCanUpdate(){return S.rv.done&&rvPhase()==="window";}
+function rvCmp(){
+ var b=S.base,r=S.w4.res;
+ return [["Orders",nvTxt(b.orders),w4Val(r.orders)],["Revenue or order value",nvTxt(b.revenue,true),w4Val(r.value,true)],["Time spent (hours)",(b.hours?b.hours:"Not set"),w4Val(r.hours)]];
+}
+/* ===== RV LOGIC END ===== */
+
+function rvChips(path,opts,max){return chipsHtml(path,opts,max);}
+function rvHead(){
+ var ph=rvPhase(),h='<div class="row" style="justify-content:space-between"><strong>'+esc(rvClock())+'</strong></div>';
+ h+='<p class="mute">Sprint started '+esc(dayLab(rvStart()))+'. Day 30 is '+esc(dayLab(rvDay30()))+', and your results update window runs to '+esc(dayLab(rvEnd()))+'. Until the Start my 30-day sprint feature exists, the start is counted from your first logged activity. You can correct it below.</p>';
+ h+='<label for="rvs">My sprint started on</label><input id="rvs" type="date" data-rv="start" value="'+esc(S.rv.start||rvStart())+'" max="'+esc(today())+'" style="max-width:200px">';
+ return h;
+}
+function reviewPage(){
+ var v=w4Verdict(w4Inputs()),rec=w4Rec(v),ph=rvPhase(),prov=ph==="during"||rec.provisional,h='<a class="back" href="#/results">&larr; Results</a><h1>Your Day 30 review</h1><p class="mute">Partnership-to-Sales. A look at where you started, what you did, what the evidence suggests, and what to focus on next.</p>';
+ h+='<div class="card">'+rvHead()+'</div>';
+ h+='<div class="card"><h2>1. Where you started, and where you are now</h2><p class="mute">Your starting numbers cover the 30 days before your sprint. Your sprint numbers cover this sprint only. We show them side by side and we do not label the difference as better or worse, because the two are not like for like.</p>';
+ rvCmp().forEach(function(x){h+='<div class="crow" style="display:block"><p style="margin:0"><strong>'+esc(x[0])+'</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(x[1])+'. This sprint: '+esc(x[2])+'.</p></div>';});
+ h+='<p class="mute">Confidence in Week 1: '+(S.base.confidence?S.base.confidence+' out of 5':'not set')+'. Now: '+(S.w4.conf[0]==="more"?"more confident":(S.w4.conf[0]==="same"?"about the same":(S.w4.conf[0]==="less"?"less confident":"not said")))+'.</p></div>';
+ var c=w4Ctr();
+ h+='<div class="card"><h2>2. What you did</h2>'+w4Counts()+'<p style="margin-top:10px">Steps completed: '+rvProg().map(function(p){return p[0]+" "+p[1]+" of "+p[2];}).join(", ")+'.</p><div class="note info">You do not need to have finished every step. Anything unfinished stays saved and you can come back to it. Messages sent, responses received and opportunities created are kept apart.</div></div>';
+ h+='<div class="card"><h2>3. What the evidence suggests</h2><div class="note '+v.cls+'"><strong>'+(prov?"Provisional reading: ":"")+esc(v.label)+'</strong> <span class="tag">rule '+v.rule+'</span></div>';
+ h+='<h3>What worked</h3>'+rvWorked().map(function(x){return '<p style="margin:4px 0">&#10003; '+esc(x)+'</p>';}).join("");
+ h+='<h3>What remains uncertain</h3>'+v.limits.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("")+'<p style="margin:4px 0">This is a reading, not a verdict. The thresholds behind it are provisional starting points, not guarantees.</p>';
+ h+='<h3>What to focus on next</h3><div class="note info"><strong>'+esc(rec.t)+'</strong><br>'+esc(rec.b)+'</div><p><strong>First small action:</strong> '+esc(rec.first)+'</p>'+(rec.extra?'<p>'+esc(rec.extra)+'</p>':'');
+ if(vstate(S.w4.res.orders)!=="pos")h+='<div class="note ok">No sale yet is a normal result for a first sprint. It tells you something about the idea, the partner or the timing, and you now know what to change.</div>';
+ h+='</div>';
+ h+='<div class="card"><h2>4. Complete your review</h2>';
+ if(!S.rv.done)h+='<p class="mute">'+(ph==="during"?"You can complete your review now. It will be marked provisional, and you can update it after Day 30.":"Saving keeps a record of your sprint as it stands today.")+'</p><button type="button" class="btn" data-a="rv-done">Save my Day 30 review</button>';
+ else h+='<div class="note ok"><strong>Saved on '+esc(dayLab(S.rv.at))+'.</strong> At that point: '+esc(S.rv.snap?S.rv.snap.label:"")+'.</div><p><button type="button" class="btn ghost" data-a="rv-undo">Undo, I want to change it</button></p>';
+ h+='</div>';
+ h+='<div class="card"><h2>5. Results that arrive after Day 30</h2><p>Your sprint ends on Day 30 and stays that way. If a result arrives later, you can add it for 14 days after Day 30, and your sprint record updates without extending the sprint.</p>';
+ if(!S.rv.done)h+='<p class="mute">Save your Day 30 review first, then you can add later results here.</p>';
+ else if(ph==="during")h+='<p class="mute">The update window opens on '+esc(dayLab(rvDay30()))+'.</p>';
+ else if(ph==="window")h+='<p class="mute">Open until '+esc(dayLab(rvEnd()))+'. Record new numbers in <a href="#/w4/3">Week 4, step 3</a>, then update your record.</p><p><button type="button" class="btn" data-a="rv-upd"'+(S.rv.upd.length>=RVMAX?' disabled':'')+'>Update my sprint record</button></p>';
+ else h+='<div class="note info">The update window closed on '+esc(dayLab(rvEnd()))+'. Your sprint record is kept as it is. You can still change your own numbers, but they no longer update the sprint record.</div>';
+ if(S.rv.upd.length)h+='<h3>Updates</h3>'+S.rv.upd.map(function(u){return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';}).join("");
+ h+='</div>';
+ h+='<div class="card"><h2>Tell us how it went <span class="tag">optional</span></h2><p class="mute">You can skip all of this. Your answers are read by the WEN team to improve the programme. They are not shared publicly.</p><label for="rvl">What did you learn, or find most useful?</label><textarea id="rvl" maxlength="1200" style="min-height:80px" data-rv="learned" placeholder="A sentence or two is plenty">'+esc(S.rv.fb.learned)+'</textarea><label>What would you miss most if it disappeared?</label>'+rvChips("rv.fb.miss",RVMISS)+'<label>How would you feel if the Sales Lab disappeared?</label>'+rvChips("rv.fb.dis",RVDIS,1)+'</div>';
+ var T=S.rv.testi;
+ h+='<div class="card"><h2>Sharing your experience <span class="tag">optional, off by default</span></h2><p class="mute">Some members like to share a few words. It is your choice, and saying no changes nothing. This is separate from the feedback above.</p>'+'<div class="row"><button type="button" class="chip" aria-pressed="'+(T.want==="yes")+'" data-a="rv-testi" data-v="yes">I would like to write a few words</button><button type="button" class="chip" aria-pressed="'+(T.want==="no")+'" data-a="rv-testi" data-v="no">Not for me</button></div>';
+ if(T.want==="yes")h+='<label for="rvt">Your words (stays private)</label><textarea id="rvt" maxlength="1500" style="min-height:100px" data-rv="ttext">'+esc(T.text)+'</textarea><div class="note info">What you write stays private and is not used anywhere unless you give permission below. We would always send you the exact wording to approve first.</div>';
+ h+='<h3>Permission to contact you about using it</h3><p><button type="button" class="chip" aria-pressed="'+!!T.contact+'" data-a="rv-contact">'+(T.contact?"&#10003; ":"")+'You may contact me about using my words as a testimonial</button></p>'+(T.contact?'<div class="note ok">Thank you. Nothing is used unless you reply yes to the exact wording. You can tap again at any time to withdraw. Given on '+esc(dayLab(T.at))+'.</div>':'<div class="note info">Not ticked, so we will not contact you about it.'+(T.wd?" Withdrawn on "+esc(dayLab(T.wd))+".":"")+'</div>')+'</div>';
+ var C=S.rv.consent;
+ h+='<div class="card"><h2>Helping us improve the programme <span class="tag">optional, off by default</span></h2><p class="mute">This is separate from sharing your story. You can say no and nothing changes, and you can withdraw it later.</p><p><button type="button" class="chip" aria-pressed="'+!!C.anon+'" data-a="rv-anon">'+(C.anon?"&#10003; ":"")+'You may use my results, without my name, to improve the programme</button></p>'+(C.anon?'<div class="note ok">Thank you. Given on '+esc(dayLab(C.at))+'. Tap again to withdraw.</div>':(C.wd?'<div class="note info">Withdrawn on '+esc(dayLab(C.wd))+'.</div>':''))+'<div class="note warn">Draft wording. It will be checked against UK data protection requirements (what we collect, why, how long we keep it and how you withdraw) before any real use.</div></div>';
+ h+='<div class="card"><h2>Your record</h2><p class="mute">You can download your data or delete it from <a href="#/profile">Profile</a>.</p></div>'+helpCard();
+ return h;
+}
+function resultsPage(){
+ var b=S.base,sent=w2Sent(),ct=w4Ctr(),r=S.w4.res,c=CL(),started=sent.length||week1Done();
+ var h='<h1>Results</h1><p class="mute">Your numbers, what they show, and what you learned. Counts, not percentages, while samples are small.</p>';
+ h+='<div class="card"><h2>Where you started</h2><p class="mute">The last 30 days before your sprint, from Week 1, step 1. "I don\'t know" stays unknown. It is never turned into zero.</p><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.orders))+'</b>Orders</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.revenue,true))+'</b>Revenue</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.partner))+'</b>Sales from partners</div></div></div>';
+ h+='<div class="card"><h2>Your sprint so far</h2><p class="mute">'+esc(started?rvClock():"Your sprint clock starts when you first log some activity.")+'</p>';
+ if(started){h+=w4Counts();if(c.status==="proposed")h+='<p style="margin-top:10px">Collaboration: '+esc(W3PATHN[w3Path()])+'.</p>';
+  var any=["clicks","orders","value","enq","hours"].some(function(k){return !!r[k].s;});
+  if(any)h+='<div class="row" style="margin-top:6px"><div class="stat"><b style="font-size:18px">'+esc(w4Val(r.clicks))+'</b>Link clicks</div><div class="stat"><b style="font-size:18px">'+esc(w4Val(r.orders))+'</b>Orders</div><div class="stat"><b style="font-size:18px">'+esc(w4Val(r.value,true))+'</b>Order value</div><div class="stat"><b style="font-size:18px">'+esc(w4Val(r.enq))+'</b>Enquiries</div></div><p class="mute">Each number keeps its own state: seen, unknown or confirmed zero.</p>';
+  else h+='<p class="mute">No Week 4 numbers recorded yet. You can add them in <a href="#/w4/3">Week 4, step 3</a>.</p>';
+  var v=w4Verdict(w4Inputs());h+='<div class="note '+v.cls+'" style="margin-top:10px"><strong>'+(rvPhase()==="during"?"Provisional reading: ":"")+esc(v.label)+'</strong> <span class="tag">rule '+v.rule+'</span><br>'+esc(v.why[0]||"")+'</div>';
+ } else h+='<p class="mute">This starts in Week 2, once you have finished Week 1 and sent your first message.</p>';
+ h+='</div>';
+ if(S.w4.hist.length)h+='<div class="card"><h2>Your results log</h2><p class="mute">Dated entries you saved in Week 4.</p>'+S.w4.hist.slice().reverse().slice(0,6).map(function(e){return '<div class="crow"><span><strong>'+esc(dayLab(e.d)||e.d)+'</strong><br><span class="mute">Clicks '+esc(w4Val(e.clicks))+', orders '+esc(w4Val(e.orders))+', enquiries '+esc(w4Val(e.enq))+'</span></span></div>';}).join("")+(S.w4.hist.length>6?'<p class="mute">Showing the latest 6 of '+S.w4.hist.length+'. All are kept.</p>':'')+'</div>';
+ var learn=[];
+ if(S.w2.diff.length)learn.push("What you think made the difference: "+S.w2.diff.join(", "));
+ if(S.w4.cap.length)learn.push("What you would do differently: "+S.w4.cap.join(", "));
+ if(S.w4.saw.length&&S.w4.saw.indexOf("none")<0)learn.push("What you could not see: "+S.w4.saw.join(", "));
+ h+='<div class="card"><h2>What you have learned</h2>'+(learn.length?learn.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join(""):'<p class="mute">Your own notes and choices from Weeks 2 to 4 appear here as you go.</p>')+(started?rvWorked().slice(0,3).map(function(x){return '<p style="margin:4px 0">&#10003; '+esc(x)+'</p>';}).join(""):'')+'</div>';
+ h+='<div class="card"><h2>Day 30 review</h2>'+(S.rv.done?'<p>Saved on '+esc(dayLab(S.rv.at))+': '+esc(S.rv.snap?S.rv.snap.label:"")+'.</p>':'<p class="mute">'+(started?"Look back at your sprint, see what the evidence suggests, and choose what to focus on next. You can open it at any time.":"Available once your sprint has started.")+'</p>')+'<p><a class="btn'+(S.rv.done?' ghost':'')+'" href="#/review">'+(S.rv.done?"Open my review":"Open my Day 30 review")+'</a></p></div>';
+ h+='<div class="card"><h2>Past sprints</h2><p class="mute">'+(S.rv.done?"Partnership-to-Sales, started "+esc(dayLab(rvStart()))+": "+esc(S.rv.snap?S.rv.snap.label:"")+".":"Your first sprint will appear here once you save your Day 30 review.")+'</p></div>';
+ return h;
+}
+function rvAction(a,d,t){
+ var R=S.rv;
+ if(a==="rv-done"){R.done=true;R.at=today();R.snap=rvSnap();R.upd=[];save();}
+ else if(a==="rv-undo"){R.done=false;R.at="";R.snap=null;R.upd=[];save();}
+ else if(a==="rv-upd"){if(!rvCanUpdate()||R.upd.length>=RVMAX&&R.upd[R.upd.length-1].at!==today())return;var u=rvSnap();if(R.upd.length&&R.upd[R.upd.length-1].at===u.at)R.upd[R.upd.length-1]=u;else R.upd.push(u);save();}
+ else if(a==="rv-testi"){R.testi.want=R.testi.want===d.v?"":d.v;if(R.testi.want!=="yes"&&R.testi.want!==""){}save();}
+ else if(a==="rv-contact"){R.testi.contact=!R.testi.contact;if(R.testi.contact){R.testi.at=today();R.testi.wd="";}else{R.testi.at="";R.testi.wd=today();}save();}
+ else if(a==="rv-anon"){R.consent.anon=!R.consent.anon;if(R.consent.anon){R.consent.at=today();R.consent.wd="";}else{R.consent.at="";R.consent.wd=today();}save();}
+ else return;
+ render();
+}
+function rvInput(t){var k=t.dataset.rv,R=S.rv;if(k==="learned"){R.fb.learned=t.value;save();}else if(k==="ttext"){R.testi.text=t.value;save();}}
+function rvDateChange(t){var v=String(t.value||"");if(v===""||(parseYmd(v)!=null&&v<=today())){S.rv.start=v;save();}render();}
+function rvfix(o){
+ var b=RVDEF(),w=(o.rv&&typeof o.rv==="object"&&!Array.isArray(o.rv))?o.rv:{},r=b;
+ var ok=function(x,y){return x!==undefined&&x!==null&&typeof x===typeof y&&Array.isArray(x)===Array.isArray(y);};
+ if(typeof w.start==="string"&&(w.start===""||parseYmd(w.start)!=null))r.start=w.start;
+ if(typeof w.done==="boolean")r.done=w.done;if(typeof w.at==="string"&&(w.at===""||parseYmd(w.at)!=null))r.at=w.at;
+ var cleanSnap=function(s){if(!s||typeof s!=="object"||Array.isArray(s)||typeof s.label!=="string"||typeof s.at!=="string"||typeof s.rule!=="string")return null;var x={at:s.at.slice(0,10),label:s.label.slice(0,40),rule:s.rule.slice(0,4),ctr:{msgs:0,resp:0,opp:0},res:{}};if(s.ctr&&typeof s.ctr==="object")["msgs","resp","opp"].forEach(function(k){x.ctr[k]=(typeof s.ctr[k]==="number"&&isFinite(s.ctr[k]))?s.ctr[k]:0;});["clicks","orders","value","enq","hours"].forEach(function(k){var y=s.res&&s.res[k];x.res[k]=(y&&typeof y.s==="string"&&W4VS[y.s]&&typeof y.v==="string")?{s:y.s,v:w4Clean(k,y.v)}:{s:"",v:""};});return x;};
+ r.snap=cleanSnap(w.snap);if(!r.snap&&r.done){r.done=false;r.at="";}
+ r.upd=[];if(Array.isArray(w.upd))w.upd.slice(-RVMAX).forEach(function(u){var c=cleanSnap(u);if(c)r.upd.push(c);});
+ if(w.fb&&typeof w.fb==="object"&&!Array.isArray(w.fb)){if(typeof w.fb.learned==="string")r.fb.learned=w.fb.learned.slice(0,1200);if(Array.isArray(w.fb.miss))r.fb.miss=w.fb.miss.filter(function(x){return typeof x==="string";}).slice(0,8);if(Array.isArray(w.fb.dis))r.fb.dis=w.fb.dis.filter(function(x){return typeof x==="string";}).slice(0,1);}
+ if(w.testi&&typeof w.testi==="object"&&!Array.isArray(w.testi)){var T=w.testi;if(T.want==="yes"||T.want==="no"||T.want==="")r.testi.want=T.want;if(typeof T.text==="string")r.testi.text=T.text.slice(0,1500);if(typeof T.contact==="boolean")r.testi.contact=T.contact;["at","wd"].forEach(function(k){if(typeof T[k]==="string"&&(T[k]===""||parseYmd(T[k])!=null))r.testi[k]=T[k];});}
+ if(w.consent&&typeof w.consent==="object"&&!Array.isArray(w.consent)){var C=w.consent;if(typeof C.anon==="boolean")r.consent.anon=C.anon;["at","wd"].forEach(function(k){if(typeof C[k]==="string"&&(C[k]===""||parseYmd(C[k])!=null))r.consent[k]=C[k];});}
+ o.rv=r;return o;
 }
 
 /* ---------- H1: navigation shell (14 Nov 2026). Home, My Sprint, Experiments, Results, Community (when switched on), Profile. ---------- */
@@ -1834,7 +1968,7 @@ var SHELLCSS='body.hasnav main{padding-bottom:96px}#mnav{display:none}'
 +'@media(max-width:480px){.tabs{flex-wrap:nowrap;gap:6px}.tabs .chip{flex:1 1 0;min-width:0;white-space:nowrap;padding:8px 4px;font-size:13.5px;text-align:center}}';
 function effRoute(){var r=route||"#/";if(/^#\/community/.test(r)&&FLAGS.community!==true)return "#/";return r;}
 function tabsFor(){var t=[["home","Home","#/"],["sprint","My Sprint","#/sprint"],["exp","Experiments","#/experiments"],["res","Results","#/results"]];if(FLAGS.community===true)t.push(["comm","Community","#/community"]);t.push(["profile","Profile","#/profile"]);return t;}
-function tabOf(r){r=r||"#/";if(r==="#/sprint"||/^#\/(step|w2|w3|w4)\/\d$/.test(r))return "sprint";if(r==="#/experiments")return "exp";if(r==="#/results")return "res";if(/^#\/community/.test(r))return "comm";if(r==="#/profile")return "profile";return "home";}
+function tabOf(r){r=r||"#/";if(r==="#/sprint"||/^#\/(step|w2|w3|w4)\/\d$/.test(r))return "sprint";if(r==="#/experiments")return "exp";if(r==="#/results"||r==="#/review")return "res";if(/^#\/community/.test(r))return "comm";if(r==="#/profile")return "profile";return "home";}
 function navHtml(){var cur=tabOf(effRoute());return tabsFor().map(function(t){return '<a href="'+t[2]+'"'+(t[0]===cur?' aria-current="page"':'')+'>'+NAVI[t[0]]+'<span>'+t[1]+'</span>'+(t[0]==="comm"?comDot():'')+'</a>';}).join("");}
 function shellNav(){
  var show=PHASE==="app"&&route!=="#/admin";
@@ -1873,7 +2007,7 @@ function experimentsPage(){
  return h+'</div>';
 }
 function nvTxt(o,money){o=o||{};if(o.s==="value"&&String(o.v||"").trim()!=="")return (money?sym(S.focus.currency):"")+o.v;if(o.s==="zero")return (money?sym(S.focus.currency):"")+"0";if(o.s==="unknown")return "I don't know";return "Not set";}
-function resultsPage(){
+function resultsPageOld(){
  var b=S.base,sent=w2Sent(),replies=sent.filter(function(e){return e.o.reply&&e.o.reply!=="noreply";}).length,due=w2Pending().filter(function(e){return w2Due(e);}).length;
  var h='<h1>Results</h1><p class="mute">Your numbers, and what they show.</p>';
  h+='<div class="card"><h2>Where you started</h2><p class="mute">The last 30 days before your sprint, from Week 1, step 1. "I don\'t know" stays unknown. It is never turned into zero.</p><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.orders))+'</b>Orders</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.revenue,true))+'</b>Revenue</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(b.partner))+'</b>Sales from partners</div></div><p><a class="btn ghost" href="#/step/1">Update my starting numbers</a></p></div>';
@@ -1921,6 +2055,7 @@ document.addEventListener("click",function(e){
  if(a.indexOf("w2-")===0){w2Action(a,d,t);return;}
  if(a.indexOf("w3-")===0){w3Action(a,d,t);return;}
  if(a.indexOf("w4-")===0){w4Action(a,d,t);return;}
+ if(a.indexOf("rv-")===0){rvAction(a,d,t);return;}
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
  if(a==="exportdata"){exportData();return;}
@@ -1959,11 +2094,12 @@ document.addEventListener("input",function(e){
  else if(t.dataset.out){w2Input(t);}
  else if(t.dataset.col){w3Input(t);}
  else if(t.dataset.w4){w4Input(t);}
+ else if(t.dataset.rv){rvInput(t);}
  else if(t.dataset.sk){S.sketch[t.dataset.sk]=S.sketch[t.dataset.sk]||{};S.sketch[t.dataset.sk].note=t.value;save();}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="signin"&&e.target.dataset&&e.target.dataset.auth){e.preventDefault();if(e.target.dataset.auth==="email")sendCode();else if(e.target.dataset.auth==="code")verifyCode();else if(e.target.dataset.auth==="pw")pwLogin();}});
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t.tagName==="SELECT"&&t.dataset.bind){setPath(t.dataset.bind,t.value);render();}});
-document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.dataset&&t.dataset.out==="sentAt")w2DateChange(t);else if(PHASE==="app"&&t&&t.dataset&&(t.dataset.col==="runStart"||t.dataset.col==="runEnd"))w3DateChange(t);});
+document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.dataset&&t.dataset.out==="sentAt")w2DateChange(t);else if(PHASE==="app"&&t&&t.dataset&&(t.dataset.col==="runStart"||t.dataset.col==="runEnd"))w3DateChange(t);else if(PHASE==="app"&&t&&t.dataset&&t.dataset.rv==="start")rvDateChange(t);});
 window.addEventListener("hashchange",function(){if(PHASE!=="app"&&!(PHASE==="adminonly"&&/^#\/(admin|community)/.test(location.hash||"")))return;route=location.hash||"#/";render();});
 
 /* ---------- Community (M3C-b). Shown only while the community switch is ON. Text only, escaped, never run as HTML. ---------- */
@@ -2409,7 +2545,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
