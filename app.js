@@ -887,7 +887,7 @@ function render(){
   var m=(route||"#/").match(/^#\/step\/(\d)/),m2=(route||"#/").match(/^#\/w2\/([1-6])$/),m3=(route||"#/").match(/^#\/w3\/([1-6])$/),m4=(route||"#/").match(/^#\/w4\/([1-6])$/);
   if(route==="#/admin"&&ME&&ME.admin){html=adminHtml();if(!ADMIN.members&&!ADMIN.busy)adminLoad();}
   else if(/^#\/community/.test(route)&&FLAGS.community===true)html=communityHtml();
-  else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(/^#\/etsy(\/[1-6])?$/.test(route))html=[etHome,ets1,ets2,ets3,ets4,ets5,ets6][+((route.match(/\/([1-6])$/)||[0,0])[1])]();else if(route==="#/profile")html=profilePage();else html=homeHub();
+  else if(etBlockP())html=etBlockHtml();else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(/^#\/etsy(\/w[1-4])?(\/[1-6])?$/.test(route))html=etRoute();else if(route==="#/profile")html=profilePage();else html=homeHub();
   html=rHead(html);
  }
  var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);try{rEnhance();}catch(e){}try{shellNav();}catch(e){}try{comPhotoFill();}catch(e){}
@@ -1863,9 +1863,9 @@ function reviewPage(){
  h+='<div class="card"><h2>5. Results that arrive after Day 30</h2><p>Your sprint ends on Day 30 and stays that way. If a result arrives later, you can add it for 14 days after Day 30, and your sprint record updates without extending the sprint.</p>';
  if(!S.rv.done)h+='<p class="mute">Save your Day 30 review first, then you can add later results here.</p>';
  else if(ph==="during")h+='<p class="mute">The update window opens on Day 31 ('+esc(dayLab(rvWinStart()))+') and runs to Day 44 ('+esc(dayLab(rvEnd()))+').</p>';
- else if(ph==="window")h+='<p class="mute">Open from Day 31 to Day 44 (until '+esc(dayLab(rvEnd()))+'). Record new numbers in <a href="#/w4/3">Week 4, step 3</a>, then add them to your record as a post-sprint update.</p>'+((S.rv.snap&&S.rv.snap.prov)?'<p class="mute">Save the final Day 30 version above first.</p>':'<p><button type="button" class="btn" data-a="rv-upd"'+(S.rv.upd.length>=RVMAX?' disabled':'')+'>Add a post-sprint update</button></p>');
+ else if(ph==="window")h+='<p class="mute">Open from Day 31 to Day 44 (until '+esc(dayLab(rvEnd()))+'). Record new numbers in <a href="'+xaW4()+'">Week 4, step 3</a>, then add them to your record as a post-sprint update.</p>'+((S.rv.snap&&S.rv.snap.prov)?'<p class="mute">Save the final Day 30 version above first.</p>':'<p><button type="button" class="btn" data-a="rv-upd"'+(S.rv.upd.length>=RVMAX?' disabled':'')+'>Add a post-sprint update</button></p>');
  else h+='<div class="note info">The update window closed on '+esc(dayLab(rvEnd()))+'. Your sprint record is kept as it is. You can still change your own numbers, but they no longer update the sprint record.</div>';
- if(S.rv.upd.length)h+='<h3>Post-sprint updates</h3>'+S.rv.upd.map(function(u){return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';}).join("");
+ if(S.rv.upd.length)h+='<h3>Post-sprint updates</h3>'+S.rv.upd.map(function(u){return rvUpdRow(u,rvExp()==="etsy");}).join("");
  h+='</div>';
  h+=fbCard();
  var T=S.rv.testi;
@@ -2195,16 +2195,16 @@ function puRow(k,money){
 function rvPastHtml(){
  var rows=[];
  (S.past||[]).forEach(function(p,i){
-  var open=pastWinOpen(p),h='<div class="card" style="box-shadow:none;border:1px solid var(--line)"><p style="margin:0"><strong>Partnership-to-Sales</strong> <span class="tag">Day 30 position: '+esc(p.label||"Not reviewed")+'</span></p><p class="mute" style="margin:2px 0 6px">Started '+esc(dayLab(p.start))+'.'+(p.auto?' Your Day 30 position was recorded automatically from your dated entries when you started your next sprint.':'')+'</p>';
-  (p.upd||[]).forEach(function(u){h+='<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';});
+  var open=pastWinOpen(p),h='<div class="card" style="box-shadow:none;border:1px solid var(--line)"><p style="margin:0"><strong>'+esc(p.exp==="etsy"?"Etsy Sales Bottleneck":"Partnership-to-Sales")+'</strong> <span class="tag">Day 30 position: '+esc(p.label||"Not reviewed")+'</span></p><p class="mute" style="margin:2px 0 6px">Started '+esc(dayLab(p.start))+'.'+(p.auto?' Your Day 30 position was recorded automatically from your dated entries when you started your next sprint.':'')+'</p>';
+  h+=etPastSummary(p);(p.upd||[]).forEach(function(u){h+=rvUpdRow(u,p.exp==="etsy");});
   if(open){
    h+='<div class="note info">The update window for this earlier sprint is open until '+esc(dayLab(pastEndDay(p)))+'. Results you add here belong to this sprint only. They do not change your current sprint or your Day 30 position.</div>';
-   if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
+   if(p.exp==="etsy"){h+=etPastLate(p,i);}else if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
    else h+='<p><button type="button" class="btn ghost" data-a="pu-open" data-i="'+i+'">Add a late result to this sprint</button></p>';
   } else if(today()>pastEndDay(p))h+='<p class="mute">The update window for this sprint closed on '+esc(dayLab(pastEndDay(p)))+'.</p>';
   rows.push(h+'</div>');
  });
- if(S.rv.done&&S.rv.snap)rows.push('<div class="crow"><span><strong>Partnership-to-Sales</strong><br><span class="mute">Started '+esc(dayLab(rvStart()))+'. Current sprint</span></span><span class="tag">'+esc(S.rv.snap.label)+'</span></div>');
+ if(S.rv.done&&S.rv.snap)rows.push('<div class="crow"><span><strong>'+esc(xaName())+'</strong><br><span class="mute">Started '+esc(dayLab(rvStart()))+'. Current sprint</span></span><span class="tag">'+esc(S.rv.snap.label)+'</span></div>');
  return rows.length?rows.join(""):'<p class="mute">Your first sprint will appear here once you save your Day 30 review.</p>';
 }
 function pastOpenNote(){
@@ -2278,7 +2278,7 @@ var ETNUM=[["shopVisits","Shop visits"],["shopOrders","Shop orders"],["shopConv"
 var ETMONEY={shopRev:1,lrev:1};
 var ETVS={"":1,value:1,zero:1,unknown:1};
 var ETQUIZ=[["a","One shopper searches, opens your listing, then opens five of your other listings. How does Etsy count that?",[["a1","Six visits"],["a2","One visit and six listing views"],["a3","Six orders"]],"a2","Etsy counts it as one visit (one browsing session) and six listing views."],["b","Etsy shows conversion rate for your shop. Can you work out a conversion rate for one listing by dividing its orders by its views?",[["b1","Yes, that is Etsy's conversion rate"],["b2","No, views and visits are different things, and Etsy does not show a listing conversion rate"],["b3","Yes, but only for digital products"]],"b2","Etsy defines conversion rate as orders divided by shop visits. Listing views are not visits, so orders divided by views would be a different, misleading number."]];
-var ETDEF=function(){var n={};ETNUM.forEach(function(x){n[x[0]]={s:"",v:""};});return {live:"",steps:{},quiz:{},base:{from:"",to:"",n:n},lst:{name:"",ref:"",chosen:""},locked:false,lockedAt:"",hist:[],orig:{title:"",tags:"",image:"",price:"",desc:""},kw:{terms:"",short:""},dec:"",note:""};};
+var ETDEF=function(){var n={};ETNUM.forEach(function(x){n[x[0]]={s:"",v:""};});return {live:"",steps:{},quiz:{},base:{from:"",to:"",n:n},lst:{name:"",ref:"",chosen:""},locked:false,lockedAt:"",hist:[],orig:{title:"",tags:"",image:"",price:"",desc:""},kw:{terms:"",short:""},dec:"",note:"",steps2:{},ticks:{},chg:{type:"",grp:"",what:"",before:"",after:"",why:"",date:"",n:14,rconf:"",rcert:""},rh:[],cm:null,dec2:"",wl:[],cf:[],nid:1,st3:{},st4:{},fx:"",nx:"",dec3:"",dec4:"",prep:{live:"",stats:false,listing:""},res:{b:{views:{s:"",v:""},favs:{s:"",v:""},lorders:{s:"",v:""},rev:{s:"",v:""},sv:{s:"",v:""}},a:{views:{s:"",v:""},favs:{s:"",v:""},lorders:{s:"",v:""},rev:{s:"",v:""},sv:{s:"",v:""}},bAt:"",aAt:"",spb:"",spa:""}};};
 var ETTXT={name:1,ref:1,title:1,tags:1,image:1,price:1,desc:1,terms:1,short:1,note:1};
 
 /* ===== ETSY E1 LOGIC START: pure rules, checked by dev/etsy_e1_tests.js ===== */
@@ -2314,7 +2314,7 @@ function etDone(){return ETSTEPS.filter(function(s){return S.et.steps[s.n];}).le
 
 function etShell(n,body){
  var s=ETSTEPS[n-1],dn=S.et.steps[n];
- var h='<a class="back" href="#/etsy/1">&larr; Etsy Sales Bottleneck, Week 1</a><span class="tag" role="note">Preview only. Not open to members yet.</span><h1>Week 1 &middot; Step '+n+' of 6</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p><p class="mute">You will need: '+esc(s.b)+' Everything saves automatically.</p>'+body;
+ var h='<a class="back" href="#/etsy/1">&larr; Etsy Sales Bottleneck, Week 1</a>'+etBn()+'<h1>Week 1 &middot; Step '+n+' of 6</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p><p class="mute">You will need: '+esc(s.b)+' Everything saves automatically.</p>'+body;
  h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="et-done" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<6?'<a class="btn ghost" href="#/etsy/'+(n+1)+'">Next step &rarr;</a>':'')+'</div>';
  return h;
 }
@@ -2323,7 +2323,7 @@ function etNumRow(k){
  return '<div class="q"><strong>'+esc(lab)+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="et-vs" data-k="'+k+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="12" data-et="n:'+k+'" value="'+esc(o.v)+'" aria-label="'+esc(lab)+'" style="max-width:160px">':'')+'</div>';
 }
 function etHome(){
- var d=etDone(),h='<h1>Etsy Sales Bottleneck</h1><span class="tag" role="note">Preview only. Not open to members yet.</span><p class="mute">Week 1 of 4: Diagnose. Use your own Etsy numbers to see what to look at first. Nothing here starts your sprint clock, and nothing is sent anywhere.</p>';
+ var d=etDone(),h='<h1>Etsy Sales Bottleneck</h1>'+etBn()+'<p class="mute">Week 1 of 4: Diagnose. Use your own Etsy numbers to see what to look at first. Nothing here starts your sprint clock, and nothing is sent anywhere.</p>';
  h+='<div class="card"><strong>'+d+' of 6 steps done</strong><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/6*100)+'%"></i></div></div>';
  if(etLiveMode()==="prepare")h+='<div class="note info"><strong>You are in preparation mode.</strong> You said you do not have a live listing yet, so this week helps you get ready. Measuring starts once a listing is live.</div>';
  h+='<div class="card"><h2>The six steps</h2>'+ETSTEPS.map(function(s){var dn=S.et.steps[s.n];return '<a class="step'+(dn?' done':'')+'" href="#/etsy/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(dn?"Done":"Open")+'</span></a>';}).join("")+'</div>';
@@ -2375,7 +2375,7 @@ function ets6(){
  h+='<div class="card"><h2>Your Week 1 summary</h2><div class="crow"><span>Live listing</span><strong>'+(E.live==="yes"?"Yes":(E.live==="no"?"Not yet":"Not said"))+'</strong></div><div class="crow"><span>Starting numbers</span><strong>'+(etLiveMode()==="prepare"?"Preparing":(ETNUM.some(function(x){return !!E.base.n[x[0]].s;})?"Recorded":"Not recorded yet"))+'</strong></div><div class="crow"><span>Focus listing</span><strong>'+esc(E.lst.chosen||"Not chosen")+'</strong></div><div class="crow"><span>Keyword shortlist</span><strong>'+E.kw.short.split("\n").filter(function(x){return x.trim();}).length+' terms</strong></div>';
  if(etLiveMode()!=="prepare")h+='<div class="note info"><strong>What to look at first:</strong> '+esc(p.t)+'</div>';
  h+='<h3>Your decision</h3>';[["next","Ready for Week 2"],["list","I want to choose a different listing first"],["numbers","I need to find more numbers first"],["help","I would like help in the group session"]].forEach(function(x){h+='<p><button type="button" class="chip" aria-pressed="'+(E.dec===x[0])+'" data-a="et-dec" data-v="'+x[0]+'">'+x[1]+'</button></p>';});
- h+='</div><div class="note info"><strong>Week 2 is not built yet.</strong> This is the first slice of the experiment, shown for review.</div>';
+ h+='</div><div class="note info"><strong>Week 2 is a preview.</strong> <a href="#/etsy/w2">Open the Week 2 preview</a>. Weeks 3 and 4 are previews too.</div>';
  return etShell(6,h);
 }
 function etAction(a,d,t){
@@ -2392,6 +2392,9 @@ function etAction(a,d,t){
 }
 function etInput(t){
  var k=t.dataset.et,E=S.et;
+ if(k.indexOf("c:")===0){et2Input(t);return;}
+ if(k.indexOf("l:")===0||k.indexOf("f:")===0||k.indexOf("r:")===0){et3Input(t);return;}
+ if(k.indexOf("p:")===0){et4Input(t);return;}
  if(k.indexOf("n:")===0){var f=k.slice(2),o=E.base.n[f];if(o&&o.s==="value"){var c=w4Clean(f,t.value);o.v=c;if(c!==t.value)t.value=c;save();}return;}
  if(k==="name"||k==="ref"){if(!E.locked){E.lst[k]=t.value.slice(0,k==="name"?120:200);save();}return;}
  if((k==="from"||k==="to")){var v=String(t.value||"");if(v===""||parseYmd(v)!=null){E.base[k]=v;save();}return;}
@@ -2411,8 +2414,934 @@ function etfix(o){
  if(w.orig&&typeof w.orig==="object")["title","tags","image","price","desc"].forEach(function(k){if(ok(w.orig[k]))r.orig[k]=w.orig[k].slice(0,600);});
  if(w.kw&&typeof w.kw==="object"){if(ok(w.kw.terms))r.kw.terms=w.kw.terms.slice(0,2000);if(ok(w.kw.short))r.kw.short=w.kw.short.slice(0,800);}
  if(["next","list","numbers","help"].indexOf(w.dec)>-1)r.dec=w.dec;
+ et2fix(w,r);
+ et3fix(w,r);
+ et4fix(w,r);
  o.et=r;return o;
 }
+
+/* ---------- Etsy Sales Bottleneck, slice E2: Week 2 (change one thing). Preview only: reachable at #/etsy/w2 and #/etsy/w2/1..6, not startable by members. ---------- */
+var ET2STEPS=[
+ {n:1,t:"Choose the one thing to change",m:35,b:"Your Week 1 numbers and keyword worksheet."},
+ {n:2,t:"Plan your change, before and after",m:40,b:"Your listing open in Etsy."},
+ {n:3,t:"Pre-change check",m:20,b:"Nothing. Six quick ticks."},
+ {n:4,t:"Choose your windows and change date",m:20,b:"Etsy's date selector, to match the dates."},
+ {n:5,t:"Make the change, then commit",m:30,b:"Your listing open in Etsy."},
+ {n:6,t:"Week 2 review",m:15,b:"Whatever you have done so far."}
+];
+var ETCHG=[
+ {k:"title",l:"Title",g:"vis",d:"The words buyers search for, in the order they read them."},
+ {k:"tags",l:"Tags",g:"vis",d:"The tag slots on your listing."},
+ {k:"image",l:"Lead image",g:"conv",d:"The first photo shoppers see in search and on the listing."},
+ {k:"desc",l:"First lines of the description",g:"conv",d:"What shoppers read first once they arrive."},
+ {k:"other",l:"Something else, one thing only",g:"",d:"You choose whether it is about being found or about what shoppers see."}
+];
+var ETGRP={vis:{l:"Being found",m:"Listing views",n:"Listing views are the count that shows whether more people are opening this listing."},conv:{l:"What shoppers see",m:"Listing orders and favourites, as separate counts",n:"Orders and favourites are read as separate counts. They are never divided by views."}};
+var ETTICKS=[
+ ["one","I am changing one thing on this listing, and only one."],
+ ["price","I will not change the price, start a sale or promotion, or change my ad settings while the windows run."],
+ ["saved","I have saved how the listing looks today."],
+ ["numbers","I have recorded my Week 1 numbers, or said which ones I cannot see."],
+ ["date","I will note the exact date the change goes live."],
+ ["proof","I understand that one listing, before and after, is a small and noisy comparison. It is not proof."]
+];
+var ETBACK=3;
+var ET2TXT={what:1,before:1,after:1,why:1};
+var ET2DEC=["next","wait","help"];
+var ETCERT=[["sure","I'm sure of the date."],["approx","I'm fairly sure. It could be a day or two different."],["unsure","I'm not sure when I made the change."]];
+function etCertOk(v){return v==="sure"||v==="approx"||v==="unsure";}
+function etRh(a,c){var E=S.et;if(E.rh.length<30)E.rh.push({at:today(),d:E.chg.date,a:a,c:c||""});}
+
+/* ===== ETSY E2 LOGIC START: pure rules, checked by dev/etsy_e2_tests.js ===== */
+function etDaysBetween(a,b){var x=parseYmd(a),y=parseYmd(b);if(x==null||y==null)return 0;return Math.round((y-x)/86400000);}
+function etWin(date,n){var t=parseYmd(date);n=+n;if(t==null||n!==Math.floor(n)||n<7||n>14)return null;return {n:n,bFrom:addDays(date,-n),bTo:addDays(date,-1),aFrom:date,aTo:addDays(date,n-1),readOn:addDays(date,n)};}
+function etWinCheck(date,n){
+ var r={ok:false,w:null,why:"",t:"",b:"",prov:false,overlap:false,maxN:0,sprint:false,retro:false,gap:0},w;
+ if(!date){r.why="nodate";r.t="Choose the change date";r.b="Enter the date the change went live in Etsy.";return r;}
+ if(parseYmd(date)==null){r.why="baddate";r.t="That date is not valid";r.b="Use the date picker.";return r;}
+ w=etWin(date,n);
+ if(!w){r.why="badn";r.t="Choose a window length";r.b="Between 7 and 14 days.";return r;}
+ var tod=today();
+ if(date>tod){r.why="future";r.t="The change date cannot be in the future";r.b="Make the change in Etsy first. Then come back and record the date it went live.";return r;}
+ if(date<addDays(tod,-ETBACK)){r.retro=true;r.gap=etDaysBetween(date,tod);}
+ if(rvCur()){
+  r.sprint=true;
+  if(date<rvStart()){r.why="beforestart";r.t="That date is before your sprint began";r.b="Your sprint began on "+dayLab(rvStart())+". The change date cannot be earlier.";return r;}
+  var e=rvEnd();
+  if(w.aTo>e){var mx=etDaysBetween(date,e)+1;r.maxN=mx>14?14:mx;r.why="toolate";r.t="That window runs past the end of your sprint";r.b="Your "+w.n+" day after-window would end on "+dayLab(w.aTo)+", which is after your update window closes on "+dayLab(e)+"."+(mx>=7?" A window of "+mx+" days or fewer fits.":" There are fewer than 7 days left, so this change cannot be read within this sprint. You can plan it for your next sprint.");return r;}
+  if(w.aTo>rvDay30())r.prov=true;
+ }
+ var bs=S.et.base;
+ if(bs.from&&bs.to&&parseYmd(bs.from)!=null&&parseYmd(bs.to)!=null&&bs.to>=w.bFrom&&bs.from<=w.bTo)r.overlap=true;
+ r.ok=true;r.w=w;return r;
+}
+function etChgGrp(){var c=S.et.chg,x=ETCHG.filter(function(o){return o.k===c.type;})[0];if(!x)return "";return x.g||(c.grp==="vis"||c.grp==="conv"?c.grp:"");}
+function etSuggest(){
+ if(etLiveMode()==="prepare")return {grp:"",t:"You are preparing, so there is nothing to suggest yet",b:"Your numbers will help you choose once your listing is live. You can read ahead in the meantime."};
+ var p=etPrompt();
+ if(p.k==="low")return {grp:"vis",t:"A place to start: being found",b:"Numbers like yours often make sellers look first at how easily the listing is found, which is the title and tags. This is a prompt, not a diagnosis. The choice is yours."};
+ if(p.k==="conv")return {grp:"conv",t:"A place to start: what shoppers see",b:"Numbers like yours often make sellers look first at what shoppers see once they arrive, such as the lead image and the first lines of the description. This is a prompt, not a diagnosis. The choice is yours."};
+ return {grp:"",t:"Your numbers do not point clearly one way",b:"Use your own judgement about the listing, and your keyword worksheet, to choose. Any one of these is a reasonable place to start."};
+}
+function etReady(){
+ var E=S.et,c=E.chg,m=[];
+ if(E.cm)return {ok:false,done:true,miss:[],wc:null};
+ if(E.live!=="yes")m.push("A live listing (Week 1, step 2). Without one there is nothing to measure yet.");
+ if(!E.lst.chosen)m.push("Your focus listing (Week 1, step 5)");
+ if(!c.type)m.push("The one thing you will change (Week 2, step 1)");
+ else if(!etChgGrp())m.push("Whether the change is about being found or about what shoppers see (step 1)");
+ if(!String(c.what).trim())m.push("A few words on exactly what you are changing (step 1)");
+ if(!String(c.before).trim())m.push("How it looks now (step 2)");
+ if(!String(c.after).trim())m.push("How it will look after (step 2)");
+ if(ETTICKS.some(function(x){return E.ticks[x[0]]!==true;}))m.push("All six checks ticked (step 3)");
+ var wc=etWinCheck(c.date,c.n);if(!wc.ok)m.push("A valid change date and window (step 4): "+wc.t);
+ else if(wc.retro&&(c.rconf!==c.date||!etCertOk(c.rcert)))m.push("Confirm the actual change date, and say how sure you are of it, because you are recording it more than "+ETBACK+" days after it happened (step 4)");
+ return {ok:m.length===0,done:false,miss:m,wc:wc};
+}
+function etCommitChange(){
+ var E=S.et,r=etReady();if(!r.ok)return false;
+ if(!E.locked&&!etCommit())return false;
+ var c=E.chg;
+ E.cm={at:today(),type:c.type,grp:etChgGrp(),what:String(c.what).trim().slice(0,160),before:c.before,after:c.after,why:c.why,date:c.date,n:r.wc.w.n,prov:r.wc.prov,retro:r.wc.retro===true,gap:r.wc.retro?r.wc.gap:0,conf:r.wc.retro?c.rconf:"",cert:r.wc.retro?c.rcert:"",rh:r.wc.retro?E.rh.slice(0,30).map(function(x){return {at:x.at,d:x.d,a:x.a,c:x.c};}):[]};
+ return true;
+}
+function et2Done(){return ET2STEPS.filter(function(s){return S.et.steps2[s.n];}).length;}
+/* ===== ETSY E2 LOGIC END ===== */
+
+function et2Shell(n,body){
+ var s=ET2STEPS[n-1],dn=S.et.steps2[n];
+ var h='<a class="back" href="#/etsy/w2">&larr; Etsy Sales Bottleneck, Week 2</a>'+etBn()+'<h1>Week 2 &middot; Step '+n+' of 6</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p><p class="mute">You will need: '+esc(s.b)+' Everything saves automatically.</p>'+body;
+ if(S.et.cm&&n<6)h+='<div class="note info"><strong>This change is committed.</strong> It was committed on '+esc(dayLab(S.et.cm.at))+' and is locked, so the comparison stays fair.</div>';
+ h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="et2-done" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<6?'<a class="btn ghost" href="#/etsy/w2/'+(n+1)+'">Next step &rarr;</a>':'')+'</div>';
+ return h;
+}
+function et2Card(){return '<div class="card"><h2>Week 2: Change one thing</h2><p class="mute">Preview only. Choose one change, plan it, check yourself, set your windows and commit. Nothing here starts your sprint clock.</p><a class="btn ghost" href="#/etsy/w2">Open the Week 2 preview</a></div>';}
+function et2Home(){
+ var d=et2Done(),E=S.et,h='<a class="back" href="#/etsy">&larr; Etsy Sales Bottleneck, Week 1</a><h1>Etsy Sales Bottleneck</h1>'+etBn()+'<p class="mute">Week 2 of 4: Change one thing. Choose one change that fits what you saw, make it, and commit with its date. Nothing here starts your sprint clock, and nothing is sent anywhere.</p>';
+ h+='<div class="card"><strong>'+d+' of 6 steps done</strong><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/6*100)+'%"></i></div></div>';
+ if(E.cm)h+=et2Log();
+ else if(etLiveMode()==="prepare")h+='<div class="note info"><strong>You are in preparation mode.</strong> You said you do not have a live listing yet. You can plan a change now, but it cannot be committed until a listing is live.</div>';
+ h+='<div class="card"><h2>The six steps</h2>'+ET2STEPS.map(function(s){var dn=E.steps2[s.n];return '<a class="step'+(dn?' done':'')+'" href="#/etsy/w2/'+s.n+'"><span class="n">'+(dn?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(dn?"Done":"Open")+'</span></a>';}).join("")+'</div>';
+ return h;
+}
+function et2Log(){
+ var m=S.et.cm;if(!m)return "";
+ var w=etWin(m.date,m.n),x=ETCHG.filter(function(o){return o.k===m.type;})[0];
+ var h='<div class="card"><h2>Change log</h2><p class="mute">Committed on '+esc(dayLab(m.at))+'. This record is locked.</p>'+(m.retro?'<div class="note warn"><strong>Recorded retrospectively.</strong> This change was recorded '+m.gap+' days after the date the member gave. The member confirmed that date ('+esc((ETCERT.filter(function(x){return x[0]===m.cert;})[0]||["",""])[1].toLowerCase())+'). Recording after the event reduces confidence in the comparison, so any result will be read with extra care.</div>':'');
+ h+='<div class="crow"><span>What</span><strong>'+esc(m.what)+'</strong></div><div class="crow"><span>Kind of change</span><strong>'+esc(x?x.l:"")+' ('+esc((ETGRP[m.grp]||{}).l||"")+')</strong></div><div class="crow"><span>Listing</span><strong>'+esc(S.et.lst.chosen)+'</strong></div><div class="crow"><span>Recorded on</span><strong>'+esc(dayLab(m.at))+'</strong></div><div class="crow"><span>Change went live (as the member says)</span><strong>'+esc(dayLab(m.date))+(m.retro?' <span class="tag">recorded retrospectively</span>':'')+'</strong></div>';
+ if(w)h+='<div class="crow"><span>Before-window</span><strong>'+esc(dayLab(w.bFrom))+' to '+esc(dayLab(w.bTo))+' ('+w.n+' days)</strong></div><div class="crow"><span>After-window</span><strong>'+esc(dayLab(w.aFrom))+' to '+esc(dayLab(w.aTo))+' ('+w.n+' days)</strong></div><div class="crow"><span>Read the numbers from</span><strong>'+esc(dayLab(w.readOn))+'</strong></div>';
+ h+='<h3>Before</h3><p style="white-space:pre-wrap">'+esc(m.before)+'</p><h3>After</h3><p style="white-space:pre-wrap">'+esc(m.after)+'</p>'+(m.why?'<h3>Why</h3><p>'+esc(m.why)+'</p>':'');
+ if(m.retro&&m.rh&&m.rh.length)h+='<h3>Confirmation history</h3>'+m.rh.map(function(x){return '<p class="mute" style="margin:3px 0">'+esc(dayLab(x.at))+': '+esc(x.a)+(x.c?' ('+esc(x.c)+')':'')+' for '+esc(dayLab(x.d))+'</p>';}).join("");
+ if(m.prov)h+='<div class="note info">Your after-window runs past Day 30. Your Day 30 review will be marked provisional, and the rest is recorded as late outcomes in your 14 day update window.</div>';
+ return h+'</div>';
+}
+function et2s1(){
+ var E=S.et,c=E.chg,lk=!!E.cm,h=LC("et2s1.lesson"),sg=etSuggest();
+ h+='<div class="card"><h2>What your Week 1 numbers suggest</h2><div class="note info"><strong>'+esc(sg.t)+'</strong><br>'+esc(sg.b)+'</div></div>';
+ h+='<div class="card"><h2>Your one change</h2>';
+ ETCHG.forEach(function(o){h+='<p><button type="button" class="chip" style="text-align:left;border-radius:10px"'+(lk?' disabled':'')+' aria-pressed="'+(c.type===o.k)+'" data-a="et2-chg" data-v="'+o.k+'"><strong>'+esc(o.l)+'</strong><br><span class="mute">'+esc(o.d)+'</span></button></p>';});
+ if(c.type==="other")h+='<label>This change is about</label><div class="row">'+["vis","conv"].map(function(g){return '<button type="button" class="chip"'+(lk?' disabled':'')+' aria-pressed="'+(c.grp===g)+'" data-a="et2-grp" data-v="'+g+'">'+ETGRP[g].l+'</button>';}).join("")+'</div>';
+ var g=etChgGrp();
+ if(g)h+='<div class="note info"><strong>What we will look at: '+esc(ETGRP[g].m)+'.</strong> '+esc(ETGRP[g].n)+'</div>';
+ h+='<label for="etwh">In a few words, exactly what will you change?</label><input id="etwh" type="text" maxlength="160" data-et="c:what" value="'+esc(c.what)+'"'+(lk?' readonly':'')+' placeholder="For example: the first five words of the title">';
+ return et2Shell(1,h+'</div>');
+}
+function et2s2(){
+ var E=S.et,c=E.chg,lk=!!E.cm,h=LC("et2s2.lesson"),x=ETCHG.filter(function(o){return o.k===c.type;})[0];
+ if(!c.type)return et2Shell(2,h+'<div class="note warn">Choose your one change in step 1 first. <a href="#/etsy/w2/1">Go to step 1</a></div>');
+ var sv=(c.type!=="other"&&E.orig[c.type])?E.orig[c.type]:"";
+ h+='<div class="card"><h2>Plan: '+esc(x.l)+'</h2><label for="etbf">How it looks now</label><textarea id="etbf" maxlength="600" style="min-height:90px" data-et="c:before"'+(lk?' readonly':'')+'>'+esc(c.before)+'</textarea>';
+ if(!lk&&sv&&c.before!==sv)h+='<p><button type="button" class="btn ghost" data-a="et2-copy">Copy from the original I saved in Week 1</button></p>';
+ if(!lk&&!sv&&c.type!=="other")h+='<p class="mute">You have not saved this part of the original yet. You can type it here, or save it in Week 1, step 5.</p>';
+ h+='<label for="etaf">How it will look after</label><textarea id="etaf" maxlength="600" style="min-height:90px" data-et="c:after"'+(lk?' readonly':'')+'>'+esc(c.after)+'</textarea><label for="etwy">One sentence on why you think it will help (optional)</label><textarea id="etwy" maxlength="600" style="min-height:60px" data-et="c:why"'+(lk?' readonly':'')+'>'+esc(c.why)+'</textarea><p class="mute">Write this before you make the change. It keeps you honest later, because the story cannot be adjusted to fit the result.</p></div>';
+ return et2Shell(2,h);
+}
+function et2s3(){
+ var E=S.et,lk=!!E.cm,h=LC("et2s3.lesson");
+ h+='<div class="card"><h2>Six checks</h2><p class="mute">These are promises that protect your comparison. Tick each one when it is true.</p>';
+ ETTICKS.forEach(function(t){h+='<p><button type="button" class="chip" style="text-align:left;border-radius:10px"'+(lk?' disabled':'')+' aria-pressed="'+(E.ticks[t[0]]===true)+'" data-a="et2-tick" data-k="'+t[0]+'">'+esc(t[1])+'</button></p>';});
+ var n=ETTICKS.filter(function(t){return E.ticks[t[0]]===true;}).length;
+ h+='<p><strong>'+n+' of 6 ticked.</strong></p></div>';
+ return et2Shell(3,h);
+}
+function et2s4(){
+ var E=S.et,c=E.chg,lk=!!E.cm,h=LC("et2s4.lesson"),wc=etWinCheck(c.date,c.n);
+ h+='<div class="card"><h2>Your windows</h2><label for="etdt">The date the change went live in Etsy</label><div class="row"><input id="etdt" type="date" data-et="c:date" value="'+esc(c.date)+'" max="'+esc(today())+'"'+(lk?' readonly':'')+' style="max-width:200px">'+(lk?'':'<button type="button" class="chip" data-a="et2-today">Today</button>')+'</div>';
+ h+='<label>How many days in each window? (7 to 14)</label><div class="row">'+[7,8,9,10,11,12,13,14].map(function(v){return '<button type="button" class="chip sm"'+(lk?' disabled':'')+' aria-pressed="'+(+c.n===v)+'" data-a="et2-n" data-v="'+v+'">'+v+'</button>';}).join("")+'</div>';
+ var w=wc.w||etWin(c.date,c.n);
+ if(w){
+  h+='<div class="crow"><span>Before-window</span><strong>'+esc(dayLab(w.bFrom))+' to '+esc(dayLab(w.bTo))+'</strong></div><div class="crow"><span>After-window</span><strong>'+esc(dayLab(w.aFrom))+' to '+esc(dayLab(w.aTo))+'</strong></div><div class="crow"><span>Read your numbers from</span><strong>'+esc(dayLab(w.readOn))+'</strong></div><p class="mute">Both windows are '+w.n+' days. In Etsy, choose these exact dates in the date selector, and look at the numbers from the date above, not earlier, so the last day has settled.</p>';
+ }
+ if(!wc.ok)h+='<div class="note '+(wc.why==="nodate"||wc.why==="badn"?"info":"warn")+'"><strong>'+esc(wc.t)+'.</strong> '+esc(wc.b)+'</div>';
+ else{
+  if(wc.retro){var cf=c.rconf===c.date;h+='<div class="note warn"><strong>You are recording this change '+wc.gap+' days after it happened.</strong> That is allowed, and it will be labelled "recorded retrospectively". It reduces confidence in the comparison, because some of what happened next may already be known. We recommend recording a change within '+ETBACK+' days. Please check the date, and confirm it is the day the change really went live.</div><p><button type="button" class="chip" style="text-align:left;border-radius:10px"'+(lk?' disabled':'')+' aria-pressed="'+cf+'" data-a="et2-rconf">I confirm the change went live on '+esc(dayLab(c.date))+'.</button></p><label>How sure are you of that date?</label>'+ETCERT.map(function(x){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px"'+(lk?' disabled':'')+' aria-pressed="'+(c.rcert===x[0])+'" data-a="et2-rcert" data-v="'+x[0]+'">'+x[1]+'</button></p>';}).join("")+(c.rcert==="unsure"?'<div class="note info">That is fine. We will still record it. Your result will be read as unclear, because without a reliable date the two measurement periods cannot be established.</div>':(c.rcert==="approx"?'<div class="note info">We will record that you are fairly sure. Your result is read from the figures, with lower confidence.</div>':''));}
+  if(wc.prov)h+='<div class="note info"><strong>Your after-window runs past Day 30.</strong> That is allowed. Your Day 30 review will be marked provisional, and the remaining days are recorded as late outcomes in your 14 day update window. Your sprint is not extended.</div>';
+  if(wc.overlap)h+='<div class="note info">Your before-window overlaps the 30 days you used for your Week 1 starting numbers. That is fine, but do not count the same days twice when you say what changed.</div>';
+  if(!wc.sprint)h+='<p class="mute">Your sprint has not started, so these dates are not checked against it.</p>';
+ }
+ return et2Shell(4,h+'</div>');
+}
+function et2s5(){
+ var E=S.et,h=LC("et2s5.lesson"),r=etReady();
+ if(E.cm)return et2Shell(5,h+et2Log());
+ h+='<div class="card"><h2>Ready to commit?</h2>';
+ if(r.ok)h+='<div class="note ok"><strong>Everything is in place.</strong> Make the change in Etsy first if you have not already, so the date you recorded is true.</div>';
+ else h+='<div class="note warn"><strong>Not quite yet. Still needed:</strong><ul>'+r.miss.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+ if(UI.etc&&r.ok)h+='<div class="note info" aria-live="polite"><strong>Commit this change and lock it?</strong>'+(r.wc&&r.wc.retro?' It will be labelled as recorded retrospectively.':'')+' Your listing, your plan and your dates will be locked and dated. You will not be able to edit them. A second change to this listing while the windows run would make the result harder to read.</div><div class="row"><button type="button" class="btn" data-a="et2-commit">Yes, commit and lock</button><button type="button" class="btn ghost" data-a="et2-cancel">Not yet</button></div>';
+ else h+='<p><button type="button" class="btn"'+(r.ok?'':' disabled')+' data-a="et2-confirm">Commit this change</button></p>';
+ return et2Shell(5,h+'</div>');
+}
+function et2s6(){
+ var E=S.et,h=LC("et2s6.lesson");
+ h+='<div class="card"><h2>Your Week 2 summary</h2><div class="crow"><span>Your one change</span><strong>'+esc(E.chg.what||"Not chosen")+'</strong></div><div class="crow"><span>Checks ticked</span><strong>'+ETTICKS.filter(function(t){return E.ticks[t[0]]===true;}).length+' of 6</strong></div><div class="crow"><span>Committed</span><strong>'+(E.cm?"Yes, on "+esc(dayLab(E.cm.at)):"Not yet")+'</strong></div>';
+ h+='<h3>Your decision</h3>';[["next","Ready to watch and log in Week 3"],["wait","I have not made the change yet"],["help","I would like help in the group session"]].forEach(function(x){h+='<p><button type="button" class="chip" aria-pressed="'+(E.dec2===x[0])+'" data-a="et2-dec" data-v="'+x[0]+'">'+x[1]+'</button></p>';});
+ h+='</div>';
+ if(E.cm)h+=et2Log();
+ h+='<div class="note info"><strong>Weeks 3 and 4 are previews.</strong> <a href="#/etsy/w3">Week 3</a> and <a href="#/etsy/w4">Week 4</a>. Nothing here is open to members yet.</div>';
+ return et2Shell(6,h);
+}
+function et2Action(a,d){
+ var E=S.et,c=E.chg,lk=!!E.cm;
+ if(a==="et2-done"){if(!/^[1-6]$/.test(String(d.n)))return;E.steps2[d.n]=!E.steps2[d.n];save();}
+ else if(a==="et2-dec"){if(ET2DEC.indexOf(d.v)<0)return;E.dec2=E.dec2===d.v?"":d.v;save();}
+ else if(lk){return;}
+ else if(a==="et2-chg"){if(!ETCHG.some(function(o){return o.k===d.v;}))return;c.type=c.type===d.v?"":d.v;if(c.type!=="other")c.grp="";save();}
+ else if(a==="et2-grp"){if(c.type!=="other"||(d.v!=="vis"&&d.v!=="conv"))return;c.grp=c.grp===d.v?"":d.v;save();}
+ else if(a==="et2-tick"){if(!ETTICKS.some(function(t){return t[0]===d.k;}))return;if(E.ticks[d.k])delete E.ticks[d.k];else E.ticks[d.k]=true;save();}
+ else if(a==="et2-n"){var v=+d.v;if(v!==Math.floor(v)||v<7||v>14)return;c.n=v;save();}
+ else if(a==="et2-today"){c.date=today();save();}
+ else if(a==="et2-rconf"){var wk=etWinCheck(c.date,c.n);if(!wk.ok||!wk.retro)return;if(c.rconf===c.date){c.rconf="";etRh("withdrawn",c.rcert);}else{c.rconf=c.date;etRh("confirmed",c.rcert);}save();}
+ else if(a==="et2-rcert"){var wr=etWinCheck(c.date,c.n);if(!wr.ok||!wr.retro||!etCertOk(d.v)||c.rcert===d.v)return;c.rcert=d.v;etRh("certainty",d.v);save();}
+ else if(a==="et2-copy"){var sv=(c.type!=="other")?E.orig[c.type]:"";if(!sv)return;c.before=String(sv).slice(0,600);save();}
+ else if(a==="et2-confirm"){if(!etReady().ok)return;UI.etc=true;}
+ else if(a==="et2-cancel"){UI.etc=false;}
+ else if(a==="et2-commit"){if(!UI.etc)return;UI.etc=false;if(!etCommitChange())return;save();}
+ else return;
+ render();
+}
+function et2Input(t){
+ var E=S.et,f=String(t.dataset.et).slice(2);if(E.cm)return;
+ if(f==="date"){var v=String(t.value||"");if(v===""||parseYmd(v)!=null){if(E.chg.rconf&&E.chg.rconf!==v){E.chg.rconf="";etRh("cancelled by a change of date",E.chg.rcert);}E.chg.date=v;save();render();}return;}
+ if(ET2TXT[f]){E.chg[f]=t.value.slice(0,f==="what"?160:600);save();}
+}
+function etRhFix(a){
+ var out=[];if(!Array.isArray(a))return out;
+ a.slice(0,30).forEach(function(x){if(x&&typeof x==="object"&&typeof x.at==="string"&&parseYmd(x.at)!=null&&typeof x.d==="string"&&parseYmd(x.d)!=null&&["confirmed","withdrawn","certainty","cancelled by a change of date"].indexOf(x.a)>-1)out.push({at:x.at,d:x.d,a:x.a,c:etCertOk(x.c)?x.c:""});});
+ return out;
+}
+function et2fix(w,r){
+ r.rh=etRhFix(w.rh);
+ var ok=function(x){return typeof x==="string";};
+ if(w.steps2&&typeof w.steps2==="object"&&!Array.isArray(w.steps2))Object.keys(w.steps2).forEach(function(k){if(/^[1-6]$/.test(k)&&w.steps2[k]===true)r.steps2[k]=true;});
+ if(w.ticks&&typeof w.ticks==="object"&&!Array.isArray(w.ticks))ETTICKS.forEach(function(t){if(w.ticks[t[0]]===true)r.ticks[t[0]]=true;});
+ var c=w.chg;
+ if(c&&typeof c==="object"&&!Array.isArray(c)){
+  if(ok(c.type)&&ETCHG.some(function(o){return o.k===c.type;}))r.chg.type=c.type;
+  if(r.chg.type==="other"&&(c.grp==="vis"||c.grp==="conv"))r.chg.grp=c.grp;
+  ["what","before","after","why"].forEach(function(k){if(ok(c[k]))r.chg[k]=c[k].slice(0,k==="what"?160:600);});
+  if(ok(c.date)&&(c.date===""||parseYmd(c.date)!=null))r.chg.date=c.date;
+  if(typeof c.n==="number"&&c.n===Math.floor(c.n)&&c.n>=7&&c.n<=14)r.chg.n=c.n;
+  if(ok(c.rconf)&&c.rconf!==""&&parseYmd(c.rconf)!=null)r.chg.rconf=c.rconf;
+  if(etCertOk(c.rcert))r.chg.rcert=c.rcert;
+ }
+ var m=w.cm;
+ if(m&&typeof m==="object"&&!Array.isArray(m)&&r.locked&&r.lst.chosen&&ok(m.at)&&parseYmd(m.at)!=null&&ok(m.date)&&parseYmd(m.date)!=null&&ok(m.type)&&ETCHG.some(function(o){return o.k===m.type;})&&typeof m.n==="number"&&m.n===Math.floor(m.n)&&m.n>=7&&m.n<=14){
+  var g=(ETCHG.filter(function(o){return o.k===m.type;})[0].g)||(m.grp==="vis"||m.grp==="conv"?m.grp:"");
+  if(g)r.cm={at:m.at,type:m.type,grp:g,what:ok(m.what)?m.what.slice(0,160):"",before:ok(m.before)?m.before.slice(0,600):"",after:ok(m.after)?m.after.slice(0,600):"",why:ok(m.why)?m.why.slice(0,600):"",date:m.date,n:m.n,prov:m.prov===true,retro:m.retro===true,gap:(m.retro===true&&typeof m.gap==="number"&&m.gap>0&&m.gap<=3650&&m.gap===Math.floor(m.gap))?m.gap:0,conf:(m.retro===true&&ok(m.conf)&&parseYmd(m.conf)!=null)?m.conf:"",cert:(m.retro===true&&etCertOk(m.cert))?m.cert:"",rh:etRhFix(m.retro===true?m.rh:[])};
+  if(r.cm&&r.cm.retro&&(!r.cm.gap||r.cm.conf!==r.cm.date||!etCertOk(r.cm.cert)))r.cm=null;
+ }
+ if(ET2DEC.indexOf(w.dec2)>-1)r.dec2=w.dec2;
+}
+
+/* ---------- Etsy Sales Bottleneck, slice E3: Weeks 3 and 4 (hold and watch, read the result). Preview only: #/etsy/w3[/1-6] and #/etsy/w4[/1-6]. Not startable by members. ---------- */
+var ET3STEPS=[
+ {n:1,t:"Hold steady and resist extra changes",m:15,b:"Nothing. A short read."},
+ {n:2,t:"Weekly log",m:20,b:"Your Etsy Stats for this listing."},
+ {n:3,t:"Confounders: what else could explain the numbers?",m:20,b:"Anything you remember changing or happening."},
+ {n:4,t:"Correct only if something is clearly broken",m:15,b:"Your listing open in Etsy."},
+ {n:5,t:"Where your windows stand",m:10,b:"Nothing."},
+ {n:6,t:"Week 3 review",m:15,b:"Whatever you have done so far."}
+];
+var ET4STEPS=[
+ {n:1,t:"Learn how to read a small result",m:25,b:"Nothing. A short lesson."},
+ {n:2,t:"Is your after-window finished?",m:10,b:"Your window dates."},
+ {n:3,t:"Record your before and after numbers",m:35,b:"Etsy Stats for the two windows."},
+ {n:4,t:"Your evidence verdict",m:20,b:"The numbers from step 3."},
+ {n:5,t:"Decide what is next",m:20,b:"Your verdict."},
+ {n:6,t:"Week 4 review",m:15,b:"Whatever you have done so far."}
+];
+var ETCONF=[
+ ["price","I changed the price",1],["sale","I ran a sale or promotion",1],["ads","I changed an ad setting, or Etsy ran Offsite Ads differently",1],
+ ["unpub","The listing was unpublished, expired or relisted",1],["second","I made a second change to this listing",1],
+ ["season","A major seasonal or holiday period",1],["shop","A shop-wide change (shop name, policies, banner, shipping)",1],
+ ["ext","A post, mention or press that sent unusual traffic",1],["other","Something else",0]
+];
+var ETNEXT=[["keep","Keep the change"],["revert","Go back to the original"],["refine","Refine the same change"],["second","Try a second change in a new sprint"],["unsure","I am not sure yet"]];
+var ETMINWIN=20;
+var ETCONFWIN=50;
+var ETSMALLORD=5;
+var ETSPIKE=[["","No, my views were fairly steady"],["spike","A one-off spike (a post, a feature, a mention) brought a lot of the views"],["uneven","Very uneven, and I cannot say why"]];
+var ETRATIO=3;
+var ETRES=["views","favs","lorders","rev","sv"];
+ETMONEY.rev=1;
+var ETRESL={views:"Listing views",favs:"Listing favourites",lorders:"Listing orders",rev:"Listing revenue (optional)",sv:"Shop visits (shop level, context only, optional)"};
+var ETKEY=["views","lorders"];
+
+/* ===== ETSY E3 LOGIC START: pure rules, checked by dev/etsy_e3_tests.js ===== */
+function etVs(o){return vstate(o);}
+function etCmWin(){var m=S.et.cm;return m?etWin(m.date,m.n):null;}
+function etNextId(){var E=S.et,n=+E.nid||1;E.nid=n+1;return n;}
+function etConfKind(k){return ETCONF.filter(function(x){return x[0]===k;})[0]||null;}
+function etConfMajor(c){var x=etConfKind(c.k);if(!x)return false;return c.k==="other"?c.maj===true:true;}
+function etWdAt(c,asOf){return !!c.wd&&(!asOf||c.wd<=asOf);}
+function etConfs(asOf){
+ var E=S.et,w=etCmWin(),r={major:[],minor:[],outside:[]};
+ E.cf.forEach(function(c){
+  if(etWdAt(c,asOf))return;
+  if(asOf&&c.at>asOf)return;
+  if(!w||c.d<w.bFrom||c.d>w.aTo){r.outside.push(c);return;}
+  (etConfMajor(c)?r.major:r.minor).push(c);
+ });
+ return r;
+}
+function etPhase(asOf){
+ var E=S.et,w=etCmWin(),t=asOf||today();
+ if(!E.cm||!w)return {k:"none"};
+ if(t<=w.aTo)return {k:"during",day:Math.max(1,etDaysBetween(w.aFrom,t)+1),of:w.n,left:etDaysBetween(t,w.aTo),w:w};
+ return {k:"ready",w:w};
+}
+function etNums(asOf){
+ var E=S.et,out={b:{},a:{},spb:"",spa:""};
+ ["b","a"].forEach(function(sc){
+  var at=E.res[sc+"At"],known=!(asOf&&(!at||at>asOf));
+  ETRES.forEach(function(k){var o=E.res[sc][k];out[sc][k]=known?{s:o.s,v:o.v}:{s:"",v:""};});
+  out["sp"+sc]=known?(E.res["sp"+sc]==="spike"||E.res["sp"+sc]==="uneven"?E.res["sp"+sc]:""):"";
+ });
+ return out;
+}
+function etN(o){var s=vstate(o);return s==="pos"?+o.v:(s==="zero"?0:null);}
+function etFmt(o,money){var s=vstate(o),c=money?sym(S.focus.currency):"";return s==="pos"?c+String(+o.v):(s==="zero"?c+"0 (confirmed)":"not seen");}
+function fin0(v){v.conf="none";return v;}
+function etVerdict(asOf){
+ var E=S.et,cm=E.cm,small="Before and after on one listing is a small, noisy comparison. It shows what happened, not what will always happen.";
+ if(!cm)return fin0(vmk("Insufficient evidence","info","E1",["No change has been committed yet, so there is nothing to compare."],["This says nothing about your listing, because nothing has been tested."],["Finish Week 2 and commit one change."]));
+ var w=etWin(cm.date,cm.n),ph=etPhase(asOf);
+ if(ph.k==="during")return fin0(vmk("Insufficient evidence","info","E2",["Your "+cm.n+" day after-window runs until "+dayLab(w.aTo)+(ph.left>0?", so there are "+ph.left+" more day"+(ph.left===1?"":"s")+" to go.":".")],["A result read before the window has finished would be a guess."],["Wait until "+dayLab(w.readOn)+", then record your numbers. Resist extra changes meanwhile."]));
+ var nm=etNums(asOf),miss=[];
+ ETKEY.forEach(function(k){["b","a"].forEach(function(sc){if(etN(nm[sc][k])===null)miss.push(ETRESL[k].toLowerCase()+" for the "+(sc==="b"?"before":"after")+"-window");});});
+ if(miss.length)return fin0(vmk("Mixed or unclear","warn","E3",["These numbers are not recorded yet: "+miss.join(", ")+"."],["Without them the two windows cannot be compared. A number you could not see is kept as unknown. It is never read as zero."],["Open Etsy Stats for the exact window dates and fill in what you can see. If a number cannot be seen, that is fine, and the result stays unclear."]));
+ var bv=etN(nm.b.views),av=etN(nm.a.views),bo=etN(nm.b.lorders),ao=etN(nm.a.lorders),bf=etN(nm.b.favs),af=etN(nm.a.favs);
+ var nums="Listing views: "+bv+" before, "+av+" after. Listing orders: "+bo+" before, "+ao+" after."+((bf!==null&&af!==null)?" Favourites: "+bf+" before, "+af+" after.":"");
+ var fin=function(v,c){v.conf=c;return v;};
+ if(bv<ETMINWIN||av<ETMINWIN){
+  var sh=[];if(bv<ETMINWIN)sh.push("your before-window had "+bv+" listing view"+(bv===1?"":"s"));if(av<ETMINWIN)sh.push("your after-window had "+av);
+  return fin(vmk("Insufficient evidence","info","E4",[nums,"Too few views to read: "+sh.join(" and ")+"."],["At least "+ETMINWIN+" listing views are needed in each window before a change can be read. With fewer, a few views either way change the picture completely.","The two windows are checked separately. A large count in one window cannot make up for a very small count in the other.","These figures ("+ETMINWIN+" in each window to read anything, about "+ETCONFWIN+" in each for a confident reading) are provisional starting points that will be reviewed against real results."],["Collect for longer, or work on being found first (title, tags, keywords), then repeat with a longer window."]),"none");
+ }
+ var cf=etConfs(asOf),retro=cm.retro===true,unsure=retro&&cm.cert==="unsure",cav=etCaveats(bv,av,bo,ao,cm,nm.spb,nm.spa);
+ var visX=cm.grp==="vis",movedX=visX?(av>bv):(ao>bo||(ao===bo&&bf!==null&&af!==null&&af>bf)),uneven=nm.spb==="uneven"||nm.spa==="uneven",spikeBoth=nm.spb==="spike"&&nm.spa==="spike",spikeFlatters=nm.spa==="spike"&&movedX&&ao>=bo,sp=(uneven||spikeBoth||spikeFlatters);
+ if(cf.major.length||unsure||sp){
+  var why=[nums];
+  if(cf.major.length)why.push("You logged "+cf.major.length+" major thing"+(cf.major.length===1?"":"s")+" inside your windows that could also explain the numbers: "+cf.major.map(function(c){return (etConfKind(c.k)||["","?"])[1].toLowerCase();}).join("; ")+".");
+  if(unsure)why.push("The change was recorded "+cm.gap+" days after the date given, and you said you are not sure when you made it, so the two measurement periods cannot be established reliably.");
+  if(uneven)why.push("You said views in the "+(nm.spb==="uneven"&&nm.spa==="uneven"?"before-window and the after-window were":(nm.spb==="uneven"?"before-window were":"after-window were"))+" very unevenly spread and you cannot say why, so the two windows may not be comparable.");
+  if(spikeBoth)why.push("You said a one-off spike in traffic fell in both windows, so neither total shows a steady level.");
+  else if(spikeFlatters)why.push("You said a one-off spike in traffic fell in the after-window. That could account for the rise by itself, so the gain cannot be put down to your change.");
+  return fin(vmk("Mixed or unclear","warn","E5",why,["Because "+(cf.major.length?"something else changed or happened":(unsure?"the measurement periods cannot be established reliably":(uneven?"the views were very unevenly spread":"a one-off spike could explain the movement")))+", the numbers cannot be put down to your change alone. Even if they moved the right way, this would not be called promising.",small].concat(cav.lines),["Write down what happened and when. If a spike had a known cause (a post, a feature, a mention), log it in Week 3, step 3. If you want a cleaner answer, repeat once things are steady and record the change on the day you make it."]),"unclear");
+ }
+ var vis=cm.grp==="vis",viewsUp=av>bv,ordersNoFall=ao>=bo,favsUp=(bf!==null&&af!==null&&af>bf);
+ var moved=vis?viewsUp:(ao>bo||(ao===bo&&favsUp));
+ if(moved&&ordersNoFall)return fin(vmk("Promising","ok","E6",[nums,vis?"The count you were aiming at, listing views, went up, and orders did not fall.":"The counts you were aiming at, orders and favourites, moved the right way, and orders did not fall."],[small,"What you can see is an improvement in the numbers. That is not the same as proof that your change caused it. Nothing else was logged, but timing, trends and luck can still move numbers.","This is encouraging. It is not proof."].concat(cav.lines),["Keep the change for now and see whether it holds in the next sprint. If you can, try a second, different change and compare again."]),cav.conf);
+ if(viewsUp&&ao<=bo)return fin(vmk("Traffic but no sales","warn","E7",[nums,"More people opened your listing, but orders did not rise."],["This shows people arrived. It does not show why they did not buy.",small].concat(cav.lines),["Look at what shoppers see once they arrive: the lead image, the first lines of the description, and how the price is shown. Change one of those next."]),cav.conf);
+ if(!moved&&cav.conf==="limited")return fin(vmk("Insufficient evidence","info","E8",[nums,vis?"Listing views were about the same, or lower ("+bv+" before, "+av+" after). With this few views, that is within what chance alone could produce.":"Neither orders nor favourites went up ("+bo+" and "+ao+" orders). With this few views, that is within what chance alone could produce."],["This does not mean your change made no difference. There were too few views to tell, so the evidence is limited.",small].concat(cav.lines),["Collect for longer and repeat with a longer window. Keep your notes, and only choose a different change once you have more views to read."]),"limited");
+ if(!moved)return fin(vmk("Approach needs reviewing","warn","E8",[nums,vis?"Listing views did not go up over a full equal window.":"Neither orders nor favourites went up over a full equal window."],["This does not mean the idea is wrong. One change on one listing, over a short window, is only one try.",small].concat(cav.lines),["Try a different variable next, such as "+(vis?"the lead image":"the title or tags")+". Change one thing again, and record it on the day."]),cav.conf);
+ return fin(vmk("Insufficient evidence","info","E9",[nums],["The numbers do not point clearly one way.",small].concat(cav.lines),["Keep your notes and try again with a longer window."]),cav.conf);
+}
+function etCaveats(bv,av,bo,ao,cm,spb,spa){
+ var mn=Math.min(bv,av),mx=Math.max(bv,av),lines=[],conf="fair";
+ if(mn<ETCONFWIN){conf="limited";lines.push("Your smaller window had "+mn+" listing views. Below about "+ETCONFWIN+" in a window, a few views either way can change the picture, so this is too limited to support a confident conclusion. Treat it as a hint.");
+  if(mn>0&&mx>=ETRATIO*mn)lines.push("One window had more than "+ETRATIO+" times the views of the other. Because the windows are equal in length that is part of the result, but a small starting count can make a big change look bigger than it is.");}
+ if(bo<ETSMALLORD&&ao<ETSMALLORD){if(conf==="fair")conf="lower";lines.push("Orders are very small counts ("+bo+" before, "+ao+" after). A difference of one or two orders is well within chance.");}
+ if(cm&&cm.retro===true&&cm.cert!=="unsure"){if(conf==="fair")conf="lower";lines.push("This change was recorded retrospectively, "+cm.gap+" days after the date given"+(cm.cert==="approx"?", and the member is fairly sure of it but it could be a day or two different":"")+". You had already seen some of what followed, so confidence is lower.");}
+ if(spb==="spike"||spa==="spike"){if(conf==="fair")conf="lower";lines.push("You flagged a one-off spike in traffic in the "+(spb==="spike"&&spa==="spike"?"before-window and the after-window":(spb==="spike"?"before-window":"after-window"))+". An unusual burst of traffic with a known cause is not a fault in your approach. It can distort a window total, so the result is read with extra care."+(spb==="spike"&&spa!=="spike"?" A spike before your change would, if anything, make your gain look smaller, so it does not stop a reading.":""));}
+ return {conf:conf,lines:lines};
+}
+function etSnap(kind){
+ var cm=S.et.cm,asOf=null,late=false,prov=false,eff="";
+ if(kind==="day30"&&rvCur()){
+  if(rvPhase()==="during")prov=true;else asOf=rvDay30();
+ }
+ if(asOf){var w=cm?etWin(cm.date,cm.n):null;if(w&&w.aTo>asOf)prov=true;
+  var E=S.et;if(E.res.aAt&&E.res.aAt>asOf)late=true;}
+ var v=etVerdict(asOf||null);
+ return {at:today(),label:v.label,rule:v.rule,kind:kind==="day30"?"day30":"update",asOf:asOf||"",late:late,prov:prov||v.rule==="E2"};
+}
+function et3Entry(d){var E=S.et,cm=E.cm;if(!cm)return {ok:false,why:"nocm"};if(!d||parseYmd(d)==null)return {ok:false,why:"baddate"};if(d>today())return {ok:false,why:"future"};if(d<cm.date)return {ok:false,why:"beforechange"};return {ok:true};}
+function et3ConfDate(d){var E=S.et,w=etCmWin();if(!w)return {ok:false,why:"nocm"};if(!d||parseYmd(d)==null)return {ok:false,why:"baddate"};if(d>today())return {ok:false,why:"future"};if(d<w.bFrom)return {ok:false,why:"early"};return {ok:true};}
+function et3AddLog(){
+ var E=S.et,u=UI.etl||{},e=et3Entry(u.d||today());if(!e.ok)return false;
+ var any=ETRES.some(function(k){return u[k]&&vstate(u[k])!=="unk";}),note=String(u.note||"").trim();
+ if(!any&&!note)return false;if(E.wl.length>=60)return false;
+ var en={id:etNextId(),d:u.d||today(),at:today(),note:note.slice(0,300),wd:""};
+ ETRES.forEach(function(k){var o=u[k]||{s:"",v:""};en[k]={s:o.s,v:o.s==="value"?w4Clean(k,o.v):""};});
+ E.wl.push(en);UI.etl=null;return true;
+}
+function et3AddConf(){
+ var E=S.et,u=UI.etf||{},e=et3ConfDate(u.d||today());if(!e.ok)return false;
+ if(!etConfKind(u.k))return false;if(E.cf.length>=60)return false;
+ if(u.k==="other"&&u.maj!==true&&u.maj!==false)return false;
+ E.cf.push({id:etNextId(),d:u.d||today(),at:today(),k:u.k,maj:u.k==="other"?u.maj===true:true,note:String(u.note||"").trim().slice(0,300),wd:""});
+ UI.etf=null;return true;
+}
+function etRecNums(){var E=S.et;return ["b","a"].some(function(sc){return ETRES.some(function(k){return !!E.res[sc][k].s;});});}
+function et3Done(){return ET3STEPS.filter(function(s){return S.et.st3[s.n];}).length;}
+function et4Done(){return ET4STEPS.filter(function(s){return S.et.st4[s.n];}).length;}
+/* ===== ETSY E3 LOGIC END ===== */
+
+function et3Shell(wk,n,body){
+ var E=S.et,st=wk===3?ET3STEPS:ET4STEPS,s=st[n-1],dn=(wk===3?E.st3:E.st4)[n],base="#/etsy/w"+wk;
+ var h='<a class="back" href="'+base+'">&larr; Etsy Sales Bottleneck, Week '+wk+'</a>'+etBn()+'<h1>Week '+wk+' &middot; Step '+n+' of 6</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p><p class="mute">You will need: '+esc(s.b)+' Everything saves automatically.</p>'+body;
+ h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="et3-done" data-w="'+wk+'" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<6?'<a class="btn ghost" href="'+base+'/'+(n+1)+'">Next step &rarr;</a>':'')+'</div>';
+ return h;
+}
+function et3NoCm(){return '<div class="note warn"><strong>No change is committed yet.</strong> Week 2 finishes with committing one change. <a href="#/etsy/w2/5">Go to Week 2, step 5</a></div>';}
+function et3Card(){return '<div class="card"><h2>Weeks 3 and 4: Hold, then read</h2><p class="mute">Preview only. A weekly log, confounders, your before-and-after numbers and your evidence verdict. Nothing here starts your sprint clock.</p><div class="row"><a class="btn ghost" href="#/etsy/w3">Week 3 preview</a><a class="btn ghost" href="#/etsy/w4">Week 4 preview</a></div></div>';}
+function et3Window(){
+ var ph=etPhase(),w=ph.w;
+ if(ph.k==="none")return et3NoCm();
+ var h='<div class="card"><h2>Where your windows stand</h2><div class="crow"><span>Your change</span><strong>'+esc(S.et.cm.what)+'</strong></div><div class="crow"><span>Before-window</span><strong>'+esc(dayLab(w.bFrom))+' to '+esc(dayLab(w.bTo))+'</strong></div><div class="crow"><span>After-window</span><strong>'+esc(dayLab(w.aFrom))+' to '+esc(dayLab(w.aTo))+'</strong></div><div class="crow"><span>Read your numbers from</span><strong>'+esc(dayLab(w.readOn))+'</strong></div>';
+ h+=ph.k==="during"?'<div class="note info"><strong>Day '+ph.day+' of '+ph.of+' of your after-window.</strong> '+(ph.left>0?ph.left+' more day'+(ph.left===1?'':'s')+' to go.':'Today is the last day.')+' Please do not read your numbers as a result yet.</div>':'<div class="note ok"><strong>Your after-window is finished.</strong> You can record your numbers in Week 4, step 3.</div>';
+ if(rvCur()&&w.aTo>rvDay30())h+='<div class="note info">Your after-window runs past Day 30, so your Day 30 position will be provisional, and the rest is recorded as a post-sprint update until '+esc(dayLab(rvEnd()))+'.</div>';
+ return h+'</div>';
+}
+function et3Num(sc,k,lab){
+ lab=lab+(ETMONEY[k]?" ("+sym(S.focus.currency).trim()+")":"");
+ var E=S.et,o=sc==="l"?((UI.etl&&UI.etl[k])||{s:"",v:""}):E.res[sc][k];
+ var opts=[["value","A number"],["zero","Zero, I checked"],["unknown","I can't see this"]];
+ return '<div class="q"><strong>'+esc(lab)+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="et3-vs" data-sc="'+sc+'" data-k="'+k+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="9" data-et="'+(sc==="l"?"l:":"r:"+sc+".")+k+'" value="'+esc(o.v)+'" aria-label="'+esc(lab)+'" style="max-width:160px">':'')+'</div>';
+}
+function et3Home(wk){
+ var E=S.et,st=wk===3?ET3STEPS:ET4STEPS,d=wk===3?et3Done():et4Done(),dn=wk===3?E.st3:E.st4,base="#/etsy/w"+wk;
+ var h='<a class="back" href="#/etsy/w2">&larr; Etsy Sales Bottleneck, Week 2</a><h1>Etsy Sales Bottleneck</h1>'+etBn()+'<p class="mute">'+(wk===3?'Week 3 of 4: Hold and watch. Leave the change alone, keep a simple log, and note anything else that could explain the numbers.':'Week 4 of 4: Read the result. Record your before and after numbers, see your evidence verdict and decide what is next.')+' Nothing here starts your sprint clock.</p>';
+ h+='<div class="card"><strong>'+d+' of 6 steps done</strong><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/6*100)+'%"></i></div></div>';
+ if(!E.cm)h+=et3NoCm();
+ h+='<div class="card"><h2>The six steps</h2>'+st.map(function(s){var x=dn[s.n];return '<a class="step'+(x?' done':'')+'" href="'+base+'/'+s.n+'"><span class="n">'+(x?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(x?"Done":"Open")+'</span></a>';}).join("")+'</div>';
+ return h;
+}
+function et3h1(){return et3Home(3);}
+function et4h(){return et3Home(4);}
+function et3s1(){
+ var E=S.et,h=LC("et3s1.lesson");
+ if(E.cm)h+='<div class="card"><h2>Your committed change</h2><div class="crow"><span>What</span><strong>'+esc(E.cm.what)+'</strong></div><div class="crow"><span>Went live</span><strong>'+esc(dayLab(E.cm.date))+'</strong></div></div>';else h+=et3NoCm();
+ return et3Shell(3,1,h+et3Window());
+}
+function et3LogHtml(){
+ var E=S.et,h="";
+ if(!E.wl.length)return '<p class="mute">Nothing logged yet.</p>';
+ E.wl.slice().sort(function(a,b){return a.d<b.d?-1:(a.d>b.d?1:a.id-b.id);}).forEach(function(en){
+  var wd=!!en.wd;
+  h+='<div class="crow" style="display:block'+(wd?';opacity:.6':'')+'"><p><strong>'+esc(dayLab(en.d))+'</strong>'+(en.d>(rvCur()?rvDay30():"9999")?' <span class="tag">post-sprint update</span>':'')+(wd?' <span class="tag">withdrawn '+esc(dayLab(en.wd))+'</span>':'')+'</p><p>'+ETRES.filter(function(k){return en[k]&&en[k].s;}).map(function(k){return esc(ETRESL[k].replace(" (shop level, context only, optional)","").replace(" (optional)",""))+': '+esc(etFmt(en[k],k==="rev"));}).join(' &middot; ')+'</p>'+(en.note?'<p style="white-space:pre-wrap">'+esc(en.note)+'</p>':'')+(wd?'':'<p><button type="button" class="chip sm" data-a="et3-lwd" data-id="'+en.id+'">Withdraw this entry</button></p>')+'</div>';
+ });
+ return h;
+}
+function et3s2(){
+ var E=S.et,h=LC("et3s2.lesson");
+ if(!E.cm)return et3Shell(3,2,h+et3NoCm());
+ var u=UI.etl||{};
+ h+='<div class="card"><h2>Add a log entry</h2><p class="mute">These are your own notes on how the listing is going. They are not used to work out your verdict. Your verdict uses the two windows in Week 4.</p><label for="etld">Date of the numbers (not before '+esc(dayLab(E.cm.date))+')</label><input id="etld" type="date" data-et="l:d" value="'+esc(u.d||today())+'" max="'+esc(today())+'" min="'+esc(E.cm.date)+'" style="max-width:200px">';
+ ["views","favs","lorders","rev"].forEach(function(k){h+=et3Num("l",k,ETRESL[k]);});
+ h+='<label for="etln">A note (optional)</label><textarea id="etln" maxlength="300" data-et="l:note" style="min-height:60px">'+esc(u.note||"")+'</textarea><p><button type="button" class="btn ghost" data-a="et3-ladd">Add to my log</button></p></div><div class="card"><h2>Your log</h2>'+et3LogHtml()+'</div>';
+ return et3Shell(3,2,h);
+}
+function et3ConfHtml(){
+ var E=S.et,h="";
+ if(!E.cf.length)return '<p class="mute">Nothing logged. That is a fine answer if nothing changed.</p>';
+ E.cf.slice().sort(function(a,b){return a.d<b.d?-1:(a.d>b.d?1:a.id-b.id);}).forEach(function(c){
+  var w=etCmWin(),inw=w&&c.d>=w.bFrom&&c.d<=w.aTo,mj=etConfMajor(c),wd=!!c.wd,k=etConfKind(c.k);
+  h+='<div class="crow" style="display:block'+(wd?';opacity:.6':'')+'"><p><strong>'+esc(dayLab(c.d))+'</strong>: '+esc(k?k[1]:"")+' <span class="tag">'+(mj?"major":"minor")+'</span>'+(inw?'':' <span class="tag">outside your windows, not counted</span>')+(wd?' <span class="tag">withdrawn '+esc(dayLab(c.wd))+'</span>':'')+'</p>'+(c.note?'<p style="white-space:pre-wrap">'+esc(c.note)+'</p>':'')+(wd?'':'<p><button type="button" class="chip sm" data-a="et3-fwd" data-id="'+c.id+'">Withdraw this entry</button></p>')+'</div>';
+ });
+ return h;
+}
+function et3s3(){
+ var E=S.et,h=LC("et3s3.lesson");
+ if(!E.cm)return et3Shell(3,3,h+et3NoCm());
+ var u=UI.etf||{},w=etCmWin();
+ h+='<div class="card"><h2>Log something that could also explain your numbers</h2><label for="etfd">Date it happened (from '+esc(dayLab(w.bFrom))+' to today)</label><input id="etfd" type="date" data-et="f:d" value="'+esc(u.d||today())+'" max="'+esc(today())+'" min="'+esc(w.bFrom)+'" style="max-width:200px"><label>What happened?</label>';
+ ETCONF.forEach(function(x){h+='<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(u.k===x[0])+'" data-a="et3-fk" data-v="'+x[0]+'">'+esc(x[1])+'</button></p>';});
+ if(u.k==="other")h+='<label>Could this change your numbers a lot?</label><div class="row"><button type="button" class="chip" aria-pressed="'+(u.maj===true)+'" data-a="et3-fmaj" data-v="yes">Yes, it could</button><button type="button" class="chip" aria-pressed="'+(u.maj===false)+'" data-a="et3-fmaj" data-v="no">Probably not</button></div>';
+ h+='<label for="etfn">A note (optional)</label><textarea id="etfn" maxlength="300" data-et="f:note" style="min-height:60px">'+esc(u.note||"")+'</textarea><p><button type="button" class="btn ghost" data-a="et3-fadd">Add to my list</button></p></div>';
+ var c=etConfs();
+ h+='<div class="card"><h2>Your list</h2><p><strong>'+c.major.length+' major, '+c.minor.length+' minor</strong> inside your windows.</p>'+et3ConfHtml()+'</div>';
+ return et3Shell(3,3,h);
+}
+function et3s4(){
+ var E=S.et,h=LC("et3s4.lesson");
+ h+='<div class="card"><h2>Your decision</h2>';
+ [["leave","Nothing is broken. I will leave the listing as it is."],["fixed","Something was clearly broken and I corrected it. I have logged it as a second change."]].forEach(function(x){h+='<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(E.fx===x[0])+'" data-a="et3-fx" data-v="'+x[0]+'">'+x[1]+'</button></p>';});
+ if(E.fx==="fixed"){var has=E.cf.some(function(c){return c.k==="second"&&!c.wd;});h+=has?'<div class="note ok">A second change is logged.</div>':'<div class="note warn"><strong>Please log it.</strong> Add "I made a second change to this listing" in <a href="#/etsy/w3/3">step 3</a>, with the date, so your result is read with the right care.</div>';}
+ return et3Shell(3,4,h+'</div>');
+}
+function et3s5(){return et3Shell(3,5,LC("et3s5.lesson")+et3Window());}
+function et3s6(){
+ var E=S.et,h=LC("et3s6.lesson"),c=etConfs();
+ h+='<div class="card"><h2>Your Week 3 summary</h2><div class="crow"><span>Log entries</span><strong>'+E.wl.filter(function(x){return !x.wd;}).length+'</strong></div><div class="crow"><span>Things that could explain the numbers</span><strong>'+c.major.length+' major, '+c.minor.length+' minor</strong></div><div class="crow"><span>Corrections</span><strong>'+(E.fx==="fixed"?"One, logged":(E.fx==="leave"?"None":"Not said"))+'</strong></div><h3>Your decision</h3>';
+ [["next","Ready to read my result in Week 4"],["wait","My after-window is not finished yet"],["help","I would like help in the group session"]].forEach(function(x){h+='<p><button type="button" class="chip" aria-pressed="'+(E.dec3===x[0])+'" data-a="et3-dec" data-w="3" data-v="'+x[0]+'">'+x[1]+'</button></p>';});
+ return et3Shell(3,6,h+'</div>');
+}
+function et4s1(){return et3Shell(4,1,LC("et4s1.lesson")+LC("et4s1.examples"));}
+function et4s2(){return et3Shell(4,2,LC("et4s2.lesson")+et3Window());}
+function et4s3(){
+ var E=S.et,h=LC("et4s3.lesson"),w=etCmWin();
+ if(!E.cm)return et3Shell(4,3,h+et3NoCm());
+ var ph=etPhase();
+ if(ph.k==="during")h+='<div class="note info"><strong>Your after-window is not finished.</strong> You can enter the before-window now, and the after-window from '+esc(dayLab(w.readOn))+'.</div>';
+ h+=rvCur()?rvPostNote():'';
+ [["b","Before-window",w.bFrom,w.bTo],["a","After-window",w.aFrom,w.aTo]].forEach(function(x){
+  h+='<div class="card"><h2>'+x[1]+': '+esc(dayLab(x[2]))+' to '+esc(dayLab(x[3]))+'</h2><p class="mute">Choose exactly these dates in Etsy Stats. Listing numbers come from the listing list, and Etsy only shows active listings there.</p>';
+  ETRES.forEach(function(k){h+=et3Num(x[0],k,ETRESL[k]);});
+  h+='<label>Were the views in this window fairly steady?</label>'+ETSPIKE.map(function(o){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+((E.res["sp"+x[0]]||"")===o[0])+'" data-a="et3-sp" data-sc="'+x[0]+'" data-v="'+o[0]+'">'+o[1]+'</button></p>';}).join("");
+  if(E.res["sp"+x[0]]==="spike")h+='<div class="note info">If you know the cause, please log it as "A post, mention or press that sent unusual traffic" in <a href="#/etsy/w3/3">Week 3, step 3</a>.</div>';
+  var at=E.res[x[0]+"At"];if(at)h+='<p class="mute">Last saved '+esc(dayLab(at))+rvPostTag(at)+'.</p>';
+  h+='</div>';
+ });
+ return et3Shell(4,3,h);
+}
+function et4s4(){
+ var E=S.et,h=LC("et4s4.lesson");
+ if(!E.cm)return et3Shell(4,4,h+et3NoCm());
+ var v=etVerdict(),sn=etSnap("update");
+ h+='<div class="card"><h2>Your evidence verdict</h2><div class="note '+v.cls+'"><strong>'+esc(v.label)+'</strong> <span class="tag">rule '+esc(v.rule)+'</span></div>';
+ if(sn.late||(rvCur()&&rvPhase()==="window"&&E.res.aAt>rvDay30()))h+='<p><span class="tag">post-sprint update</span></p>';
+  var cl={limited:"Limited. Too limited to support a confident conclusion.",lower:"Lower than usual. See the notes below.",fair:"Fair for a small before-and-after.",unclear:"Unclear.",none:""}[v.conf||"none"];
+ if(cl)h+='<p><strong>How much confidence?</strong> <span class="tag">'+esc(cl)+'</span></p>';
+ h+='<h3>What the numbers show</h3><ul>'+v.why.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><h3>What they cannot show</h3><ul>'+v.limits.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><h3>A reasonable next step</h3><ul>'+v.next.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+ var c=etConfs();
+ h+='<div class="card"><h2>What was considered</h2><div class="crow"><span>Major things logged inside your windows</span><strong>'+c.major.length+'</strong></div><div class="crow"><span>Minor things</span><strong>'+c.minor.length+'</strong></div><div class="crow"><span>Provisional settings used</span><strong>At least '+ETMINWIN+' listing views in each window to read a result, and about '+ETCONFWIN+' in each to remove the low-view caution</strong></div><p class="mute">These two figures are provisional testing assumptions. About '+ETCONFWIN+' is not proof of reliability and not a validated benchmark.</p><div class="crow"><span>Recorded</span><strong>'+(E.cm.retro?"retrospectively ("+esc((ETCERT.filter(function(x){return x[0]===E.cm.cert;})[0]||["",""])[1].toLowerCase())+")":"on the day or within 3 days")+'</strong></div></div>';
+ if(rvCur()){var s30=etSnap("day30");h+='<div class="card"><h2>Your Day 30 position</h2><p><strong>'+esc(s30.label)+'</strong> '+(s30.prov?'<span class="tag">provisional</span>':'')+(s30.late?' <span class="tag">numbers saved after Day 30</span>':'')+'</p><p class="mute">This is what your numbers said on Day 30. Anything saved later is kept as a post-sprint update.</p></div>';}
+ return et3Shell(4,4,h);
+}
+function et4s5(){
+ var E=S.et,h=LC("et4s5.lesson"),v=etVerdict();
+ h+='<div class="card"><h2>Your verdict was: '+esc(v.label)+'</h2><h3>What would you like to do?</h3>';
+ ETNEXT.forEach(function(x){h+='<p><button type="button" class="chip" aria-pressed="'+(E.nx===x[0])+'" data-a="et3-nx" data-v="'+x[0]+'">'+x[1]+'</button></p>';});
+ return et3Shell(4,5,h+'</div>');
+}
+function et4s6(){
+ var E=S.et,h=LC("et4s6.lesson"),v=etVerdict(),nx=ETNEXT.filter(function(x){return x[0]===E.nx;})[0];
+ h+='<div class="card"><h2>Your Week 4 summary</h2><div class="crow"><span>Your change</span><strong>'+esc(E.cm?E.cm.what:"None committed")+'</strong></div><div class="crow"><span>Evidence verdict</span><strong>'+esc(v.label)+'</strong></div><div class="crow"><span>Your decision</span><strong>'+esc(nx?nx[1]:"Not chosen")+'</strong></div><h3>Anything else?</h3>';
+ [["done","I am done with this experiment for now"],["help","I would like help in the group session"]].forEach(function(x){h+='<p><button type="button" class="chip" aria-pressed="'+(E.dec4===x[0])+'" data-a="et3-dec" data-w="4" data-v="'+x[0]+'">'+x[1]+'</button></p>';});
+ h+='</div><div class="note info"><strong>The Day 30 review and Results pages for Etsy are wired in during slice E4.</strong> This is the third slice of the experiment, shown for review.</div>';
+ return et3Shell(4,6,h);
+}
+function et3Action(a,d){
+ var E=S.et,u;
+ if(a==="et3-done"){var st=+d.w===3?E.st3:(+d.w===4?E.st4:null);if(!st||!/^[1-6]$/.test(String(d.n)))return;st[d.n]=!st[d.n];save();}
+ else if(a==="et3-dec"){if(+d.w===3&&["next","wait","help"].indexOf(d.v)>-1)E.dec3=E.dec3===d.v?"":d.v;else if(+d.w===4&&["done","help"].indexOf(d.v)>-1)E.dec4=E.dec4===d.v?"":d.v;else return;save();}
+ else if(a==="et3-fx"){if(d.v!=="leave"&&d.v!=="fixed")return;E.fx=E.fx===d.v?"":d.v;save();}
+ else if(a==="et3-nx"){if(!ETNEXT.some(function(x){return x[0]===d.v;}))return;E.nx=E.nx===d.v?"":d.v;save();}
+ else if(a==="et3-vs"){
+  if(!E.cm||!ETVS[d.v]||d.v==="")return;
+  if(d.sc==="l"){if(ETRES.indexOf(d.k)<0)return;UI.etl=UI.etl||{};var o=UI.etl[d.k]||{s:"",v:""};o.s=o.s===d.v?"":d.v;if(o.s!=="value")o.v="";UI.etl[d.k]=o;}
+  else if(d.sc==="b"||d.sc==="a"){if(ETRES.indexOf(d.k)<0)return;var q=E.res[d.sc][d.k];q.s=q.s===d.v?"":d.v;if(q.s!=="value")q.v="";E.res[d.sc+"At"]=today();save();}
+  else return;
+ }
+ else if(a==="et3-ladd"){if(!et3AddLog())return;save();}
+ else if(a==="et3-lwd"){var l=E.wl.filter(function(x){return x.id===+d.id;})[0];if(!l||l.wd)return;l.wd=today();save();}
+ else if(a==="et3-sp"){if(!E.cm||(d.sc!=="b"&&d.sc!=="a")||(d.v!==""&&d.v!=="spike"&&d.v!=="uneven"))return;E.res["sp"+d.sc]=E.res["sp"+d.sc]===d.v?"":d.v;E.res[d.sc+"At"]=today();save();}
+ else if(a==="et3-fk"){if(!etConfKind(d.v))return;UI.etf=UI.etf||{};UI.etf.k=UI.etf.k===d.v?"":d.v;if(UI.etf.k!=="other")delete UI.etf.maj;}
+ else if(a==="et3-fmaj"){UI.etf=UI.etf||{};if(UI.etf.k!=="other"||(d.v!=="yes"&&d.v!=="no"))return;UI.etf.maj=d.v==="yes";}
+ else if(a==="et3-fadd"){if(!E.cm||!et3AddConf())return;save();}
+ else if(a==="et3-fwd"){var c=E.cf.filter(function(x){return x.id===+d.id;})[0];if(!c||c.wd)return;c.wd=today();save();}
+ else return;
+ render();
+}
+function et3Input(t){
+ var E=S.et,k=String(t.dataset.et),p=k.slice(0,2),f=k.slice(2);
+ if(p==="l:"){
+  if(f==="d"){var v=String(t.value||"");UI.etl=UI.etl||{};if(v===""||parseYmd(v)!=null)UI.etl.d=v;return;}
+  if(f==="note"){UI.etl=UI.etl||{};UI.etl.note=t.value.slice(0,300);return;}
+  if(ETRES.indexOf(f)>-1){UI.etl=UI.etl||{};var o=UI.etl[f];if(o&&o.s==="value"){var c=w4Clean(f,t.value);o.v=c;if(c!==t.value)t.value=c;}}
+  return;
+ }
+ if(p==="f:"){UI.etf=UI.etf||{};if(f==="d"){var v2=String(t.value||"");if(v2===""||parseYmd(v2)!=null)UI.etf.d=v2;}else if(f==="note")UI.etf.note=t.value.slice(0,300);return;}
+ if(p==="r:"){
+  if(!E.cm)return;var m=/^(b|a)\.(views|favs|lorders|rev|sv)$/.exec(f);if(!m)return;
+  var q=E.res[m[1]][m[2]];if(q.s!=="value")return;var cl=w4Clean(m[2],t.value);q.v=cl;if(cl!==t.value)t.value=cl;E.res[m[1]+"At"]=today();save();
+ }
+}
+function et3fix(w,r){
+ var ok=function(x){return typeof x==="string";},isObj=function(x){return x&&typeof x==="object"&&!Array.isArray(x);};
+ ["st3","st4"].forEach(function(k){if(isObj(w[k]))Object.keys(w[k]).forEach(function(n){if(/^[1-6]$/.test(n)&&w[k][n]===true)r[k][n]=true;});});
+ var vsOk=function(y){return isObj(y)&&ok(y.s)&&ETVS[y.s]&&ok(y.v);};
+ if(isObj(w.res)){
+  ["b","a"].forEach(function(sc){if(isObj(w.res[sc]))ETRES.forEach(function(k){var y=w.res[sc][k];if(vsOk(y))r.res[sc][k]={s:y.s,v:y.s==="value"?w4Clean(k,y.v):""};});
+   var at=w.res[sc+"At"];if(ok(at)&&parseYmd(at)!=null)r.res[sc+"At"]=at;r.res["sp"+sc]=(w.res["sp"+sc]==="spike"||w.res["sp"+sc]==="uneven")?w.res["sp"+sc]:(w.res["sp"+sc]===true?"uneven":"");});
+ }
+ var maxId=0;
+ if(Array.isArray(w.wl))w.wl.slice(0,60).forEach(function(x){
+  if(!isObj(x)||typeof x.id!=="number"||x.id!==Math.floor(x.id)||x.id<1||x.id>100000||!ok(x.d)||parseYmd(x.d)==null||!ok(x.at)||parseYmd(x.at)==null)return;
+  var en={id:x.id,d:x.d,at:x.at,note:ok(x.note)?x.note.slice(0,300):"",wd:(ok(x.wd)&&parseYmd(x.wd)!=null)?x.wd:""};
+  ETRES.forEach(function(k){var y=x[k];en[k]=vsOk(y)?{s:y.s,v:y.s==="value"?w4Clean(k,y.v):""}:{s:"",v:""};});
+  if(x.id>maxId)maxId=x.id;r.wl.push(en);
+ });
+ if(Array.isArray(w.cf))w.cf.slice(0,60).forEach(function(x){
+  if(!isObj(x)||typeof x.id!=="number"||x.id!==Math.floor(x.id)||x.id<1||x.id>100000||!ok(x.d)||parseYmd(x.d)==null||!ok(x.at)||parseYmd(x.at)==null||!ok(x.k)||!etConfKind(x.k))return;
+  if(x.k==="other"&&typeof x.maj!=="boolean")return;
+  if(x.id>maxId)maxId=x.id;
+  r.cf.push({id:x.id,d:x.d,at:x.at,k:x.k,maj:x.k==="other"?x.maj===true:true,note:ok(x.note)?x.note.slice(0,300):"",wd:(ok(x.wd)&&parseYmd(x.wd)!=null)?x.wd:""});
+ });
+ var seen={};r.wl=r.wl.filter(function(x){if(seen["l"+x.id])return false;seen["l"+x.id]=1;return true;});r.cf=r.cf.filter(function(x){if(seen["c"+x.id]||seen["l"+x.id])return false;seen["c"+x.id]=1;return true;});
+ r.nid=Math.max(maxId+1,(typeof w.nid==="number"&&w.nid===Math.floor(w.nid)&&w.nid>0&&w.nid<=100001)?w.nid:1);
+ if(w.fx==="leave"||w.fx==="fixed")r.fx=w.fx;
+ if(ETNEXT.some(function(x){return x[0]===w.nx;}))r.nx=w.nx;
+ if(["next","wait","help"].indexOf(w.dec3)>-1)r.dec3=w.dec3;
+ if(["done","help"].indexOf(w.dec4)>-1)r.dec4=w.dec4;
+}
+function etRouteInner(){
+ var m=/^#\/etsy(?:\/(w[1-4]))?(?:\/([1-6]))?$/.exec(route)||[],n=+(m[2]||0),wk=m[1]||"";
+ if(wk==="w1")return n?[0,ets1,ets2,ets3,ets4,ets5,ets6][n]():etHome();
+ if(wk==="w2")return [et2Home,et2s1,et2s2,et2s3,et2s4,et2s5,et2s6][n]();
+ if(wk==="w3")return [et3h1,et3s1,et3s2,et3s3,et3s4,et3s5,et3s6][n]();
+ if(wk==="w4")return [et4h,et4s1,et4s2,et4s3,et4s4,et4s5,et4s6][n]();
+ return n?[0,ets1,ets2,ets3,ets4,ets5,ets6][n]():etHome()+et2Card()+et3Card();
+}
+
+/* ---------- E4: Etsy Sales Bottleneck inside the shared sprint (the experiment adapter). ----------
+   The shared pages (Home, My Sprint, Results, Day 30 review, Past sprints, the chooser) keep their own code.
+   This module tells them what is specific to the Etsy experiment, and for Partnership-to-Sales it simply points
+   back at the functions that were already there. Wrappers capture the earlier definition and fall through to it
+   unless the sprint in progress is an Etsy one. */
+var EXPKEY={partnership:"part",etsy:"etsy"};
+EXPOPEN.etsy=true;
+var ETWKT=["Diagnose","Change one thing","Hold and watch","Read the result"];
+var ETTOTAL=24;
+function rvExp(){var c=rvCur();return c&&c.experiment==="etsy"?"etsy":"partnership";}
+function etActive(){var c=rvCur();return !!c&&c.experiment==="etsy";}
+function etBn(){return etActive()?"":'<span class="tag" role="note">Preview only. Not open to members yet.</span>';}
+function xaName(){return rvExp()==="etsy"?"Etsy Sales Bottleneck":"Partnership-to-Sales";}
+function xaTotal(){return rvExp()==="etsy"?ETTOTAL:25;}
+function xaW4(){return rvExp()==="etsy"?"#/etsy/w4/3":"#/w4/3";}
+function etWith(obj,fn){var keep=S.et;S.et=obj;try{return fn();}finally{S.et=keep;}}
+
+/* ===== ETSY E4 LOGIC START: pure rules, checked by dev/etsy_e4_tests.js ===== */
+function etPrepReady(){var p=S.et.prep;return p.live==="yes"&&p.stats===true;}
+function etStepsOf(i){return [ETSTEPS,ET2STEPS,ET3STEPS,ET4STEPS][i];}
+function etDOf(i){var E=S.et;return [E.steps,E.steps2,E.st3,E.st4][i]||{};}
+function etWeekDone(i){
+ var E=S.et,L=etStepsOf(i),D=etDOf(i);
+ return L.every(function(s){return D[s.n];})||[E.dec==="next",E.dec2==="next",E.dec3==="next",E.dec4==="done"][i];
+}
+function etCurWeek(){for(var i=0;i<4;i++){if(!etWeekDone(i))return i+1;}return 4;}
+function etWeekBase(w){return w===1?"#/etsy/":"#/etsy/w"+w+"/";}
+function etStepCount(){var n=0;for(var i=0;i<4;i++)n+=rCount(etStepsOf(i),etDOf(i));return n;}
+function etWeeks(){
+ var cur=etCurWeek(),out=[];
+ for(var i=0;i<4;i++){
+  var L=etStepsOf(i),D=etDOf(i),n=rCount(L,D),tot=L.length,st=(i+1<cur)?"done":(i+1===cur?"now":"later"),first=0;
+  if(st==="now"){for(var j=0;j<tot;j++){if(!D[L[j].n]){first=L[j].n;break;}}}
+  out.push({n:i+1,title:ETWKT[i],L:L,D:D,done:n,total:tot,state:st,open:i===0||etWeekDone(i-1),first:first,
+   status:st==="later"?"Opens when you finish Week "+i:(st==="done"&&n===tot?"Done":n+" of "+tot+" steps done")});
+ }
+ return out;
+}
+function etHasWork(){
+ var E=S.et;
+ if(E.cm||E.wl.length||E.cf.length)return true;
+ return ["b","a"].some(function(sc){return ETRES.some(function(k){return !!E.res[sc][k].s;});});
+}
+function etFresh(prep){var e=ETDEF();if(prep)e.prep=prep;return e;}
+function etStart(){
+ var prep=S.et.prep;S.et=etFresh(prep);S.et.live=(prep&&prep.live==="yes")?"yes":"";
+ var pl=String((prep&&prep.listing)||"").trim(),pn=String(S.focus.product||"").trim();if(pl)S.et.lst.name=pl.slice(0,120);else if(pn)S.et.lst.name=pn.slice(0,120);
+}
+function etPrepPrefilled(){var E=S.et,pl=String(E.prep.listing||"").trim();return !!pl&&!E.lst.chosen&&E.lst.name===pl.slice(0,120);}
+function etProfilePrefilled(){var E=S.et,pn=String(S.focus.product||"").trim();return !!pn&&!E.lst.chosen&&E.lst.name===pn.slice(0,120);}
+function etResetP(){
+ var b=blank(),keep={testi:S.rv.testi,consent:S.rv.consent};
+ S.steps={};S.decision="";S.cands=[];S.sketch={};S.nextId=1;S.base=b.base;S.refl="";S.types=b.types;S.cdraft=b.cdraft;S.cmsg="";S.fitIndex=0;S.newType="";
+ S.w2=b.w2;S.out={};S.w3=b.w3;S.col=clone(W3DEF);S.w4=W4DEF();S.rv=RVDEF();S.rv.testi=keep.testi;S.rv.consent=keep.consent;S.week=1;
+}
+function etArchive(prev){
+ var snap=S.rv.snap,auto=false;
+ if(!snap){snap=etSnap("day30");auto=true;}
+ var e={exp:"etsy",sid:prev.id,start:prev.start_day,archivedAt:today(),label:snap.label,rule:snap.rule,review:!!S.rv.done,auto:auto,snap:snap,upd:S.rv.upd.slice(0,20),etx:clone(S.et)};
+ S.past=(S.past||[]);if(S.past.length>=10)S.past.shift();S.past.push(e);
+}
+function etPastFix(x){
+ var okd=function(y){return (typeof y==="string"&&(y===""||parseYmd(y)!=null))?y:"";},st=function(y,n){return typeof y==="string"?y.slice(0,n):"";},nm=function(y){return (typeof y==="number"&&isFinite(y)&&y>=0&&y<100000)?Math.floor(y):0;};
+ var rvt=rvfix({rv:{snap:x.snap,upd:x.upd,done:!!x.snap}}).rv;
+ return {exp:"etsy",sid:nm(x.sid),auto:x.auto===true,start:okd(x.start),archivedAt:okd(x.archivedAt),label:st(x.label,40),rule:st(x.rule,4),review:x.review===true,snap:rvt.snap,upd:rvt.upd,etx:etfix({et:x.etx}).et};
+}
+/* Recommendations: evidence and assumption are always shown apart. Nothing defaults to another experiment. */
+function etRec(v){
+ var l=v.label,r=v.rule,t,b,f,x="",bs,as;
+ if(l==="Promising"){t="Keep the change, then test a second one";b="Your numbers moved the right way. A second, different change on the same listing, in a new Etsy sprint, shows whether this was a pattern.";f="Choose a variable you have not changed yet (title, tags, lead image or the first lines of the description).";bs="The count you were aiming at moved the right way and orders did not fall.";as="We are assuming your change, not something else, caused it. Your numbers cannot prove that.";}
+ else if(l==="Traffic but no sales"){t="Try a change to what shoppers see";b="More people opened your listing but orders did not rise, so the next place to look is what they see once they arrive.";f="Choose one of the lead image, the first lines of the description, or how the price is shown, and change only that.";bs="Listing views went up and listing orders did not.";as="We are assuming the page, not the price or the product itself, is the weak point. Your numbers cannot confirm that.";}
+ else if(l==="Approach needs reviewing"){t="Try a different variable next";b="Your aimed-at count did not move over a full equal window. That is one try, not the end of the idea.";f="Change a different variable in a new Etsy sprint, and record it on the day you make it.";x="If traffic is the real constraint, Partnership-to-Sales is open now and can bring visitors. Find Your Buyers is coming soon and is not open yet.";bs="Neither of the counts you were aiming at went up, with enough views to read.";as="We are assuming the variable you changed was the right one to test. A different one may behave differently.";}
+ else if(l==="Mixed or unclear"){t="Repeat once, with steady conditions";b="Something else changed, or the date or numbers could not be established, so your change cannot be told apart from the rest.";f=r==="E3"?"Record the missing numbers from Etsy Stats for your two windows.":"Write down what else happened and when, then repeat with steady conditions and an on-the-day record.";bs=r==="E3"?"Some key numbers are not recorded.":"Something else could explain the movement, or the dates are uncertain.";as="We are assuming nothing else needed to be considered. If something else mattered, please log it.";}
+ else{t=(r==="E4"||r==="E8")?"Collect for longer":"Wait for your window, then record your numbers";b=(r==="E4"||r==="E8")?"There were too few views to read a result. That says nothing about your change, only that the numbers are small.":"Your result cannot be read yet.";f=(r==="E1")?"Finish Week 2 and commit one change.":(r==="E2"?"Resist extra changes, and come back once your after-window has finished.":"Repeat with a longer window, or work on being found first (title, tags, keywords).");x=(r==="E4"||r==="E8")?"Partnership-to-Sales is open now and can bring visits while your listing is quiet. You are free to choose it, or to choose another experiment when more open.":"";bs=(r==="E4"||r==="E8")?"There were fewer views than the provisional minimum, or the evidence is limited.":"There is not enough yet to read.";as="We are assuming the numbers will be steadier with a longer window.";}
+ return {t:t,b:b,first:f,extra:x,basis:bs,assume:as,provisional:rvPhase()==="during"||r==="E2"};
+}
+function rvUpdRow(u,et){
+ if(et)return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Etsy evidence reading updated</span></span><span class="tag">'+esc(u.label)+'</span></div>';
+ return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';
+}
+/* ===== ETSY E4 LOGIC END ===== */
+
+/* --- wrappers: Etsy where the sprint is Etsy, the earlier behaviour everywhere else --- */
+var _sprHasWork=sprHasWork;sprHasWork=function(){return rvExp()==="etsy"?etHasWork():_sprHasWork();};
+var _rvSnap=rvSnap;rvSnap=function(k){return rvExp()==="etsy"?etSnap(k):_rvSnap(k);};
+var _sprArchive=sprArchive;
+sprArchive=function(prev){
+ if(prev&&prev.experiment==="etsy"){etArchive(prev);etResetP();S.et=etFresh(S.et.prep);}
+ else{_sprArchive(prev);S.et=etFresh(S.et.prep);}
+};
+var _d5fix=d5fix;
+d5fix=function(o){
+ var src=Array.isArray(o.past)?o.past.slice(-10):[],out=[];
+ src.forEach(function(x){
+  if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="etsy"){out.push(etPastFix(x));}
+  else{var t=_d5fix({past:[x]});if(t.past.length)out.push(t.past[0]);}
+ });
+ var r=_d5fix(o);r.past=out.slice(-10);return r;
+};
+var _tabOf=tabOf;tabOf=function(r){r=r||"#/";if(/^#\/etsy(\/|$)/.test(r)&&etActive())return "sprint";return _tabOf(r);};
+var _sprConfirm=sprConfirm;
+sprConfirm=function(label){if(typeof UI.sprConf==="string"){var s=UI.sprConf;UI.sprConf=false;var r=_sprConfirm(label);UI.sprConf=s;return r;}return _sprConfirm(label);};
+var _rWeeks=rWeeks;rWeeks=function(){return etActive()?etWeeks():_rWeeks();};
+var _rTrack=rTrack;
+rTrack=function(){
+ if(!etActive())return _rTrack();
+ return '<div class="rweeks">'+etWeeks().map(function(w){
+  var inner='<small>Week '+w.n+'</small><b>'+esc(w.title)+'</b>'+rBars(w)+'<em>'+esc(w.status)+'</em>';
+  return w.open?'<a class="rwk '+w.state+'" href="#/etsy/w'+w.n+'">'+inner+'</a>':'<div class="rwk later">'+inner+'</div>';
+ }).join("")+'</div>';
+};
+var _rNext=rNext;
+rNext=function(){
+ if(!(etActive()&&(SPR.loaded?rvPhase():"during")==="during"))return _rNext();
+ var wk=etCurWeek(),W=etWeeks()[wk-1],base=etWeekBase(wk),first=W.first;
+ if(!first)return {k:"Your next step",t:"Open your results",d:"You have finished every step. Your results, your evidence reading and your Day 30 review are in one place.",link:"#/results",b:"Open my results"};
+ var s=W.L[first-1];
+ return {k:"Your next step",t:s.t,d:"You will need: "+s.b+" Everything saves as you go.",m:s.m,link:base+first,b:"Continue Week "+wk+", step "+first,w:wk,n:first};
+};
+var _rHomeList=rHomeList;
+rHomeList=function(nx){
+ var ph=SPR.loaded?rvPhase():"during";
+ if(!etActive()||ph!=="during")return _rHomeList(nx);
+ var W=etWeeks()[etCurWeek()-1];
+ return '<div class="card"><h2>Week '+W.n+': '+esc(W.title)+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,etWeekBase(W.n)+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+};
+var _rSoFar=rSoFar;
+rSoFar=function(){
+ if(!etActive())return _rSoFar();
+ var E=S.et,h='<div class="card"><h2>Your sprint so far</h2>';
+ if(!etStepCount()&&!E.cm)return h+'<p class="mute">Your numbers appear here once you begin. What you did, what came back and what sold are always kept apart.</p></div>';
+ h+='<div class="tiles"><div class="tile"><b>'+etStepCount()+'</b><span>Steps done</span></div><div class="tile"><b aria-hidden="true">'+(E.cm?"&#10003;":"&ndash;")+'</b><span>Change committed<span class="sr">: '+(E.cm?"yes":"not yet")+'</span></span></div><div class="tile"><b>'+E.wl.filter(function(x){return !x.wd;}).length+'</b><span>Log entries</span></div></div>';
+ return h+'<p><a class="link" href="#/results">Open your results</a></p></div>';
+};
+var _home=home;home=function(){return etActive()?etMySprint():_home();};
+var _resultsPage=resultsPage;resultsPage=function(){return etActive()?etResultsPage():_resultsPage();};
+var _reviewPage=reviewPage;
+reviewPage=function(){
+ if(!etActive())return _reviewPage();
+ var tail=_reviewPage(),i=tail.indexOf('<div class="card"><h2>4. Complete your review</h2>');
+ return etReviewHead()+(i>-1?tail.slice(i):"");
+};
+var _ets5=ets5;
+ets5=function(){var h=_ets5();if(etPrepPrefilled())h=h.replace('<label for="etn">','<p class="mute">Carried over from your preparation. Please check it, and change it if it is not the listing you mean.</p><label for="etn">');else if(etProfilePrefilled())h=h.replace('<label for="etn">','<p class="mute">Pre-filled from your product details. Please check it, and change it if it is not the listing you mean.</p><label for="etn">');return h;};
+
+/* --- the chooser: two open experiments, each started only by its own button --- */
+function sprConfirmX(key,label){
+ var again=rvPhase()!=="notstarted";
+ if(UI.sprBusy)return '<p class="mute">Starting...</p>';
+ if(UI.sprConf!==key)return '<p><button type="button" class="btn" data-a="spr-askx" data-x="'+key+'">'+esc(label)+'</button></p>';
+ return '<div class="note ok" role="alertdialog" aria-label="Confirm starting your sprint"><p><strong>Begin Day 1 today ('+esc(dayLab(today()))+')?</strong></p><p>Day 30 would be '+esc(dayLab(addDays(today(),29)))+'. You can finish early, but you cannot pause the clock. After Day 30 you will have 14 more days to add late results, which does not extend your sprint.'+(again?' Your current sprint will be saved to Past sprints, and your activity and results will start fresh. Only your business, offer and buyer details carry forward.':'')+' If you press this by mistake, you can undo it within 24 hours before logging any messages or results.</p><p class="row"><button type="button" class="btn" data-a="spr-gox" data-x="'+key+'">Yes, start Day 1 today</button><button type="button" class="btn ghost" data-a="spr-cancel">Not yet</button></p></div>';
+}
+experimentsPage=function(){
+ var ph=rvPhase(),cx=EXPKEY[rvExp()],h='<h1>Experiments</h1><p class="mute">Six experiments, four weeks each, about 3 to 5 hours a week. You run one sprint at a time, and you choose when the next one starts. Nothing starts automatically.</p>'+sprintBar(false);
+ if(UI.sprErr&&ph==="notstarted")h+='<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>';
+ function card(x,i){
+  var open=!!EXPOPEN[x[0]],c='<li class="rxc '+(open?"open":"soon")+'"><div class="rxg">'+rSvg("-50 -50 100 100",rExpG(x[0],open,open))+'</div><div class="rxb"><p class="rxk">Experiment '+(i+1)+'</p><h2>'+esc(x[1])+'</h2><p class="rxs">'+esc(x[2])+'</p><div class="rxo"><b>Your outcome</b><span>'+esc(x[3])+'</span></div><p class="rxm">4 weeks &middot; 3 to 5 hours a week &middot; Best for: '+esc(x[4])+'</p>';
+  if(!open)return c+'<p class="rxm"><strong>Coming soon.</strong> Not open yet, so it cannot be started.</p></div></li>';
+  if(!SPR.loaded)return c+'<p class="rxm">We could not check your sprint just now. Please refresh the page.</p></div></li>';
+  if(ph==="during"){c+=cx===x[0]?'<p class="rxm"><strong>Your current experiment.</strong> '+esc(rvClock())+'. Find it under <a href="#/sprint">My Sprint</a>. You can start your next sprint after Day 30.</p>':'<p class="rxm">You already have a sprint running. You can start this one after Day 30.</p>';return c+'</div></li>';}
+  var key=x[0]==="etsy"?"etsy":"partnership",label=ph==="notstarted"?"Start my 30-day sprint":"Start another sprint";
+  if(key==="etsy"&&!etPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a live Etsy listing that you can measure. Your 30 days do not start until you have one and press start yourself.</p><p><a class="btn ghost" href="#/etsy">Prepare for the Etsy experiment</a></p></div></li>';
+  c+=(ph==="notstarted"?'<p class="rxm">Ready when you are. Your 30 days begin only when you press the button.</p>':'<p class="rxm">Your last sprint is complete. You can choose when to start another, and it will not start by itself.</p>')+sprConfirmX(key,label);
+  return c+'</div></li>';
+ }
+ var open="",rest="";EXPX.forEach(function(x,i){if(EXPOPEN[x[0]])open+=card(x,i);else rest+=card(x,i);});
+ var first=ph==="notstarted"&&!(S.chk&&S.chk.done);if(first)h+='<div class="rchk">'+chkCard()+'</div>';h+='<ul class="rxgrid">'+open+'</ul>';
+ h+='<div class="note warn"><strong>Temporary test limitation.</strong> In this test build Partnership-to-Sales and the Etsy Sales Bottleneck can be started. The other four will become available as they are built. You will always be able to choose any experiment that is open.</div>';
+ if(!first)h+='<div class="rchk">'+chkCard()+'</div>';
+ return h+'<ul class="rxgrid">'+rest+'</ul>';
+};
+var _sprAction=sprAction;
+sprAction=function(a,d,t){
+ if(a==="spr-askx"){if(d.x!=="etsy"&&d.x!=="partnership")return;UI.sprConf=d.x;UI.sprErr="";render();}
+ else if(a==="spr-gox"){UI.sprX=d.x==="etsy"?"etsy":"partnership";sprGo();}
+ else if(a==="spr-go"){UI.sprX="partnership";sprGo();}
+ else _sprAction(a,d,t);
+};
+sprGo=async function(){
+ if(UI.sprBusy)return;
+ var key=UI.sprX==="etsy"?"etsy":"partnership";
+ if(key==="etsy"&&!etPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Etsy preparation checklist first.";render();return;}
+ UI.sprBusy=true;UI.sprErr="";render();
+ var prev=rvCur(),ph=rvPhase();
+ var r=await sb.rpc("start_sprint",{p_experiment:key,p_day:today()});
+ UI.sprBusy=false;UI.sprConf=false;
+ if(r.error){UI.sprErr=sprMsg(r.error.message);render();return;}
+ if(prev&&(ph==="window"||ph==="closed"))sprArchive(prev);
+ if(key==="etsy")etStart();
+ await sprLoad();
+ save();toast("Day 1 begins today. Good luck.");render();
+};
+
+/* --- preparation: guidance and a checklist. It never starts the clock, never counts as experiment activity --- */
+function etPrep(){
+ var P=S.et.prep,ph=SPR.loaded?rvPhase():"",ready=etPrepReady();
+ var h='<a class="back" href="#/experiments">&larr; Experiments</a><h1>Prepare for the Etsy experiment</h1><p class="mute">Get ready first. Nothing on this page starts your 30 days, and nothing here counts as completed experiment activity.</p>';
+ h+='<div class="card"><h2>What the experiment is</h2><p>Over four weeks you use your own Etsy numbers to see whether your listing has a visibility problem or a conversion problem, make one deliberate change, and read the result honestly. It needs a live Etsy listing, because everything is measured from your Etsy Stats.</p></div>';
+ h+='<div class="card"><h2>The four weeks, in plain words</h2><ol>'+ETWKT.map(function(t,i){return '<li><strong>Week '+(i+1)+': '+esc(t)+'.</strong> '+esc(ETWKD[i])+'</li>';}).join("")+'</ol><p class="mute">About 3 to 5 hours a week. You can read ahead, and you can go at your own pace inside each week.</p></div>';
+ h+='<div class="card"><h2>What you need before it can start</h2><p><strong>Is your listing live?</strong></p><div class="row"><button type="button" class="chip" aria-pressed="'+(P.live==="yes")+'" data-a="et4-live" data-v="yes">Yes, it is live</button><button type="button" class="chip" aria-pressed="'+(P.live==="no")+'" data-a="et4-live" data-v="no">Not yet</button></div>';
+ h+='<label for="etpl">The listing you plan to focus on (optional)</label><input id="etpl" type="text" maxlength="120" data-et="p:listing" value="'+esc(P.listing||"")+'" placeholder="For example: Monthly budget planner"><p class="mute">This is carried into your sprint, where you check it and choose it in Week 1.</p><p style="margin-top:12px"><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(P.stats===true)+'" data-a="et4-stats">I can open Shop Manager, then Stats, and see this listing\'s views, favourites and orders.</button></p>';
+ if(P.live==="no")h+='<div class="note info"><strong>That is fine, and there is a lot you can do first.</strong> Get your listing live, then come back. While you wait you can think about the words a buyer would type to find your product, and which one listing you most want to focus on. Your 30 days will not start until your listing is live and you choose to begin.</div>';
+ h+='<p class="mute">The sprint starts only when you press the start button yourself. About 3 to 5 hours a week for four weeks.</p></div>';
+ if(!SPR.loaded)h+='<div class="note warn" role="status">We could not check your sprint just now. Please refresh the page.</div>';
+ else if(etActive())h+='<div class="note ok">You are already on this experiment. <a href="#/sprint">Open My Sprint</a>.</div>';
+ else if(ph==="during")h+='<div class="note info">You already have a sprint running. You can start the Etsy experiment after Day 30, if you wish.</div>';
+ else if(ready){
+  h+='<div class="card"><h2>Ready when you are</h2><p>Your listing is live and you can see its numbers.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("etsy",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
+ }else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both of these are needed: your listing is live, and you can see its Stats. Tick them above when they are true.</div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It does not need a listing. It borrows other people\'s audiences to bring your product to new buyers.</span></p><p class="mute">Email-to-Sale, Show-to-Sell, Find Your Buyers and LIVE Sales are coming soon, and are not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ return h;
+}
+function et4Input(t){if(String(t.dataset.et)==="p:listing"){S.et.prep.listing=String(t.value||"").slice(0,120);save();}}
+function et4Action(a,d){
+ var P=S.et.prep;
+ if(a==="et4-live"){if(d.v!=="yes"&&d.v!=="no")return;P.live=P.live===d.v?"":d.v;if(P.live!=="yes")P.stats=false;save();}
+ else if(a==="et4-stats"){if(P.live!=="yes")return;P.stats=!P.stats;save();}
+ else return;
+ render();
+}
+var ETWKD=["Understand your numbers and choose your listing.","Choose one change, plan it, and commit.","Leave it alone, keep a simple log, and note anything else that could matter.","Record your numbers, read the result, and decide what is next."];
+function etRoute(){
+ var m=/^#\/etsy(?:\/(w[1-4]))?(?:\/([1-6]))?$/.exec(route)||[],wk=m[1]||"",n=+(m[2]||0);
+ if(!etActive())return etPrep();
+ if(!wk&&!n)return etMySprint();
+ var w=wk?+wk.slice(1):1;
+ if(w>1&&!etWeekDone(w-2))return '<a class="back" href="#/sprint">&larr; My Sprint</a><h1>Week '+w+' is not open yet</h1><div class="note info">Week '+w+' opens when you finish Week '+(w-1)+'. <a href="'+(w===2?"#/etsy/w1":"#/etsy/w"+(w-1))+'">Go to Week '+(w-1)+'</a></div>';
+ return etRouteInner();
+}
+function etBlockP(){return etActive()&&/^#\/(step\/[1-7]|w[234]\/[1-6])$/.test(route||"");}
+function etBlockHtml(){return '<a class="back" href="#/sprint">&larr; My Sprint</a><h1>This is your Etsy sprint</h1><p class="mute">Partnership-to-Sales pages are not part of the sprint you are on. They are not changed or lost.</p><div class="note info">You can run Partnership-to-Sales as your next sprint, after Day 30. <a href="#/sprint">Back to My Sprint</a></div>';}
+
+/* --- My Sprint --- */
+function etMySprint(){
+ var wk=etCurWeek(),E=S.et,W=etWeeks()[wk-1];
+ var h='<h1>My Sprint</h1><p class="mute">Etsy Sales Bottleneck &middot; Week '+wk+' of 4</p>'+sprintBar(true);
+ h+='<div class="tabs rwpick">'+etWeeks().map(function(w){
+  var g=rSvg("-50 -50 100 100",rWeekG(w.n,w.open,"#fff"));
+  return w.open?'<a class="chip rwb" aria-pressed="'+(w.n===wk)+'" href="#/etsy/w'+w.n+'">'+g+'<b>'+esc(w.title)+'</b>Week '+w.n+(w.state==="done"?' &#10003;':'')+'</a>':'<button type="button" class="chip rwb" disabled title="Opens when you finish Week '+(w.n-1)+'">'+g+'<b>'+esc(w.title)+'</b>Week '+w.n+'</button>';
+ }).join("")+'</div>';
+ h+='<p class="mute"><strong>This week:</strong> '+esc(ETWKD[wk-1])+'</p>';if(wk===1)h+='<p class="mute">Week 2 opens when you finish Week 1 (choose "Ready for Week 2" in the last step).</p>';
+ var pn=String(S.focus.product||"").trim();if(pn)h+='<div class="note ok"><strong>Your product:</strong> '+esc(pn)+'</div>';
+ if(E.lst.chosen)h+='<div class="note ok"><strong>Your focus listing:</strong> '+esc(E.lst.chosen)+(E.locked?' <span class="tag">locked</span>':'')+'</div>';
+ h+='<div class="card"><h2>Week '+W.n+': '+esc(W.title)+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,etWeekBase(W.n)+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+ return h+'<p class="mute"><a href="#/experiments">See all six experiments, and the sales check</a></p>';
+}
+
+/* --- Results --- */
+function etPair(k){var E=S.et;return etFmt(E.res.b[k],k==="rev")+" &rarr; "+etFmt(E.res.a[k],k==="rev");}
+function etResultsPage(){
+ var E=S.et,v=etVerdict(),ph=rvPhase(),started=etStepCount()>0||!!E.cm,h='<div class="phd"><h1>Results</h1><p class="mute">Your numbers, what they show, and what you learned. Counts, not percentages, while samples are small.</p>';
+ if(started){
+  h+='<div class="rtally"><div><h3>You did</h3><p><b>'+etStepCount()+'</b>Steps done</p><p><b>'+(E.cm?"1":"0")+'</b>Change committed</p><p><b>'+E.wl.filter(function(x){return !x.wd;}).length+'</b>Log entries</p></div>'
+   +'<div><h3>Came back</h3><p><b>'+etPair("views")+'</b>Listing views, before to after</p><p><b>'+etPair("favs")+'</b>Listing favourites, before to after</p></div>'
+   +'<div><h3>Sold</h3><p><b>'+etPair("lorders")+'</b>Listing orders, before to after</p><p><b>'+etPair("rev")+'</b>Listing revenue, before to after</p></div></div>';
+ }
+ h+='</div><!--/phd--><div class="rcols"><div>';
+ var n=E.base.n;
+ h+='<div class="card"><h2>Where you started</h2><p class="mute">The diagnostic baseline from Week 1: the 30 days before your sprint, where Etsy had them. It is not your before-window. "I can\'t see this" stays unknown and is never turned into zero.</p><h3>Your shop (shop level)</h3><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(nvTxt(n.shopVisits))+'</b>Visits</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(n.shopOrders))+'</b>Orders</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(n.shopRev,true))+'</b>Revenue</div></div><h3>Your focus listing (listing level)</h3><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(nvTxt(n.views))+'</b>Views</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(n.favs))+'</b>Favourites</div><div class="tile"><b style="font-size:20px">'+esc(nvTxt(n.lorders))+'</b>Orders</div></div><p class="mute">Shop numbers and listing numbers are never added or compared with each other.</p></div>';
+ h+='<div class="card"><h2>Your sprint so far</h2><p class="mute">'+esc(rvClock())+'</p>';
+ if(E.cm){var w=etWin(E.cm.date,E.cm.n);h+='<p>Your change: <strong>'+esc(E.cm.what)+'</strong>, which went live on '+esc(dayLab(E.cm.date))+(E.cm.retro?' <span class="tag">recorded retrospectively</span>':'')+'.</p>'+(w?'<p class="mute">Before-window '+esc(dayLab(w.bFrom))+' to '+esc(dayLab(w.bTo))+'. After-window '+esc(dayLab(w.aFrom))+' to '+esc(dayLab(w.aTo))+'.</p>':'');}
+ else h+='<p class="mute">No change is committed yet. You commit one in <a href="#/etsy/w2/5">Week 2, step 5</a>.</p>';
+ if(!etRecNums())h+='<p class="mute">No before and after numbers recorded yet. You can add them in <a href="#/etsy/w4/3">Week 4, step 3</a>.</p>';
+ h+='</div>';
+ if(started){h+='<section class="rpnl gold rread"><small>What the evidence suggests</small><h2>'+(ph==="during"&&v.rule!=="E2"?"Provisional reading: ":"")+esc(v.label)+'</h2><p>'+esc(v.why[0]||"")+'</p><p class="mute">A reading, not a verdict. An improvement you can see is not proof that your change caused it. <span class="tag">rule '+v.rule+'</span>'+(v.conf&&v.conf!=="none"?' <span class="tag">confidence: '+esc(v.conf)+'</span>':'')+'</p></section>';}
+ h+='</div><div class="rside">';
+ h+='<div class="card"><h2>Day 30 review</h2>'+(S.rv.done?'<p>Saved on '+esc(dayLab(S.rv.at))+': '+esc(S.rv.snap?S.rv.snap.label:"")+'.</p>':'<p class="mute">'+(started?"Look back at your sprint, see what the evidence suggests, and choose what to focus on next. You can open it at any time.":"Available once your sprint has started.")+'</p>')+'<p><a class="btn'+(S.rv.done?' ghost':'')+'" href="#/review">'+(S.rv.done?"Open my Day 30 review":"Open my Day 30 review")+'</a></p></div>';
+ if(E.wl.length)h+='<div class="card"><h2>Your weekly log</h2><p class="mute">Your own dated notes from Week 3.</p>'+E.wl.filter(function(x){return !x.wd;}).slice(-6).reverse().map(function(e){return '<div class="crow"><span><strong>'+esc(dayLab(e.d))+'</strong><br><span class="mute">Views '+esc(etFmt(e.views))+', favourites '+esc(etFmt(e.favs))+', orders '+esc(etFmt(e.lorders))+'</span></span></div>';}).join("")+'</div>';
+ var c=etConfs(),learn=[];
+ if(E.cf.length)learn.push("Things that could also explain your numbers: "+c.major.length+" major, "+c.minor.length+" minor");
+ if(E.nx){var nxt=ETNEXT.filter(function(x){return x[0]===E.nx;})[0];if(nxt)learn.push("What you decided next: "+nxt[1]);}
+ h+='<div class="card"><h2>What you have learned</h2>'+(learn.length?learn.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join(""):'<p class="mute">Your own notes and choices from Weeks 2 to 4 appear here as you go.</p>')+'</div>';
+ h+='<div class="card"><h2>Past sprints</h2>'+rvPastHtml()+'</div>';
+ return h+'</div></div>';
+}
+
+/* --- Day 30 review: the Etsy head, then the shared tail (complete, late results, feedback, consent, record) --- */
+function etReviewHead(){
+ var E=S.et,v=etVerdict(),rec=etRec(v),ph=rvPhase(),prov=ph==="during"||rec.provisional,n=E.base.n;
+ var h='<a class="back" href="#/results">&larr; Results</a><h1>Your Day 30 review</h1><p class="mute">Etsy Sales Bottleneck. A look at where you started, what you did, what the evidence suggests, and what to focus on next.</p>'+sprintBar(true);
+ h+='<div class="card"><h2>1. Where you started, and where you are now</h2><p class="mute">Your diagnostic baseline is the 30 days before your sprint. Your before-window and after-window are equal periods either side of your change. We show them side by side and we do not label the difference as better or worse, because the periods are not like for like.</p>';
+ [["views","Listing views",false],["lorders","Listing orders",false],["rev","Listing revenue",true]].forEach(function(x){
+  var base=x[0]==="views"?n.views:(x[0]==="lorders"?n.lorders:n.lrev);
+  h+='<div class="crow" style="display:block"><p style="margin:0"><strong>'+esc(x[1])+'</strong></p><p class="mute" style="margin:2px 0 8px">Baseline (30 days): '+esc(etFmt(base,x[2]))+'. Before-window: '+esc(etFmt(E.res.b[x[0]],x[2]))+'. After-window: '+esc(etFmt(E.res.a[x[0]],x[2]))+'.</p></div>';
+ });
+ h+='<p class="mute">Shop visits and shop figures are shop level. They are never added to or compared with listing figures.</p></div>';
+ h+='<div class="card"><h2>2. What you did</h2><p>Steps completed: '+ETWKT.map(function(t,i){return "Week "+(i+1)+" "+rCount(etStepsOf(i),etDOf(i))+" of "+etStepsOf(i).length;}).join(", ")+'.</p>'+(E.cm?'<p>You committed one change on '+esc(dayLab(E.cm.at))+': <strong>'+esc(E.cm.what)+'</strong>'+(E.cm.retro?' <span class="tag">recorded retrospectively</span>':'')+'.</p>':'<p>No change committed yet.</p>')+'<p>Log entries: '+E.wl.filter(function(x){return !x.wd;}).length+'. Confounders logged: '+E.cf.filter(function(x){return !x.wd;}).length+'.</p><div class="note info">You do not need to have finished every step. Anything unfinished stays saved and you can come back to it.</div></div>';
+ h+='<div class="card"><h2>3. What the evidence suggests</h2><div class="note '+v.cls+'"><strong>'+(prov?"Provisional reading: ":"")+esc(v.label)+'</strong> <span class="tag">rule '+v.rule+'</span>'+(v.conf&&v.conf!=="none"?' <span class="tag">confidence: '+esc(v.conf)+'</span>':'')+'</div>';
+ h+='<h3>What the numbers show</h3>'+v.why.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("");
+ h+='<h3>What remains uncertain</h3>'+v.limits.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("")+'<p style="margin:4px 0">This is a reading, not a verdict. The thresholds behind it are provisional starting points, not guarantees.</p>';
+ h+='<h3>What to focus on next</h3><div class="note info"><strong>'+esc(rec.t)+'</strong><br>'+esc(rec.b)+'</div><p><strong>First small action:</strong> '+esc(rec.first)+'</p>'+(rec.extra?'<p>'+esc(rec.extra)+'</p>':'')+'<p class="mute"><strong>Evidence:</strong> '+esc(rec.basis)+'</p><p class="mute"><strong>Assumption:</strong> '+esc(rec.assume)+'</p></div>';
+ return h;
+}
+
+/* --- Past sprints: late Etsy numbers for an earlier sprint, kept apart from the current one --- */
+function etPastSummary(p){
+ if(p.exp!=="etsy"||!p.etx)return "";
+ var x=p.etx,cm=x.cm,h="";
+ if(cm)h+='<p class="mute" style="margin:2px 0 6px">Change: '+esc(cm.what)+', which went live on '+esc(dayLab(cm.date))+(cm.retro?' (recorded retrospectively)':'')+'. Before and after, views '+etWith(x,function(){return etPair("views");})+', orders '+etWith(x,function(){return etPair("lorders");})+'.</p>';
+ else h+='<p class="mute" style="margin:2px 0 6px">No change was committed in this sprint.</p>';
+ return h;
+}
+function pueDraft(){if(!UI.pue)UI.pue={i:-1,res:{b:{views:{s:"",v:""},favs:{s:"",v:""},lorders:{s:"",v:""},rev:{s:"",v:""}},a:{views:{s:"",v:""},favs:{s:"",v:""},lorders:{s:"",v:""},rev:{s:"",v:""}}}};return UI.pue;}
+function etPastLate(p,i){
+ if(!(UI.pue&&UI.pue.i===i))return '<p><button type="button" class="btn ghost" data-a="pue-open" data-i="'+i+'">Add late Etsy numbers to this sprint</button></p>';
+ var u=pueDraft(),h='<p class="mute">Add what you can now see for this earlier sprint. They belong to this sprint only, and do not change your current sprint or the Day 30 position. Leave anything you do not want to change.</p>';
+ [["b","Before-window"],["a","After-window"]].forEach(function(w){
+  h+='<h3>'+w[1]+'</h3>';
+  ["views","favs","lorders","rev"].forEach(function(k){
+   var o=u.res[w[0]][k],opts=[["value","A number"],["zero","Zero, I checked"],["unknown","I can't see this"]];
+   h+='<div class="q"><strong>'+esc(ETRESL[k]+(ETMONEY[k]?" ("+sym(S.focus.currency).trim()+")":""))+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="pue-vs" data-sc="'+w[0]+'" data-k="'+k+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="9" data-pue="'+w[0]+'.'+k+'" value="'+esc(o.v)+'" aria-label="'+esc(ETRESL[k])+'" style="max-width:160px">':'')+'</div>';
+  });
+ });
+ return h+'<p class="row"><button type="button" class="btn" data-a="pue-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pue-cancel">Cancel</button></p>';
+}
+function puEAction(a,d){
+ var u=UI.pue||null;
+ if(a==="pue-open"){var i=+d.i,p=(S.past||[])[i];if(!p||p.exp!=="etsy"||!p.etx||!pastWinOpen(p))return;UI.pue=null;u=pueDraft();u.i=i;}
+ else if(a==="pue-cancel"){UI.pue=null;}
+ else if(a==="pue-vs"){u=pueDraft();if((d.sc!=="b"&&d.sc!=="a")||ETRES.indexOf(d.k)<0||d.k==="sv"||!ETVS[d.v]||d.v==="")return;var o=u.res[d.sc][d.k];if(!o)return;o.s=o.s===d.v?"":d.v;if(o.s!=="value")o.v="";}
+ else if(a==="pue-save"){
+  if(!u)return;
+  var p2=(S.past||[])[u.i];if(!p2||p2.exp!=="etsy"||!p2.etx||!pastWinOpen(p2))return;
+  var any=false;["b","a"].forEach(function(sc){Object.keys(u.res[sc]).forEach(function(k){var o=u.res[sc][k];if(o.s){any=true;p2.etx.res[sc][k]={s:o.s,v:o.s==="value"?w4Clean(k,o.v):""};}});});
+  if(!any)return;
+  ["b","a"].forEach(function(sc){if(Object.keys(u.res[sc]).some(function(k){return !!u.res[sc][k].s;}))p2.etx.res[sc+"At"]=today();});
+  var v=etWith(p2.etx,function(){return etVerdict();});
+  var e={at:today(),label:v.label,rule:v.rule,ctr:{msgs:0,resp:0,opp:0},res:{},kind:"update",asOf:"",late:false,prov:false};
+  p2.upd=p2.upd||[];if(p2.upd.length&&p2.upd[p2.upd.length-1].at===e.at)p2.upd[p2.upd.length-1]=e;else if(p2.upd.length<RVMAX)p2.upd.push(e);else return;
+  UI.pue=null;save();
+ }
+ else return;
+ render();
+}
+function puEInput(t){var u=pueDraft(),m=/^(b|a)\.(views|favs|lorders|rev)$/.exec(String(t.dataset.pue));if(!m)return;var o=u.res[m[1]][m[2]];if(o&&o.s==="value"){var c=w4Clean(m[2],t.value);o.v=c;if(c!==t.value)t.value=c;}}
+
+function et4fix(w,r){var p=w.prep;if(p&&typeof p==="object"&&!Array.isArray(p)){if(p.live==="yes"||p.live==="no")r.prep.live=p.live;if(p.stats===true&&r.prep.live==="yes")r.prep.stats=true;if(typeof p.listing==="string")r.prep.listing=p.listing.slice(0,120);}}
 
 /* ---------- H1: navigation shell (14 Nov 2026). Home, My Sprint, Experiments, Results, Community (when switched on), Profile. ---------- */
 var NAVI={
@@ -2606,7 +3535,7 @@ function rHomeList(nx){
 }
 function rXRow(){
  var ph=SPR.loaded?rvPhase():"";
- return '<ul class="rxrow">'+EXPX.map(function(x){var open=x[0]==="part";return '<li class="'+(open?"open":"soon")+'">'+rSvg("-50 -50 100 100",rExpG(x[0],open))+'<b>'+esc(x[1])+'</b><span>'+(open?(ph==="during"?"Your current experiment":"Open now"):"Coming soon")+'</span></li>';}).join("")+'</ul><p><a class="link" href="#/experiments">See all six experiments</a></p>';
+ return '<ul class="rxrow">'+EXPX.map(function(x){var open=!!EXPOPEN[x[0]];return '<li class="'+(open?"open":"soon")+'">'+rSvg("-50 -50 100 100",rExpG(x[0],open))+'<b>'+esc(x[1])+'</b><span>'+(open?(ph==="during"&&EXPKEY[rvExp()]===x[0]?"Your current experiment":"Open now"):"Coming soon")+'</span></li>';}).join("")+'</ul><p><a class="link" href="#/experiments">See all six experiments</a></p>';
 }
 function rSoFar(){
  var b=S.base||{},have=b.orders&&b.orders.s&&b.revenue&&b.revenue.s&&b.partner&&b.partner.s,h='<div class="card"><h2>Your sprint so far</h2>';
@@ -2621,8 +3550,8 @@ function homeHub(){
   +'<div class="rpanel"><small>'+esc(nx.k)+'</small><p>'+esc(nx.d)+'</p><a class="btn" href="'+nx.link+'">'+esc(nx.b)+'</a>'+(nx.m?'<span class="mins">About '+hm(nx.m)+'</span>':'')+(nx.skip?'<p class="rskip"><a href="#/step/1">Skip for now and start Week 1, step 1</a></p>':'')+'</div></div>'+rDays()+'<p class="rdates">'+esc(rDates())+'</p></div><!--/phd-->';
  if(!SPR.loaded)h+=sprintBar(false);
  h+=pastOpenNote();
- h+='<section class="rtrack"><h2>'+(done?done+' of 25 steps done in Partnership-to-Sales':'Partnership-to-Sales: 25 steps across four weeks')+'</h2>'+rTrack()+'</section>';
- h+='<div class="rcols"><div>'+rHomeList(nx)+(week1Done()?w2Banner():'')+'<div class="card"><h2>Experiments</h2>'+rXRow()+'</div></div><div class="rside">'+rSoFar();
+ h+='<section class="rtrack"><h2>'+(done?done+' of '+xaTotal()+' steps done in '+xaName():xaName()+': '+xaTotal()+' steps across four weeks')+'</h2>'+rTrack()+'</section>';
+ h+='<div class="rcols"><div>'+rHomeList(nx)+(etActive()?'':(week1Done()?w2Banner():''))+'<div class="card"><h2>Experiments</h2>'+rXRow()+'</div></div><div class="rside">'+rSoFar();
  if(FLAGS.community===true){
   var s=COM.sum,n=s?(s.new_posts||0):0,rp=s?(s.replies_to_me||0):0;
   h+='<section class="rpnl gold">'+rRing()+'<small>Group coaching</small><h2>The next session, and your hot-seat question</h2><p>Monthly group coaching, and a private way to ask for your message or proposal to be looked at.</p><p><a class="btn ghost" href="#/community/coaching">Coaching and events</a></p></section>';
@@ -2781,6 +3710,10 @@ document.addEventListener("click",function(e){
  if(a.indexOf("rv-")===0){rvAction(a,d,t);return;}
  if(a.indexOf("spr-")===0||a.indexOf("chk-")===0||a.indexOf("fb-")===0){sprAction(a,d,t);return;}
  if(a.indexOf("pu-")===0){puAction(a,d,t);return;}
+ if(a.indexOf("et2-")===0){et2Action(a,d);return;}
+ if(a.indexOf("et3-")===0){et3Action(a,d);return;}
+ if(a.indexOf("et4-")===0){et4Action(a,d);return;}
+ if(a.indexOf("pue-")===0){puEAction(a,d);return;}
  if(a.indexOf("et-")===0){etAction(a,d,t);return;}
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
@@ -2823,6 +3756,7 @@ document.addEventListener("input",function(e){
  else if(t.dataset.rv){rvInput(t);}
  else if(t.dataset.pu){puInput(t);}
  else if(t.dataset.et){etInput(t);}
+ else if(t.dataset.pue){puEInput(t);}
  else if(t.dataset.sk){S.sketch[t.dataset.sk]=S.sketch[t.dataset.sk]||{};S.sketch[t.dataset.sk].note=t.value;save();}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="signin"&&e.target.dataset&&e.target.dataset.auth){e.preventDefault();if(e.target.dataset.auth==="email")sendCode();else if(e.target.dataset.auth==="code")verifyCode();else if(e.target.dataset.auth==="pw")pwLogin();}});
@@ -3273,7 +4207,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
