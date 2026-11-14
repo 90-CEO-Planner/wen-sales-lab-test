@@ -58,8 +58,8 @@ async function signOutAll(){
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function keysOf(o){var m={};Object.keys(o).forEach(function(k){m[k]=JSON.stringify(o[k]);});return m;}
 function changedKeys(){var out=[];if(!S)return out;Object.keys(S).forEach(function(k){if(SYNC.bk[k]!==JSON.stringify(S[k]))out.push(k);});return out;}
-function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF(),past:[],chk:CHKDEF(),et:ETDEF()};}
-function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return etfix(d5fix(rvfix(w4fix(w3fix(w2fix(o))))));}
+function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF(),past:[],chk:CHKDEF(),et:ETDEF(),em:EMDEF()};}
+function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return emfix(etfix(d5fix(rvfix(w4fix(w3fix(w2fix(o)))))));}
 
 /* ---------- local mirror: survives a closed tab or a dropped connection ---------- */
 function mirrorKey(){return ME?"wsl_mirror_"+ME.id:null;}
@@ -887,7 +887,7 @@ function render(){
   var m=(route||"#/").match(/^#\/step\/(\d)/),m2=(route||"#/").match(/^#\/w2\/([1-6])$/),m3=(route||"#/").match(/^#\/w3\/([1-6])$/),m4=(route||"#/").match(/^#\/w4\/([1-6])$/);
   if(route==="#/admin"&&ME&&ME.admin){html=adminHtml();if(!ADMIN.members&&!ADMIN.busy)adminLoad();}
   else if(/^#\/community/.test(route)&&FLAGS.community===true)html=communityHtml();
-  else if(etBlockP())html=etBlockHtml();else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(/^#\/etsy(\/w[1-4])?(\/[1-6])?$/.test(route))html=etRoute();else if(route==="#/profile")html=profilePage();else html=homeHub();
+  else if(etBlockP())html=etBlockHtml();else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(/^#\/etsy(\/w[1-4])?(\/[1-6])?$/.test(route))html=etRoute();else if(/^#\/email(\/w[1-4])?(\/[1-5])?$/.test(route))html=emRoute();else if(route==="#/profile")html=profilePage();else html=homeHub();
   html=rHead(html);
  }
  var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);try{rEnhance();}catch(e){}try{shellNav();}catch(e){}try{comPhotoFill();}catch(e){}
@@ -1863,9 +1863,9 @@ function reviewPage(){
  h+='<div class="card"><h2>5. Results that arrive after Day 30</h2><p>Your sprint ends on Day 30 and stays that way. If a result arrives later, you can add it for 14 days after Day 30, and your sprint record updates without extending the sprint.</p>';
  if(!S.rv.done)h+='<p class="mute">Save your Day 30 review first, then you can add later results here.</p>';
  else if(ph==="during")h+='<p class="mute">The update window opens on Day 31 ('+esc(dayLab(rvWinStart()))+') and runs to Day 44 ('+esc(dayLab(rvEnd()))+').</p>';
- else if(ph==="window")h+='<p class="mute">Open from Day 31 to Day 44 (until '+esc(dayLab(rvEnd()))+'). Record new numbers in <a href="'+xaW4()+'">Week 4, step 3</a>, then add them to your record as a post-sprint update.</p>'+((S.rv.snap&&S.rv.snap.prov)?'<p class="mute">Save the final Day 30 version above first.</p>':'<p><button type="button" class="btn" data-a="rv-upd"'+(S.rv.upd.length>=RVMAX?' disabled':'')+'>Add a post-sprint update</button></p>');
+ else if(ph==="window")h+='<p class="mute">Open from Day 31 to Day 44 (until '+esc(dayLab(rvEnd()))+'). Record new numbers in <a href="'+xaW4()+'">Week 4, step '+xaW4Step()+'</a>, then add them to your record as a post-sprint update.</p>'+((S.rv.snap&&S.rv.snap.prov)?'<p class="mute">Save the final Day 30 version above first.</p>':'<p><button type="button" class="btn" data-a="rv-upd"'+(S.rv.upd.length>=RVMAX?' disabled':'')+'>Add a post-sprint update</button></p>');
  else h+='<div class="note info">The update window closed on '+esc(dayLab(rvEnd()))+'. Your sprint record is kept as it is. You can still change your own numbers, but they no longer update the sprint record.</div>';
- if(S.rv.upd.length)h+='<h3>Post-sprint updates</h3>'+S.rv.upd.map(function(u){return rvUpdRow(u,rvExp()==="etsy");}).join("");
+ if(S.rv.upd.length)h+='<h3>Post-sprint updates</h3>'+S.rv.upd.map(function(u){return rvUpdRow(u,rvExp());}).join("");
  h+='</div>';
  h+=fbCard();
  var T=S.rv.testi;
@@ -2195,11 +2195,11 @@ function puRow(k,money){
 function rvPastHtml(){
  var rows=[];
  (S.past||[]).forEach(function(p,i){
-  var open=pastWinOpen(p),h='<div class="card" style="box-shadow:none;border:1px solid var(--line)"><p style="margin:0"><strong>'+esc(p.exp==="etsy"?"Etsy Sales Bottleneck":"Partnership-to-Sales")+'</strong> <span class="tag">Day 30 position: '+esc(p.label||"Not reviewed")+'</span></p><p class="mute" style="margin:2px 0 6px">Started '+esc(dayLab(p.start))+'.'+(p.auto?' Your Day 30 position was recorded automatically from your dated entries when you started your next sprint.':'')+'</p>';
-  h+=etPastSummary(p);(p.upd||[]).forEach(function(u){h+=rvUpdRow(u,p.exp==="etsy");});
+  var open=pastWinOpen(p),h='<div class="card" style="box-shadow:none;border:1px solid var(--line)"><p style="margin:0"><strong>'+esc(xaNameOf(p.exp))+'</strong> <span class="tag">Day 30 position: '+esc(p.label||"Not reviewed")+'</span></p><p class="mute" style="margin:2px 0 6px">Started '+esc(dayLab(p.start))+'.'+(p.auto?' Your Day 30 position was recorded automatically from your dated entries when you started your next sprint.':'')+'</p>';
+  h+=pastSummary(p);(p.upd||[]).forEach(function(u){h+=rvUpdRow(u,p.exp);});
   if(open){
    h+='<div class="note info">The update window for this earlier sprint is open until '+esc(dayLab(pastEndDay(p)))+'. Results you add here belong to this sprint only. They do not change your current sprint or your Day 30 position.</div>';
-   if(p.exp==="etsy"){h+=etPastLate(p,i);}else if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
+   if(p.exp==="etsy"){h+=etPastLate(p,i);}else if(p.exp==="email"){h+=emPastLate(p,i);}else if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
    else h+='<p><button type="button" class="btn ghost" data-a="pu-open" data-i="'+i+'">Add a late result to this sprint</button></p>';
   } else if(today()>pastEndDay(p))h+='<p class="mute">The update window for this sprint closed on '+esc(dayLab(pastEndDay(p)))+'.</p>';
   rows.push(h+'</div>');
@@ -3011,6 +3011,8 @@ function etRouteInner(){
    back at the functions that were already there. Wrappers capture the earlier definition and fall through to it
    unless the sprint in progress is an Etsy one. */
 var EXPKEY={partnership:"part",etsy:"etsy"};
+function xaNameOf(e){return e==="etsy"?"Etsy Sales Bottleneck":(e==="email"?"Email-to-Sale":"Partnership-to-Sales");}
+function pastSummary(p){return p.exp==="etsy"?etPastSummary(p):(p.exp==="email"?emPastSummary(p):"");}
 EXPOPEN.etsy=true;
 var ETWKT=["Diagnose","Change one thing","Hold and watch","Read the result"];
 var ETTOTAL=24;
@@ -3020,6 +3022,7 @@ function etBn(){return etActive()?"":'<span class="tag" role="note">Preview only
 function xaName(){return rvExp()==="etsy"?"Etsy Sales Bottleneck":"Partnership-to-Sales";}
 function xaTotal(){return rvExp()==="etsy"?ETTOTAL:25;}
 function xaW4(){return rvExp()==="etsy"?"#/etsy/w4/3":"#/w4/3";}
+function xaW4Step(){return 3;}
 function etWith(obj,fn){var keep=S.et;S.et=obj;try{return fn();}finally{S.et=keep;}}
 
 /* ===== ETSY E4 LOGIC START: pure rules, checked by dev/etsy_e4_tests.js ===== */
@@ -3081,8 +3084,8 @@ function etRec(v){
  else{t=(r==="E4"||r==="E8")?"Collect for longer":"Wait for your window, then record your numbers";b=(r==="E4"||r==="E8")?"There were too few views to read a result. That says nothing about your change, only that the numbers are small.":"Your result cannot be read yet.";f=(r==="E1")?"Finish Week 2 and commit one change.":(r==="E2"?"Resist extra changes, and come back once your after-window has finished.":"Repeat with a longer window, or work on being found first (title, tags, keywords).");x=(r==="E4"||r==="E8")?"Partnership-to-Sales is open now and can bring visits while your listing is quiet. You are free to choose it, or to choose another experiment when more open.":"";bs=(r==="E4"||r==="E8")?"There were fewer views than the provisional minimum, or the evidence is limited.":"There is not enough yet to read.";as="We are assuming the numbers will be steadier with a longer window.";}
  return {t:t,b:b,first:f,extra:x,basis:bs,assume:as,provisional:rvPhase()==="during"||r==="E2"};
 }
-function rvUpdRow(u,et){
- if(et)return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Etsy evidence reading updated</span></span><span class="tag">'+esc(u.label)+'</span></div>';
+function rvUpdRow(u,exp){
+ if(exp==="etsy"||exp==="email")return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">'+(exp==="etsy"?"Etsy":"Email")+' evidence reading updated</span></span><span class="tag">'+esc(u.label)+'</span></div>';
  return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';
 }
 /* ===== ETSY E4 LOGIC END ===== */
@@ -3092,14 +3095,17 @@ var _sprHasWork=sprHasWork;sprHasWork=function(){return rvExp()==="etsy"?etHasWo
 var _rvSnap=rvSnap;rvSnap=function(k){return rvExp()==="etsy"?etSnap(k):_rvSnap(k);};
 var _sprArchive=sprArchive;
 sprArchive=function(prev){
- if(prev&&prev.experiment==="etsy"){etArchive(prev);etResetP();S.et=etFresh(S.et.prep);}
- else{_sprArchive(prev);S.et=etFresh(S.et.prep);}
+ if(prev&&prev.experiment==="etsy"){etArchive(prev);etResetP();}
+ else if(prev&&prev.experiment==="email"){emArchive(prev);etResetP();}
+ else{_sprArchive(prev);}
+ S.et=etFresh(S.et.prep);S.em=emFresh(S.em.prep);
 };
 var _d5fix=d5fix;
 d5fix=function(o){
  var src=Array.isArray(o.past)?o.past.slice(-10):[],out=[];
  src.forEach(function(x){
   if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="etsy"){out.push(etPastFix(x));}
+  else if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="email"){out.push(emPastFix(x));}
   else{var t=_d5fix({past:[x]});if(t.past.length)out.push(t.past[0]);}
  });
  var r=_d5fix(o);r.past=out.slice(-10);return r;
@@ -3165,35 +3171,37 @@ experimentsPage=function(){
   if(!open)return c+'<p class="rxm"><strong>Coming soon.</strong> Not open yet, so it cannot be started.</p></div></li>';
   if(!SPR.loaded)return c+'<p class="rxm">We could not check your sprint just now. Please refresh the page.</p></div></li>';
   if(ph==="during"){c+=cx===x[0]?'<p class="rxm"><strong>Your current experiment.</strong> '+esc(rvClock())+'. Find it under <a href="#/sprint">My Sprint</a>. You can start your next sprint after Day 30.</p>':'<p class="rxm">You already have a sprint running. You can start this one after Day 30.</p>';return c+'</div></li>';}
-  var key=x[0]==="etsy"?"etsy":"partnership",label=ph==="notstarted"?"Start my 30-day sprint":"Start another sprint";
+  var key=x[0]==="etsy"?"etsy":(x[0]==="email"?"email":"partnership"),label=ph==="notstarted"?"Start my 30-day sprint":"Start another sprint";
   if(key==="etsy"&&!etPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a live Etsy listing that you can measure. Your 30 days do not start until you have one and press start yourself.</p><p><a class="btn ghost" href="#/etsy">Prepare for the Etsy experiment</a></p></div></li>';
+  if(key==="email"&&!emPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a list of people who agreed to hear from you, and a tool to send from. Your 30 days do not start until you are ready and press start yourself.</p><p><a class="btn ghost" href="#/email">Prepare for Email-to-Sale</a></p></div></li>';
   c+=(ph==="notstarted"?'<p class="rxm">Ready when you are. Your 30 days begin only when you press the button.</p>':'<p class="rxm">Your last sprint is complete. You can choose when to start another, and it will not start by itself.</p>')+sprConfirmX(key,label);
   return c+'</div></li>';
  }
  var open="",rest="";EXPX.forEach(function(x,i){if(EXPOPEN[x[0]])open+=card(x,i);else rest+=card(x,i);});
  var first=ph==="notstarted"&&!(S.chk&&S.chk.done);if(first)h+='<div class="rchk">'+chkCard()+'</div>';h+='<ul class="rxgrid">'+open+'</ul>';
- h+='<div class="note warn"><strong>Temporary test limitation.</strong> In this test build Partnership-to-Sales and the Etsy Sales Bottleneck can be started. The other four will become available as they are built. You will always be able to choose any experiment that is open.</div>';
+ h+='<div class="note warn"><strong>Temporary test limitation.</strong> In this test build Partnership-to-Sales, the Etsy Sales Bottleneck and Email-to-Sale can be started. The other three will become available as they are built. You will always be able to choose any experiment that is open.</div>';
  if(!first)h+='<div class="rchk">'+chkCard()+'</div>';
  return h+'<ul class="rxgrid">'+rest+'</ul>';
 };
 var _sprAction=sprAction;
 sprAction=function(a,d,t){
- if(a==="spr-askx"){if(d.x!=="etsy"&&d.x!=="partnership")return;UI.sprConf=d.x;UI.sprErr="";render();}
- else if(a==="spr-gox"){UI.sprX=d.x==="etsy"?"etsy":"partnership";sprGo();}
+ if(a==="spr-askx"){if(d.x!=="etsy"&&d.x!=="partnership"&&d.x!=="email")return;UI.sprConf=d.x;UI.sprErr="";render();}
+ else if(a==="spr-gox"){UI.sprX=d.x==="etsy"?"etsy":(d.x==="email"?"email":"partnership");sprGo();}
  else if(a==="spr-go"){UI.sprX="partnership";sprGo();}
  else _sprAction(a,d,t);
 };
 sprGo=async function(){
  if(UI.sprBusy)return;
- var key=UI.sprX==="etsy"?"etsy":"partnership";
+ var key=UI.sprX==="etsy"?"etsy":(UI.sprX==="email"?"email":"partnership");
  if(key==="etsy"&&!etPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Etsy preparation checklist first.";render();return;}
+ if(key==="email"&&!emPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Email-to-Sale preparation checklist first.";render();return;}
  UI.sprBusy=true;UI.sprErr="";render();
  var prev=rvCur(),ph=rvPhase();
  var r=await sb.rpc("start_sprint",{p_experiment:key,p_day:today()});
  UI.sprBusy=false;UI.sprConf=false;
  if(r.error){UI.sprErr=sprMsg(r.error.message);render();return;}
  if(prev&&(ph==="window"||ph==="closed"))sprArchive(prev);
- if(key==="etsy")etStart();
+ if(key==="etsy")etStart();if(key==="email")emStart();
  await sprLoad();
  save();toast("Day 1 begins today. Good luck.");render();
 };
@@ -3342,6 +3350,578 @@ function puEAction(a,d){
 function puEInput(t){var u=pueDraft(),m=/^(b|a)\.(views|favs|lorders|rev)$/.exec(String(t.dataset.pue));if(!m)return;var o=u.res[m[1]][m[2]];if(o&&o.s==="value"){var c=w4Clean(m[2],t.value);o.v=c;if(c!==t.value)t.value=c;}}
 
 function et4fix(w,r){var p=w.prep;if(p&&typeof p==="object"&&!Array.isArray(p)){if(p.live==="yes"||p.live==="no")r.prep.live=p.live;if(p.stats===true&&r.prep.live==="yes")r.prep.stats=true;if(typeof p.listing==="string")r.prep.listing=p.listing.slice(0,120);}}
+
+/* ---------- Email-to-Sale: turn an existing, consented email list into sales with one three email sequence. ----------
+   Built on the shared sprint (clock, Home, My Sprint, Results, Day 30 review, update window, Past sprints) through the same
+   experiment adapter as the Etsy experiment. One measurable experiment: a three email sequence, tracked clicks, orders and revenue. */
+var EMSTEPS=[
+ [{n:1,t:"How a small list turns into sales",m:25,b:"Nothing. A short lesson and a quick check."},
+  {n:2,t:"Your list and where you start",m:30,b:"Your email tool, for the list size and the last 30 days."},
+  {n:3,t:"Check your list before you email",m:20,b:"Five honest yes or no answers."},
+  {n:4,t:"Choose one offer, and how you will count orders",m:30,b:"The one product, and a link or code you can track."},
+  {n:5,t:"Week 1 review",m:15,b:"Whatever you have done so far."}],
+ [{n:1,t:"How three emails work together",m:20,b:"Nothing. A short lesson."},
+  {n:2,t:"Write email 1: the invitation",m:40,b:"Your offer from Week 1."},
+  {n:3,t:"Write email 2: the reason to act",m:35,b:"Your offer, and one true story or result."},
+  {n:4,t:"Write email 3: the last reminder",m:30,b:"Your offer, and a real deadline."},
+  {n:5,t:"Pre-send check, schedule and commit",m:30,b:"Your three drafts, open in your email tool."}],
+ [{n:1,t:"Send, then hold steady",m:15,b:"Nothing. A short read."},
+  {n:2,t:"Send log",m:20,b:"Your email tool, for the send dates and recipient counts."},
+  {n:3,t:"What else could explain the numbers?",m:20,b:"Anything you remember changing or happening."},
+  {n:4,t:"Week 3 review",m:15,b:"Whatever you have done so far."}],
+ [{n:1,t:"How to read a small email result",m:25,b:"Nothing. A short lesson."},
+  {n:2,t:"Record your numbers",m:35,b:"Your email tool, and your orders for the tracked link or code."},
+  {n:3,t:"Your evidence verdict",m:20,b:"The numbers from step 2."},
+  {n:4,t:"Decide what is next",m:25,b:"Your verdict."}]
+];
+var EMWKT=["Prepare","Write and schedule","Send and watch","Read the result"];
+var EMWKD=["Get your list, your offer and how you will count orders ready.","Write three short emails and schedule them.","Send them, leave things alone, and note anything else that could matter.","Record your numbers, read the result, and decide what is next."];
+var EMTOTAL=18;
+var EMMINRECIP=20,EMCONFRECIP=100,EMMINCLICKS=10,EMSMALLORD=3,EMTAIL=7;
+var EMCK=[["agreed","Everyone on this list agreed to hear from me by email."],["source","I know where each person's address came from."],["unsub","Every email I send has a working unsubscribe link, and my name or business is clear."],["nobought","I did not buy, rent or scrape this list."],["unsubd","I will not email anyone who has already unsubscribed or asked me to stop."]];
+var EMTICKS=[["agreed","My list check in Week 1 is still true."],["ident","Each email says who it is from and has a working unsubscribe link."],["ask","Each email asks for one thing."],["track","I have tested the tracked link or code, and it works."],["plan","I will send all three on my scheduled dates and change nothing else about the offer in between."],["proof","I understand one sequence to one list is a small test and not proof."]];
+var EMCONF=[["price","I changed the price"],["promo","I ran another promotion or sale, or sent another offer to the same people"],["list","My list changed a lot (cleaned, imported or grew quickly)"],["partner","Another business or a partner mailed my list or promoted the same offer"],["ads","I ran ads or posts for the same offer"],["season","A major seasonal or holiday period"],["ext","A post, mention or press that sent unusual traffic"],["other","Something else"]];
+var EMNEXT=[["repeat","Repeat the same sequence to a new group"],["improve","Improve one thing and send again"],["pause","Pause, and work on my list first"],["other","Take what I learned to a different experiment"],["unsure","I am not sure yet"]];
+var EMS=(function(){
+ var s=function(n){return {t:"s",n:n};},v={t:"v"},b={t:"b"},d={t:"d"},e=function(a){return {t:"e",v:a};};
+ var yn=e(["","yes","no","unsure"]);
+ var mail={t:"o",f:{subj:s(100),hook:s(400),val:s(600),ask:s(300),ps:s(300)}};
+ return {t:"o",f:{
+  prep:{t:"o",f:{list:e(["","yes","no"]),tool:b}},
+  steps:{t:"m",k:/^[1-5]$/,i:b},steps2:{t:"m",k:/^[1-5]$/,i:b},st3:{t:"m",k:/^[1-4]$/,i:b},st4:{t:"m",k:/^[1-4]$/,i:b},
+  dec:e(["","next"]),dec2:e(["","next"]),dec3:e(["","next"]),dec4:e(["","done"]),
+  ls:{t:"o",f:{size:v,src:e(["","signup","freebie","customers","event","other"]),last:d,sent30:v,orders30:v,rev30:v}},
+  ck:{t:"o",f:{agreed:yn,source:yn,unsub:yn,nobought:yn,unsubd:yn}},
+  of:{t:"o",f:{product:s(120),who:s(200),goal:s(200),trk:e(["","link","code","none"]),ref:s(200)}},
+  mk:{t:"a",n:3,i:mail},
+  ticks:{t:"m",k:/^(agreed|ident|ask|track|plan|proof)$/,i:b},
+  sch:{t:"a",n:3,i:d},
+  cm:{t:"c"},
+  sd:{t:"a",n:3,i:{t:"o",f:{d:d,n:v}}},
+  cf:{t:"a",n:60,i:{t:"o",f:{id:{t:"n"},d:d,at:d,k:e(EMCONF.map(function(x){return x[0];})),maj:b,note:s(300),wd:d}}},
+  nid:{t:"n"},
+  res:{t:"o",f:{clicks:v,orders:v,rev:v,unsub:v,compl:v,at:d}},
+  nx:e(["","repeat","improve","pause","other","unsure"])
+ }};
+})();
+function emDef(n){
+ if(n.t==="o"){var o={};Object.keys(n.f).forEach(function(k){o[k]=emDef(n.f[k]);});return o;}
+ if(n.t==="a"){var a=[];if(n.n===3){for(var i=0;i<3;i++)a.push(emDef(n.i));}return a;}
+ if(n.t==="m")return {};if(n.t==="s"||n.t==="d")return "";if(n.t==="b")return false;if(n.t==="e")return "";if(n.t==="v")return {s:"",v:""};if(n.t==="n")return 1;if(n.t==="c")return null;return null;
+}
+function emClean(n,x,dflt){
+ var ok=function(y){return typeof y==="string";};
+ if(n.t==="s")return ok(x)?x.slice(0,n.n):dflt;
+ if(n.t==="d")return (ok(x)&&(x===""||parseYmd(x)!=null))?x:dflt;
+ if(n.t==="b")return x===true;
+ if(n.t==="e")return (ok(x)&&n.v.indexOf(x)>-1)?x:dflt;
+ if(n.t==="n")return (typeof x==="number"&&x===Math.floor(x)&&x>0&&x<=100001)?x:dflt;
+ if(n.t==="v"){if(x&&typeof x==="object"&&!Array.isArray(x)&&ok(x.s)&&ETVS[x.s]&&ok(x.v))return {s:x.s,v:x.s==="value"?w4Clean("n",x.v):""};return dflt;}
+ if(n.t==="o"){var o=(x&&typeof x==="object"&&!Array.isArray(x))?x:{},r={};Object.keys(n.f).forEach(function(k){r[k]=emClean(n.f[k],o[k],dflt&&dflt[k]!==undefined?dflt[k]:emDef(n.f[k]));});return r;}
+ if(n.t==="m"){var m={};if(x&&typeof x==="object"&&!Array.isArray(x))Object.keys(x).forEach(function(k){if(n.k.test(k)&&x[k]===true)m[k]=true;});return m;}
+ if(n.t==="a"){var a=[];if(Array.isArray(x)){x.slice(0,n.n).forEach(function(y,i){a.push(emClean(n.i,y,emDef(n.i)));});}
+  if(n.n===3){while(a.length<3)a.push(emDef(n.i));}return a;}
+ return dflt;
+}
+function EMDEF(){return emDef(EMS);}
+function emfix(o){
+ var w=(o.em&&typeof o.em==="object"&&!Array.isArray(o.em))?o.em:{},r=emClean(EMS,w,EMDEF());
+ // the confounder list: unique ids, only valid entries, "other" keeps its own severity
+ var seen={},maxId=0;r.cf=(Array.isArray(w.cf)?w.cf.slice(0,60):[]).filter(function(x){return x&&typeof x==="object"&&typeof x.id==="number"&&x.id===Math.floor(x.id)&&x.id>0&&x.id<=100000&&typeof x.d==="string"&&parseYmd(x.d)!=null&&typeof x.at==="string"&&parseYmd(x.at)!=null&&EMCONF.some(function(c){return c[0]===x.k;})&&!seen[x.id]&&(seen[x.id]=1);}).map(function(x){if(x.id>maxId)maxId=x.id;return {id:x.id,d:x.d,at:x.at,k:x.k,maj:x.k==="other"?x.maj===true:true,note:typeof x.note==="string"?x.note.slice(0,300):"",wd:(typeof x.wd==="string"&&parseYmd(x.wd)!=null)?x.wd:""};});
+ r.nid=Math.max(maxId+1,(typeof w.nid==="number"&&w.nid===Math.floor(w.nid)&&w.nid>0&&w.nid<=100001)?w.nid:1);
+ // the committed plan: needs three valid distinct ascending dates, a commit date, and ticks all done
+ var c=w.cm;r.cm=null;
+ if(c&&typeof c==="object"&&!Array.isArray(c)&&typeof c.at==="string"&&parseYmd(c.at)!=null&&Array.isArray(c.sch)&&c.sch.length===3&&c.sch.every(function(x){return typeof x==="string"&&parseYmd(x)!=null;})&&c.sch[0]<c.sch[1]&&c.sch[1]<c.sch[2]){
+  r.cm={at:c.at,sch:c.sch.slice(0,3),mk:(Array.isArray(c.mk)?c.mk:[]).slice(0,3).map(function(m){return emClean(EMS.f.mk.i,m,emDef(EMS.f.mk.i));}),trk:EMS.f.of.f.trk.v.indexOf(c.trk)>-1?c.trk:"",ref:typeof c.ref==="string"?c.ref.slice(0,200):"",what:typeof c.what==="string"?c.what.slice(0,200):""};
+  while(r.cm.mk.length<3)r.cm.mk.push(emDef(EMS.f.mk.i));
+ }
+ o.em=r;return o;
+}
+/* ===== EMAIL LOGIC START: pure rules, checked by dev/email_e5_tests.js ===== */
+function emVs(o){return vstate(o);}
+function emN(o){var s=vstate(o);return s==="pos"?+o.v:(s==="zero"?0:null);}
+function emFmt(o,money){var s=vstate(o),c=money?sym(S.focus.currency):"";return s==="pos"?c+String(+o.v):(s==="zero"?c+"0 (confirmed)":"not seen");}
+function emActive(){var c=rvCur();return !!c&&c.experiment==="email";}
+function emPrepReady(){var p=S.em.prep;return p.list==="yes"&&p.tool===true;}
+function emStepsOf(i){return EMSTEPS[i];}
+function emDOf(i){var E=S.em;return [E.steps,E.steps2,E.st3,E.st4][i]||{};}
+function emWeekDone(i){var E=S.em,L=emStepsOf(i),D=emDOf(i);return L.every(function(s){return D[s.n];})||[E.dec==="next",E.dec2==="next",E.dec3==="next",E.dec4==="done"][i];}
+function emCurWeek(){for(var i=0;i<4;i++){if(!emWeekDone(i))return i+1;}return 4;}
+function emWeekBase(w){return w===1?"#/email/":"#/email/w"+w+"/";}
+function emStepCount(){var n=0;for(var i=0;i<4;i++)n+=rCount(emStepsOf(i),emDOf(i));return n;}
+function emWeeks(){
+ var cur=emCurWeek(),out=[];
+ for(var i=0;i<4;i++){
+  var L=emStepsOf(i),D=emDOf(i),n=rCount(L,D),tot=L.length,st=(i+1<cur)?"done":(i+1===cur?"now":"later"),first=0;
+  if(st==="now"){for(var j=0;j<tot;j++){if(!D[L[j].n]){first=L[j].n;break;}}}
+  out.push({n:i+1,title:EMWKT[i],L:L,D:D,done:n,total:tot,state:st,open:i===0||emWeekDone(i-1),first:first,status:st==="later"?"Opens when you finish Week "+i:(st==="done"&&n===tot?"Done":n+" of "+tot+" steps done")});
+ }
+ return out;
+}
+function emListCheck(){
+ var c=S.em.ck,vals=EMCK.map(function(x){return c[x[0]];});
+ if(vals.every(function(v){return v==="yes";}))return {k:"ready",t:"You answered yes to all five",b:"This is based only on what you told us. It is not confirmation that your list or your emails meet the law, and the Sales Lab does not check your list. Please keep your answers true while you send."};
+ if(vals.some(function(v){return v==="no";}))return {k:"no",t:"Do not email this list yet",b:"At least one answer is no. Only email people who agreed to hear from you, who know where their address came from, who can unsubscribe, and who have not asked you to stop. Fix that first. You can choose another experiment in the meantime."};
+ if(vals.some(function(v){return v==="";}))return {k:"open",t:"Answer all five",b:"Every one needs an honest yes, no or not sure."};
+ return {k:"unsure",t:"Find out before you send",b:"At least one answer is not sure. Please find out first, for example by checking where the list came from. This is general guidance, not legal advice."};
+}
+function emDays(a,b){var x=parseYmd(a),y=parseYmd(b);if(x==null||y==null)return 0;return Math.round((y-x)/86400000);}
+function emSchCheck(sch,at){
+ var r={ok:false,why:"",t:"",b:""},tod=at||today();
+ if(!Array.isArray(sch)||sch.length!==3||sch.some(function(x){return !x||parseYmd(x)==null;})){r.why="missing";r.t="Choose three send dates";r.b="One for each email.";return r;}
+ if(sch[0]<tod){r.why="past";r.t="The first send date has passed";r.b="Choose today or a day ahead, so the plan is made before the sending.";return r;}
+ if(!(sch[0]<sch[1]&&sch[1]<sch[2])){r.why="order";r.t="The dates must be in order";r.b="Email 1, then 2, then 3, each on a later day.";return r;}
+ if(emDays(sch[0],sch[1])<2||emDays(sch[1],sch[2])<2){r.why="gap";r.t="Leave at least two days between emails";r.b="Closer than that is hard to tell apart and tires your readers.";return r;}
+ var w={from:sch[0],to:addDays(sch[2],EMTAIL),readOn:addDays(sch[2],EMTAIL+1)};r.w=w;
+ if(rvCur()){
+  if(sch[0]<rvStart()){r.why="beforestart";r.t="That is before your sprint began";r.b="Your sprint began on "+dayLab(rvStart())+".";return r;}
+  if(w.to>rvEnd()){r.why="toolate";r.t="That runs past the end of your update window";r.b="Your sequence and the "+EMTAIL+" days of watching afterwards would end on "+dayLab(w.to)+", after your update window closes on "+dayLab(rvEnd())+". Send sooner, or plan it for your next sprint.";return r;}
+  if(w.to>rvDay30())r.prov=true;
+ }
+ r.ok=true;return r;
+}
+function emDraftCheck(m){
+ var txt=[m.hook,m.val,m.ask].join(" ").trim(),words=txt?txt.split(/\s+/).length:0,issues=[];
+ if(!m.subj.trim())issues.push("It needs a subject line.");else if(m.subj.length>60)issues.push("The subject line is long. Under about 60 characters shows in full on a phone.");
+ if(m.subj&&m.subj===m.subj.toUpperCase()&&/[A-Z]{4}/.test(m.subj))issues.push("Avoid writing the subject line in capitals.");
+ if(!m.ask.trim())issues.push("It needs one clear ask.");
+ if(words<30)issues.push("It is very short. A few more sentences help the reader decide.");else if(words>250)issues.push("It is long for one ask. Under about 200 words is easier to read.");
+ if(/(guarantee|get rich|earn \$|earn £|100% (safe|sure))/i.test(txt))issues.push("Avoid promises you cannot keep, such as guarantees or income claims.");
+ return {words:words,issues:issues,ok:issues.length===0};
+}
+function emCompose(m){var p=[];if(m.hook.trim())p.push(m.hook.trim());if(m.val.trim())p.push(m.val.trim());if(m.ask.trim())p.push(m.ask.trim());if(m.ps.trim())p.push("P.S. "+m.ps.trim());return p.join("\n\n");}
+function emReady(){
+ var E=S.em,m=[];
+ if(E.cm)return {ok:false,done:true,miss:[]};
+ if(emListCheck().k!=="ready")m.push("Your list check answers are not all yes yet (Week 1, step 3)");
+ if(!E.of.product.trim())m.push("The one offer (Week 1, step 4)");
+ if(!E.of.trk)m.push("How you will count orders (Week 1, step 4)");
+ [0,1,2].forEach(function(i){var c=emDraftCheck(E.mk[i]);if(!E.mk[i].subj.trim()||!E.mk[i].ask.trim()||!(E.mk[i].hook.trim()||E.mk[i].val.trim()))m.push("Email "+(i+1)+" needs a subject, some words and one ask (Week 2, step "+(i+2)+")");});
+ if(EMTICKS.some(function(x){return E.ticks[x[0]]!==true;}))m.push("All six checks ticked (step 5)");
+ var sc=emSchCheck(E.sch);if(!sc.ok)m.push("Valid send dates (step 5): "+sc.t);
+ return {ok:m.length===0,done:false,miss:m,sc:sc};
+}
+function emCommit(){
+ var E=S.em,r=emReady();if(!r.ok)return false;
+ E.cm={at:today(),sch:E.sch.slice(0,3),mk:E.mk.map(function(m){return {subj:m.subj,hook:m.hook,val:m.val,ask:m.ask,ps:m.ps};}),trk:E.of.trk,ref:E.of.ref,what:E.of.product.trim().slice(0,200)};
+ return true;
+}
+function emSent(){return S.em.sd.filter(function(x){return !!x.d;});}
+function emWin(){
+ var E=S.em;if(!E.cm)return null;var sd=emSent();
+ var last=sd.length?sd.map(function(x){return x.d;}).sort().slice(-1)[0]:E.cm.sch[2],first=sd.length?sd.map(function(x){return x.d;}).sort()[0]:E.cm.sch[0];
+ return {from:first,to:addDays(last,EMTAIL),readOn:addDays(last,EMTAIL+1),allSent:sd.length===3};
+}
+function emConfKind(k){return EMCONF.filter(function(x){return x[0]===k;})[0]||null;}
+function emConfMajor(c){return c.k==="other"?c.maj===true:!!emConfKind(c.k);}
+function emConfs(asOf){
+ var E=S.em,w=emWin(),r={major:[],minor:[],outside:[]};
+ E.cf.forEach(function(c){
+  if(c.wd&&(!asOf||c.wd<=asOf))return;if(asOf&&c.at>asOf)return;
+  var lo=E.cm?addDays(E.cm.sch[0],-7):"";
+  if(!w||c.d<lo||c.d>w.to){r.outside.push(c);return;}
+  (emConfMajor(c)?r.major:r.minor).push(c);
+ });
+ return r;
+}
+function emNums(asOf){
+ var E=S.em,known=!(asOf&&(!E.res.at||E.res.at>asOf)),o={};
+ ["clicks","orders","rev","unsub","compl"].forEach(function(k){o[k]=known?{s:E.res[k].s,v:E.res[k].v}:{s:"",v:""};});
+ return o;
+}
+function emRecip(){var n=emSent().map(function(x){return emN(x.n);});if(n.length<3||n.some(function(x){return x===null;}))return null;return Math.min.apply(null,n);}
+function emVerdict(asOf){
+ var E=S.em,cm=E.cm,small="One sequence to one list is a small test. It shows what happened, not what will always happen.";
+ var fin=function(v,c){v.conf=c;return v;};
+ if(!cm)return fin(vmk("Insufficient evidence","info","M1",["No sequence is scheduled yet, so there is nothing to read."],["This says nothing about your list or your offer, because nothing has been tested."],["Finish Week 2 and commit your three emails."]),"none");
+ var w=emWin(),t=asOf||today();
+ if(!w.allSent||t<w.readOn)return fin(vmk("Insufficient evidence","info","M2",[w.allSent?"Your three emails have gone out, and people can still respond until "+dayLab(w.to)+".":"Not all three emails are logged as sent yet."],["A result read before people have had time to respond would be a guess."],[w.allSent?"Wait until "+dayLab(w.readOn)+", then record your numbers.":"Send the rest of your sequence and log each send. Resist changing the offer meanwhile."]),"none");
+ var nm=emNums(asOf),clicks=emN(nm.clicks),orders=emN(nm.orders),rc=emRecip();
+ if(clicks===null||orders===null||rc===null||cm.trk==="none"){
+  var why=[];if(clicks===null)why.push("Clicks are not recorded.");if(orders===null)why.push("Orders are not recorded.");if(rc===null)why.push("A recipient count is missing from your send log.");if(cm.trk==="none")why.push("You said you could not track orders to these emails.");
+  return fin(vmk("Mixed or unclear","warn","M3",why,["Without these the sequence cannot be read. A number you could not see is kept as unknown, and is never read as zero.","If orders cannot be traced to the emails, we cannot say whether they brought any."],["Record what you can see in your email tool and your orders. For next time, use a link or a code that only this sequence uses."]),"unclear");
+ }
+ var nums="Sent to at least "+rc+" people each time. Tracked clicks: "+clicks+". Orders: "+orders+".";
+ if(rc<EMMINRECIP)return fin(vmk("Insufficient evidence","info","M4",[nums,"Fewer than "+EMMINRECIP+" people received at least one of the emails."],["That list is too small to read a result from. A few people either way changes everything.","The minimum used, "+EMMINRECIP+" recipients, and about "+EMCONFRECIP+" for a confident reading, are provisional starting points that will be reviewed against real results."],["Grow your list a little first, or repeat to a larger group."]),"none");
+ var cf=emConfs(asOf),cav=emCaveats(rc,orders,nm);
+ if(cf.major.length){
+  return fin(vmk("Mixed or unclear","warn","M5",[nums,"You logged "+cf.major.length+" major thing"+(cf.major.length===1?"":"s")+" around your sequence that could also explain the numbers: "+cf.major.map(function(c){return (emConfKind(c.k)||["","?"])[1].toLowerCase();}).join("; ")+"."],["Because something else changed or happened, the numbers cannot be put down to your sequence alone. Even with orders, this would not be called promising.",small].concat(cav.lines),["Write down what happened and when. For a cleaner answer, send again with nothing else changing."]),"unclear");
+ }
+ if(orders>0)return fin(vmk("Promising","ok","M6",[nums],["What you can see is orders after your sequence. That is not the same as proof that your emails caused them. Some of these people may have bought anyway.",small,"This is encouraging. It is not proof."].concat(cav.lines),["Repeat to a new group, or improve one thing and send again, and compare."]),cav.conf);
+ if(clicks>=EMMINCLICKS)return fin(vmk("Traffic but no sales","warn","M7",[nums,"People clicked through, and you confirmed no orders."],["This shows interest reached your page. It does not show why nobody bought.",small].concat(cav.lines),["Look at what people saw after clicking: the page, the price and the offer. Change one of those, then send again."]),cav.conf);
+ if(rc<EMCONFRECIP)return fin(vmk("Insufficient evidence","info","M8",[nums,"With a list this size, few clicks and no orders are within what chance could produce."],["This does not mean your emails or your offer did not work. There were too few people to tell, so the evidence is limited.",small].concat(cav.lines),["Repeat to a larger group, or improve one thing and send again, before deciding anything."]),"limited");
+ return fin(vmk("Approach needs reviewing","warn","M8",[nums,"Few people clicked and nobody ordered, from a list of a reasonable size."],["This does not mean the idea is wrong. One sequence is one try.",small].concat(cav.lines),["Try changing one thing next: the subject lines, the offer, or who you send to."]),cav.conf);
+}
+function emCaveats(rc,orders,nm){
+ var lines=[],conf="fair";
+ if(rc<EMCONFRECIP){conf="limited";lines.push("Your list was about "+rc+" people. Below about "+EMCONFRECIP+" recipients, a few people either way can change the picture, so this is too limited to support a confident conclusion. Treat it as a hint.");}
+ if(orders<EMSMALLORD&&orders>0){if(conf==="fair")conf="lower";lines.push("Orders are a very small count ("+orders+"). One or two orders are well within chance.");}
+ var u=emN(nm.unsub),c=emN(nm.compl);
+ if(c!==null&&c>0)lines.push("You recorded "+c+" spam complaint"+(c===1?"":"s")+". Please review whether everyone on your list really agreed to hear from you before you send again.");
+ if(u!==null&&u>0)lines.push("You recorded "+u+" unsubscribe"+(u===1?"":"s")+". That is normal and healthy. It is counted apart from sales.");
+ return {conf:conf,lines:lines};
+}
+function emSnap(kind){
+ var asOf=null,late=false,prov=false;
+ if(kind==="day30"&&rvCur()){if(rvPhase()==="during")prov=true;else asOf=rvDay30();}
+ if(asOf){var w=emWin();if(w&&w.to>asOf)prov=true;if(S.em.res.at&&S.em.res.at>asOf)late=true;}
+ var v=emVerdict(asOf||null);
+ return {at:today(),label:v.label,rule:v.rule,ctr:{msgs:0,resp:0,opp:0},res:{},kind:kind==="day30"?"day30":"update",asOf:asOf||"",late:late,prov:prov||v.rule==="M2"};
+}
+function emHasWork(){var E=S.em;return !!E.cm||E.sd.some(function(x){return !!x.d;})||E.cf.length>0||["clicks","orders","rev","unsub","compl"].some(function(k){return !!E.res[k].s;});}
+function emFresh(prep){var e=EMDEF();if(prep)e.prep=prep;return e;}
+function emStart(){var prep=S.em.prep;S.em=emFresh(prep);var pn=String(S.focus.product||"").trim();if(pn)S.em.of.product=pn.slice(0,120);}
+function emRec(v){
+ var l=v.label,r=v.rule,t,b,f,x="",bs,as;
+ if(l==="Promising"){t="Repeat it to a new group, then compare";b="Orders came after your sequence. Sending the same three emails to a new group shows whether it was a pattern.";f="Pick a fresh group from your list who did not get this sequence, and use the same link or code.";bs="Orders were recorded after the sequence, with no major confounder logged.";as="We are assuming your emails, not something else, led to those orders. Your numbers cannot prove that.";}
+ else if(l==="Traffic but no sales"){t="Improve what people see after the click";b="People clicked, so the emails did their job. The next place to look is the page, the price or the offer.";f="Choose one of the page, the price or how the offer is described, change only that, and send again.";bs="Tracked clicks reached the threshold and no orders were confirmed.";as="We are assuming the page and offer, rather than the emails, are the weak point. Your numbers cannot confirm that.";}
+ else if(l==="Approach needs reviewing"){t="Change one thing, then send again";b="Few people clicked from a list of a reasonable size. That is one try, not the end of the idea.";f="Change one thing: the subject lines, the offer, or who you send to.";x="If your list is the constraint, Partnership-to-Sales is open now and can widen who you reach. Find Your Buyers is coming soon and is not open yet.";bs="Few clicks and no orders from a list of at least "+EMCONFRECIP+" people.";as="We are assuming the subject lines and offer were what to change. Your list may simply not be ready to buy.";}
+ else if(l==="Mixed or unclear"){t="Send again with steady conditions";b="Something else changed, or the numbers could not be traced to your sequence, so it cannot be read cleanly.";f=r==="M3"?"Record the missing numbers, and use a link or code only this sequence uses next time.":"Write down what else happened, then send again with nothing else changing.";bs=r==="M3"?"Some key numbers or the tracking were missing.":"Something else could explain the numbers.";as="We are assuming nothing else needed to be considered. If something did, please log it.";}
+ else{t=(r==="M4"||r==="M8")?"Reach more people first":"Wait for your sequence to finish";b=(r==="M4"||r==="M8")?"There were too few people to read a result. That says nothing about your emails, only that the numbers are small.":"Your result cannot be read yet.";f=(r==="M1")?"Finish Week 2 and commit your three emails.":(r==="M2"?"Send the rest, log each send, and come back after the watching period.":"Repeat to a larger group before deciding anything.");x=(r==="M4"||r==="M8")?"Partnership-to-Sales is open now and can widen who you reach. You are free to choose it, or another experiment when more open.":"";bs=(r==="M4"||r==="M8")?"The list was smaller than the provisional minimum, or the evidence is limited.":"There is not enough yet to read.";as="We are assuming a larger group will give a steadier picture.";}
+ return {t:t,b:b,first:f,extra:x,basis:bs,assume:as,provisional:rvPhase()==="during"||r==="M2"};
+}
+/* ===== EMAIL LOGIC END ===== */
+
+/* --- screens --- */
+function emShell(wk,n,body){
+ var E=S.em,st=emStepsOf(wk-1),s=st[n-1],dn=emDOf(wk-1)[n],base="#/email/w"+wk;
+ var h='<a class="back" href="'+base+'">&larr; Email-to-Sale, Week '+wk+'</a><h1>Week '+wk+' &middot; Step '+n+' of '+st.length+'</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p><p class="mute">You will need: '+esc(s.b)+' Everything saves automatically.</p>'+body;
+ h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="em-done" data-w="'+wk+'" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<st.length?'<a class="btn ghost" href="'+(wk===1?"#/email/w1/":"#/email/w"+wk+"/")+(n+1)+'">Next step &rarr;</a>':'')+'</div>';
+ return h;
+}
+function emNumRow(path,lab,o,money){
+ var opts=[["value","A number"],["zero","Zero, I checked"],["unknown","I can't see this"]];
+ return '<div class="q"><strong>'+esc(lab+(money?" ("+sym(S.focus.currency).trim()+")":""))+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="em-vs" data-p="'+path+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="9" data-em="n:'+path+'" value="'+esc(o.v)+'" aria-label="'+esc(lab)+'" style="max-width:160px">':'')+'</div>';
+}
+function emGet(path){
+ var p=String(path).split("."),o=S.em;for(var i=0;i<p.length;i++){if(o==null)return null;o=o[/^\d$/.test(p[i])?+p[i]:p[i]];}return o;
+}
+var EMVSPATH=/^(ls\.(size|sent30|orders30|rev30)|sd\.[0-2]\.n|res\.(clicks|orders|rev|unsub|compl))$/;
+function emHome(wk){
+ wk=wk||1;var E=S.em,st=emStepsOf(wk-1),d=rCount(st,emDOf(wk-1)),dn=emDOf(wk-1),base=emWeekBase(wk);
+ var h='<a class="back" href="#/sprint">&larr; My Sprint</a><h1>Email-to-Sale</h1><p class="mute">Week '+wk+' of 4: '+esc(EMWKT[wk-1])+'. '+esc(EMWKD[wk-1])+'</p><div class="card"><strong>'+d+' of '+st.length+' steps done</strong><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/st.length*100)+'%"></i></div></div>';
+ h+='<div class="card"><h2>The steps</h2>'+st.map(function(s){var x=dn[s.n];return '<a class="step'+(x?' done':'')+'" href="'+base+s.n+'"><span class="n">'+(x?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(x?"Done":"Open")+'</span></a>';}).join("")+'</div>';
+ return h;
+}
+function em1s1(){
+ return emShell(1,1,LC("em1s1.lesson")+'<div class="card"><h2>Quick check</h2>'+EMQUIZ.map(function(q){var sel=S.em.quizq?S.em.quizq[q[0]]:"";return '<div class="q"><strong>'+esc(q[1])+'</strong><div class="row" style="flex-direction:column;align-items:stretch">'+q[2].map(function(o){return '<button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(UI.emq&&UI.emq[q[0]]===o[0])+'" data-a="em-q" data-q="'+q[0]+'" data-v="'+o[0]+'">'+esc(o[1])+'</button>';}).join("")+'</div>'+(UI.emq&&UI.emq[q[0]]?'<div class="note '+(UI.emq[q[0]]===q[3]?"ok":"info")+'" aria-live="polite">'+(UI.emq[q[0]]===q[3]?"Good. ":"Have another look. ")+esc(q[4])+'</div>':'')+'</div>';}).join("")+'</div>');
+}
+var EMQUIZ=[["a","You have a small list of 60 people who all agreed to hear from you. Is it big enough to learn from?",[["a1","No, lists under 1,000 are useless"],["a2","Yes, as a first small test, as long as you treat the result as a hint"],["a3","Only if you buy more addresses"]],"a2","A small, consented list is a good place to learn. Just read the result as a hint, not proof. Never buy addresses."],["b","Which is the best single thing to ask for in each email?",[["b1","Three different things, so there is something for everyone"],["b2","One clear thing"],["b3","Nothing, just be friendly"]],"b2","One clear ask per email makes it easy to act, and easy to count."]];
+function em1s2(){
+ var E=S.em,h=LC("em1s2.lesson")+'<div class="card"><h2>Your list</h2>'+emNumRow("ls.size","People on the list you would email",E.ls.size);
+ h+='<label>How did most of these people join?</label><div class="row">'+[["signup","A sign-up form"],["freebie","A free download"],["customers","They bought from me"],["event","An event or class"],["other","Another way"]].map(function(x){return '<button type="button" class="chip" aria-pressed="'+(E.ls.src===x[0])+'" data-a="em-src" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>';
+ h+='<label for="emlast">The last time you emailed this list (optional)</label><input id="emlast" type="date" data-em="ls.last" value="'+esc(E.ls.last)+'" max="'+esc(today())+'" style="max-width:200px"></div>';
+ h+='<div class="card"><h2>Where you start (the last 30 days)</h2><p class="mute">This is your starting point. If you cannot see a number, say so, and it is kept as unknown. It is never read as zero.</p>'+emNumRow("ls.sent30","Emails you sent to this list",E.ls.sent30)+emNumRow("ls.orders30","Orders you can trace to emails",E.ls.orders30)+emNumRow("ls.rev30","Revenue you can trace to emails",E.ls.rev30,true)+'</div>';
+ return emShell(1,2,h);
+}
+function em1s3(){
+ var E=S.em,h=LC("em1s3.lesson")+'<div class="card"><h2>Five honest questions</h2>';
+ EMCK.forEach(function(x){h+='<div class="q"><strong>'+esc(x[1])+'</strong><div class="row">'+[["yes","Yes"],["no","No"],["unsure","Not sure"]].map(function(o){return '<button type="button" class="chip sm" aria-pressed="'+(E.ck[x[0]]===o[0])+'" data-a="em-ck" data-k="'+x[0]+'" data-v="'+o[0]+'">'+o[1]+'</button>';}).join("")+'</div></div>';});
+ var r=emListCheck();h+='<div class="note '+(r.k==="ready"?"ok":(r.k==="open"?"info":"warn"))+'"><strong>'+esc(r.t)+'.</strong> '+esc(r.b)+'</div><p class="mute">This is general guidance, not legal advice, and answering yes is not confirmation that you meet the law. The rules about emailing people are in the Privacy and Electronic Communications Regulations and UK GDPR. The Sales Lab never sends emails for you: you send from your own tool.</p><div class="note warn">Draft wording. It will be checked against UK data protection and e-privacy requirements before launch.</div></div>';
+ return emShell(1,3,h);
+}
+function em1s4(){
+ var E=S.em,h=LC("em1s4.lesson")+'<div class="card"><h2>Your one offer</h2><label for="emp">What are you inviting people to buy?</label><input id="emp" type="text" maxlength="120" data-em="of.product" value="'+esc(E.of.product)+'">'+(String(S.focus.product||"").trim()&&E.of.product===String(S.focus.product).trim().slice(0,120)?'<p class="mute">Pre-filled from your product details. Please check it.</p>':'')+'<label for="emw">Who on your list is it for?</label><input id="emw" type="text" maxlength="200" data-em="of.who" value="'+esc(E.of.who)+'" placeholder="For example: everyone who downloaded the free planner"><label for="emg">What do you hope happens, in a sentence?</label><input id="emg" type="text" maxlength="200" data-em="of.goal" value="'+esc(E.of.goal)+'"></div>';
+ h+='<div class="card"><h2>How will you count orders?</h2><div class="row" style="flex-direction:column;align-items:stretch">'+[["link","A link that only this sequence uses"],["code","A discount or order code that only this sequence uses"],["none","I cannot track it yet"]].map(function(x){return '<button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(E.of.trk===x[0])+'" data-a="em-trk" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>';
+ if(E.of.trk==="none")h+='<div class="note warn">That is honest, and it means your result will be read as unclear, because orders cannot be traced to the emails. A link or a code takes a few minutes to set up.</div>';
+ else if(E.of.trk)h+='<label for="emr">The link or code (optional, only you see this)</label><input id="emr" type="text" maxlength="200" data-em="of.ref" value="'+esc(E.of.ref)+'">';
+ return emShell(1,4,h+'</div>');
+}
+function emSummary1(){
+ var E=S.em,r=emListCheck();
+ return '<div class="card"><h2>Your Week 1 summary</h2><div class="crow"><span>List size</span><strong>'+esc(emFmt(E.ls.size))+'</strong></div><div class="crow"><span>List check</span><strong>'+esc(r.t)+'</strong></div><div class="crow"><span>Your offer</span><strong>'+esc(E.of.product||"Not chosen")+'</strong></div><div class="crow"><span>Counting orders</span><strong>'+esc({link:"A link",code:"A code",none:"Not yet"}[E.of.trk]||"Not chosen")+'</strong></div><h3>Your decision</h3>'+[["next","Ready for Week 2"]].map(function(x){return '<p><button type="button" class="chip" aria-pressed="'+(E.dec===x[0])+'" data-a="em-dec" data-w="1" data-v="'+x[0]+'">'+x[1]+'</button></p>';}).join("")+'</div>';
+}
+function em1s5(){return emShell(1,5,LC("em1s5.lesson")+emSummary1());}
+function em2s1(){return emShell(2,1,LC("em2s1.lesson"));}
+function emDraft(i,wk,n){
+ var E=S.em,m=E.mk[i],lk=!!E.cm,c=emDraftCheck(m),pre=EMDRAFTHINT[i];
+ var h=LC("em2s"+(i+2)+".lesson")+'<div class="card"><h2>Email '+(i+1)+'</h2><label for="emS'+i+'">Subject line</label><input id="emS'+i+'" type="text" maxlength="100" data-em="mk.'+i+'.subj" value="'+esc(m.subj)+'"'+(lk?' readonly':'')+'><label for="emH'+i+'">The opening: a line that sounds like you</label><textarea id="emH'+i+'" maxlength="400" style="min-height:70px" data-em="mk.'+i+'.hook"'+(lk?' readonly':'')+' placeholder="'+esc(pre[0])+'">'+esc(m.hook)+'</textarea><label for="emV'+i+'">The useful part</label><textarea id="emV'+i+'" maxlength="600" style="min-height:90px" data-em="mk.'+i+'.val"'+(lk?' readonly':'')+' placeholder="'+esc(pre[1])+'">'+esc(m.val)+'</textarea><label for="emA'+i+'">The one ask</label><textarea id="emA'+i+'" maxlength="300" style="min-height:60px" data-em="mk.'+i+'.ask"'+(lk?' readonly':'')+' placeholder="'+esc(pre[2])+'">'+esc(m.ask)+'</textarea><label for="emP'+i+'">A P.S. (optional)</label><input id="emP'+i+'" type="text" maxlength="300" data-em="mk.'+i+'.ps" value="'+esc(m.ps)+'"'+(lk?' readonly':'')+'></div>';
+ h+='<div class="card"><h2>Your email, as it will read</h2><p><strong>'+esc(m.subj||"(no subject yet)")+'</strong></p><p style="white-space:pre-wrap">'+esc(emCompose(m)||"Start writing above.")+'</p><p class="mute">'+c.words+' words. Remember to add your tracked link or code, and the unsubscribe link your email tool provides.</p>'+(c.issues.length?'<div class="note info"><strong>Worth another look:</strong><ul>'+c.issues.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>':(m.subj||m.ask?'<div class="note ok">That reads well for one email.</div>':''))+'</div>';
+ return emShell(wk,n,h);
+}
+var EMDRAFTHINT=[["Hi, it has been a while. I have been working on something I think you will like.","Say what it is, who it is for, and one result or reason it helps.","Invite them to look, using your tracked link."],["Last week I shared something. Here is why I made it.","One true story or result that shows why it is worth their time.","Invite them again, with the tracked link."],["This closes on [a real date].","A short reminder of what they get, and the real deadline or limit.","A final invitation with the tracked link."]];
+function em2s2(){return emDraft(0,2,2);}
+function em2s3(){return emDraft(1,2,3);}
+function em2s4(){return emDraft(2,2,4);}
+function em2s5(){
+ var E=S.em,lk=!!E.cm,h=LC("em2s5.lesson");
+ if(lk)return emShell(2,5,h+emPlanLog());
+ h+='<div class="card"><h2>Six checks</h2><p class="mute">Tick each one when it is true.</p>'+EMTICKS.map(function(t){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(E.ticks[t[0]]===true)+'" data-a="em-tick" data-k="'+t[0]+'">'+esc(t[1])+'</button></p>';}).join("")+'<p><strong>'+EMTICKS.filter(function(t){return E.ticks[t[0]]===true;}).length+' of 6 ticked.</strong></p></div>';
+ h+='<div class="card"><h2>When will you send each one?</h2>'+[0,1,2].map(function(i){return '<label for="emD'+i+'">Email '+(i+1)+'</label><input id="emD'+i+'" type="date" data-em="sch.'+i+'" value="'+esc(E.sch[i])+'" min="'+esc(today())+'" style="max-width:200px">';}).join("");
+ var sc=emSchCheck(E.sch);
+ if(sc.ok){h+='<div class="crow"><span>You will be watching until</span><strong>'+esc(dayLab(sc.w.to))+'</strong></div><div class="crow"><span>Read your numbers from</span><strong>'+esc(dayLab(sc.w.readOn))+'</strong></div>';if(sc.prov)h+='<div class="note info">Your watching period runs past Day 30, so your Day 30 position will be provisional, and the rest is recorded as a post-sprint update in your 14 day update window.</div>';}
+ else if(E.sch.some(function(x){return !!x;}))h+='<div class="note '+(sc.why==="missing"?"info":"warn")+'"><strong>'+esc(sc.t)+'.</strong> '+esc(sc.b)+'</div>';
+ h+='</div>';
+ var r=emReady();
+ h+='<div class="card"><h2>Ready to commit?</h2>';
+ if(r.ok)h+='<div class="note ok"><strong>Everything is in place.</strong></div>';else h+='<div class="note warn"><strong>Not quite yet. Still needed:</strong><ul>'+r.miss.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+ if(UI.emc&&r.ok)h+='<div class="note info" aria-live="polite"><strong>Commit and lock your plan?</strong> Your three emails, your offer, how you will count orders and your dates will be locked and dated.</div><div class="row"><button type="button" class="btn" data-a="em-commit">Yes, commit and lock</button><button type="button" class="btn ghost" data-a="em-cancel">Not yet</button></div>';
+ else h+='<p><button type="button" class="btn"'+(r.ok?'':' disabled')+' data-a="em-confirm">Commit my plan</button></p>';
+ return emShell(2,5,h+'</div>');
+}
+function emPlanLog(){
+ var E=S.em,c=E.cm;if(!c)return "";
+ return '<div class="card"><h2>Your plan</h2><p class="mute">Committed on '+esc(dayLab(c.at))+'. This record is locked.</p><div class="crow"><span>Offer</span><strong>'+esc(c.what)+'</strong></div><div class="crow"><span>Counting orders</span><strong>'+esc({link:"A link",code:"A code",none:"Not yet"}[c.trk]||"")+'</strong></div>'+c.sch.map(function(d,i){return '<div class="crow"><span>Email '+(i+1)+'</span><strong>'+esc(dayLab(d))+(c.mk[i].subj?': '+esc(c.mk[i].subj):'')+'</strong></div>';}).join("")+'</div>';
+}
+function emStatus(){
+ var E=S.em,w=emWin();if(!E.cm)return '<div class="note warn"><strong>No plan is committed yet.</strong> Week 2 finishes with committing your three emails. <a href="#/email/w2/5">Go to Week 2, step 5</a></div>';
+ var sd=emSent().length;
+ return '<div class="card"><h2>Where you are</h2><div class="crow"><span>Emails logged as sent</span><strong>'+sd+' of 3</strong></div><div class="crow"><span>Watching until</span><strong>'+esc(dayLab(w.to))+'</strong></div><div class="crow"><span>Read your numbers from</span><strong>'+esc(dayLab(w.readOn))+'</strong></div>'+(w.allSent&&today()<w.readOn?'<div class="note info">All three have gone out. People can still respond, so please do not read your numbers as a result yet.</div>':'')+(rvCur()&&w.to>rvDay30()?'<div class="note info">Your watching period runs past Day 30, so your Day 30 position will be provisional, and the rest is recorded as a post-sprint update until '+esc(dayLab(rvEnd()))+'.</div>':'')+'</div>';
+}
+function em3s1(){return emShell(3,1,LC("em3s1.lesson")+emPlanLog()+emStatus());}
+function em3s2(){
+ var E=S.em,h=LC("em3s2.lesson");
+ if(!E.cm)return emShell(3,2,h+emStatus());
+ h+='<div class="card"><h2>Your send log</h2><p class="mute">Record each email when it goes out. The date cannot be before you committed, or in the future.</p>';
+ [0,1,2].forEach(function(i){var x=E.sd[i];h+='<h3>Email '+(i+1)+(E.cm.mk[i].subj?': '+esc(E.cm.mk[i].subj):'')+'</h3><p class="mute">Planned for '+esc(dayLab(E.cm.sch[i]))+'.</p><label for="emsd'+i+'">The day you sent it</label><input id="emsd'+i+'" type="date" data-em="sd.'+i+'.d" value="'+esc(x.d)+'" min="'+esc(E.cm.at)+'" max="'+esc(today())+'" style="max-width:200px">'+(x.d?emNumRow("sd."+i+".n","How many people it went to",x.n):'');});
+ return emShell(3,2,h+'</div>'+emStatus());
+}
+function emConfHtml(){
+ var E=S.em,h="";if(!E.cf.length)return '<p class="mute">Nothing logged. That is a fine answer if nothing changed.</p>';
+ E.cf.slice().sort(function(a,b){return a.d<b.d?-1:(a.d>b.d?1:a.id-b.id);}).forEach(function(c){var w=emWin(),inw=w&&E.cm&&c.d>=addDays(E.cm.sch[0],-7)&&c.d<=w.to,mj=emConfMajor(c),wd=!!c.wd,k=emConfKind(c.k);h+='<div class="crow" style="display:block'+(wd?';opacity:.6':'')+'"><p><strong>'+esc(dayLab(c.d))+'</strong>: '+esc(k?k[1]:"")+' <span class="tag">'+(mj?"major":"minor")+'</span>'+(inw?'':' <span class="tag">outside your window, not counted</span>')+(wd?' <span class="tag">withdrawn '+esc(dayLab(c.wd))+'</span>':'')+'</p>'+(c.note?'<p style="white-space:pre-wrap">'+esc(c.note)+'</p>':'')+(wd?'':'<p><button type="button" class="chip sm" data-a="em-fwd" data-id="'+c.id+'">Withdraw this entry</button></p>')+'</div>';});
+ return h;
+}
+function em3s3(){
+ var E=S.em,h=LC("em3s3.lesson");if(!E.cm)return emShell(3,3,h+emStatus());
+ var u=UI.emf||{};
+ h+='<div class="card"><h2>Log something that could also explain your numbers</h2><label for="emfd">The day it happened</label><input id="emfd" type="date" data-em="f:d" value="'+esc(u.d||today())+'" max="'+esc(today())+'" min="'+esc(addDays(E.cm.sch[0],-7))+'" style="max-width:200px">'+EMCONF.map(function(x){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(u.k===x[0])+'" data-a="em-fk" data-v="'+x[0]+'">'+esc(x[1])+'</button></p>';}).join("");
+ if(u.k==="other")h+='<label>Could this change your numbers a lot?</label><div class="row"><button type="button" class="chip" aria-pressed="'+(u.maj===true)+'" data-a="em-fmaj" data-v="yes">Yes, it could</button><button type="button" class="chip" aria-pressed="'+(u.maj===false)+'" data-a="em-fmaj" data-v="no">Probably not</button></div>';
+ h+='<label for="emfn">A note (optional)</label><textarea id="emfn" maxlength="300" data-em="f:note" style="min-height:60px">'+esc(u.note||"")+'</textarea><p><button type="button" class="btn ghost" data-a="em-fadd">Add to my list</button></p></div>';
+ var c=emConfs();h+='<div class="card"><h2>Your list</h2><p><strong>'+c.major.length+' major, '+c.minor.length+' minor</strong> around your sequence.</p>'+emConfHtml()+'</div>';
+ return emShell(3,3,h);
+}
+function em3s4(){
+ var E=S.em;return emShell(3,4,LC("em3s4.lesson")+'<div class="card"><h2>Your Week 3 summary</h2><div class="crow"><span>Emails logged as sent</span><strong>'+emSent().length+' of 3</strong></div><div class="crow"><span>Things that could explain the numbers</span><strong>'+(function(){var c=emConfs();return c.major.length+" major, "+c.minor.length+" minor";})()+'</strong></div><h3>Your decision</h3>'+[["next","Ready to read my result in Week 4"]].map(function(x){return '<p><button type="button" class="chip" aria-pressed="'+(E.dec3===x[0])+'" data-a="em-dec" data-w="3" data-v="'+x[0]+'">'+x[1]+'</button></p>';}).join("")+'</div>');
+}
+function em4s1(){return emShell(4,1,LC("em4s1.lesson")+LC("em4s1.examples"));}
+function em4s2(){
+ var E=S.em,h=LC("em4s2.lesson");if(!E.cm)return emShell(4,2,h+emStatus());
+ h+=rvCur()?rvPostNote():'';
+ h+='<div class="card"><h2>Your numbers for the whole sequence</h2><p class="mute">Count from your first send to '+esc(dayLab(emWin().to))+'. Use the link or code only this sequence uses. Unsubscribes and complaints are counted apart from sales.</p>'+emNumRow("res.clicks","Tracked clicks",E.res.clicks)+emNumRow("res.orders","Orders from your link or code",E.res.orders)+emNumRow("res.rev","Revenue from those orders",E.res.rev,true)+emNumRow("res.unsub","Unsubscribes",E.res.unsub)+emNumRow("res.compl","Spam complaints (if your tool shows them)",E.res.compl);
+ if(E.res.at)h+='<p class="mute">Last saved '+esc(dayLab(E.res.at))+(rvCur()&&E.res.at>rvDay30()?' <span class="tag">post-sprint update</span>':'')+'.</p>';
+ return emShell(4,2,h+'</div>');
+}
+function em4s3(){
+ var E=S.em,h=LC("em4s3.lesson");if(!E.cm)return emShell(4,3,h+emStatus());
+ var v=emVerdict(),cl={limited:"Limited. Too limited to support a confident conclusion.",lower:"Lower than usual. See the notes below.",fair:"Fair for a small test.",unclear:"Unclear.",none:""}[v.conf||"none"];
+ h+='<div class="card"><h2>Your evidence verdict</h2><div class="note '+v.cls+'"><strong>'+esc(v.label)+'</strong> <span class="tag">rule '+esc(v.rule)+'</span></div>'+(cl?'<p><strong>How much confidence?</strong> <span class="tag">'+esc(cl)+'</span></p>':'')+'<h3>What the numbers show</h3><ul>'+v.why.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><h3>What they cannot show</h3><ul>'+v.limits.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><h3>A reasonable next step</h3><ul>'+v.next.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+ h+='<div class="card"><h2>What was considered</h2><div class="crow"><span>Smallest group an email went to</span><strong>'+(emRecip()===null?"not recorded":emRecip())+'</strong></div><div class="crow"><span>Major things logged</span><strong>'+emConfs().major.length+'</strong></div><div class="crow"><span>Provisional settings used</span><strong>At least '+EMMINRECIP+' recipients to read a result, about '+EMCONFRECIP+' for a confident reading</strong></div><p class="mute">These are provisional testing assumptions, not proof of reliability and not a validated benchmark.</p></div>';
+ return emShell(4,3,h);
+}
+function em4s4(){
+ var E=S.em,v=emVerdict(),h=LC("em4s4.lesson")+'<div class="card"><h2>Your verdict was: '+esc(v.label)+'</h2><h3>What would you like to do?</h3>'+EMNEXT.map(function(x){return '<p><button type="button" class="chip" aria-pressed="'+(E.nx===x[0])+'" data-a="em-nx" data-v="'+x[0]+'">'+x[1]+'</button></p>';}).join("")+'<h3>Anything else?</h3>'+[["done","I am done with this experiment for now"]].map(function(x){return '<p><button type="button" class="chip" aria-pressed="'+(E.dec4===x[0])+'" data-a="em-dec" data-w="4" data-v="'+x[0]+'">'+x[1]+'</button></p>';}).join("")+'</div>';
+ return emShell(4,4,h);
+}
+function emBlockedNote(){return '<div class="note info">Weeks open in order. Finish the week before it first.</div>';}
+function emRouteInner(){
+ var m=/^#\/email(?:\/(w[1-4]))?(?:\/([1-5]))?$/.exec(route)||[],n=+(m[2]||0),wk=m[1]?+m[1].slice(1):(n?1:0);
+ if(!wk)return emHome(1);
+ if(!n)return emHome(wk);
+ var F=[null,[0,em1s1,em1s2,em1s3,em1s4,em1s5],[0,em2s1,em2s2,em2s3,em2s4,em2s5],[0,em3s1,em3s2,em3s3,em3s4],[0,em4s1,em4s2,em4s3,em4s4]];
+ return F[wk][n]?F[wk][n]():emHome(wk);
+}
+function emRoute(){
+ var m=/^#\/email(?:\/(w[1-4]))?(?:\/([1-5]))?$/.exec(route)||[],wk=m[1]||"",n=+(m[2]||0);
+ if(!emActive())return emPrep();
+ if(!wk&&!n)return emMySprint();
+ var w=wk?+wk.slice(1):1;
+ if(w>1&&!emWeekDone(w-2))return '<a class="back" href="#/sprint">&larr; My Sprint</a><h1>Week '+w+' is not open yet</h1><div class="note info">Week '+w+' opens when you finish Week '+(w-1)+'. <a href="#/email/w'+(w-1)+'">Go to Week '+(w-1)+'</a></div>';
+ return emRouteInner();
+}
+function emPrep(){
+ var P=S.em.prep,ph=SPR.loaded?rvPhase():"",ready=emPrepReady();
+ var h='<a class="back" href="#/experiments">&larr; Experiments</a><h1>Prepare for Email-to-Sale</h1><p class="mute">Get ready first. Nothing on this page starts your 30 days, and nothing here counts as completed experiment activity.</p>';
+ h+='<div class="card"><h2>What the experiment is</h2><p>Over four weeks you write a three email sequence for people who already agreed to hear from you. You send it from your own email tool, and count what comes back from a link or code only this sequence uses. You read the result honestly, and decide what is next. The Sales Lab never sends emails for you.</p></div>';
+ h+='<div class="card"><h2>The four weeks, in plain words</h2><ol>'+EMWKT.map(function(t,i){return '<li><strong>Week '+(i+1)+': '+esc(t)+'.</strong> '+esc(EMWKD[i])+'</li>';}).join("")+'</ol><p class="mute">About 3 to 5 hours a week. You can read ahead, and you can go at your own pace inside each week.</p></div>';
+ h+='<div class="card"><h2>What you need before it can start</h2><p><strong>Do you have an email list of people who agreed to hear from you?</strong></p><div class="row"><button type="button" class="chip" aria-pressed="'+(P.list==="yes")+'" data-a="em-plist" data-v="yes">Yes</button><button type="button" class="chip" aria-pressed="'+(P.list==="no")+'" data-a="em-plist" data-v="no">Not yet</button></div><p style="margin-top:12px"><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(P.tool===true)+'" data-a="em-ptool">I have an email tool I can send from, and it adds an unsubscribe link.</button></p>';
+ if(P.list==="no")h+='<div class="note info"><strong>That is fine.</strong> Only email people who agreed to hear from you. A free download or a sign-up form on your own site is the usual way to build one. Come back when you have a list. Your 30 days will not start until then, and you choose when to begin.</div>';
+ h+='<p class="mute">The sprint starts only when you press the start button yourself.</p></div>';
+ if(!SPR.loaded)h+='<div class="note warn" role="status">We could not check your sprint just now. Please refresh the page.</div>';
+ else if(emActive())h+='<div class="note ok">You are already on this experiment. <a href="#/sprint">Open My Sprint</a>.</div>';
+ else if(ph==="during")h+='<div class="note info">You already have a sprint running. You can start Email-to-Sale after Day 30, if you wish.</div>';
+ else if(ready)h+='<div class="card"><h2>Ready when you are</h2><p>You have a list and a tool. You will check the list properly in Week 1.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("email",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
+ else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both are needed: a list of people who agreed to hear from you, and a tool to send from.</div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It does not need a list. It borrows other people\'s audiences.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p class="mute">Show-to-Sell, Find Your Buyers and LIVE Sales are coming soon, and are not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ return h;
+}
+function emMySprint(){
+ var wk=emCurWeek(),W=emWeeks()[wk-1];
+ var h='<h1>My Sprint</h1><p class="mute">Email-to-Sale &middot; Week '+wk+' of 4</p>'+sprintBar(true);
+ h+='<div class="tabs rwpick">'+emWeeks().map(function(w){var g=rSvg("-50 -50 100 100",rWeekG(w.n,w.open,"#fff"));return w.open?'<a class="chip rwb" aria-pressed="'+(w.n===wk)+'" href="#/email/w'+w.n+'">'+g+'<b>'+esc(w.title)+'</b>Week '+w.n+(w.state==="done"?' &#10003;':'')+'</a>':'<button type="button" class="chip rwb" disabled title="Opens when you finish Week '+(w.n-1)+'">'+g+'<b>'+esc(w.title)+'</b>Week '+w.n+'</button>';}).join("")+'</div>';
+ h+='<p class="mute"><strong>This week:</strong> '+esc(EMWKD[wk-1])+'</p>'+(wk===1?'<p class="mute">Week 2 opens when you finish Week 1 (choose "Ready for Week 2" in the last step).</p>':'');
+ var pn=String(S.focus.product||"").trim();if(pn)h+='<div class="note ok"><strong>Your product:</strong> '+esc(pn)+'</div>';
+ h+='<div class="card"><h2>Week '+W.n+': '+esc(W.title)+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,emWeekBase(W.n)+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+ return h+'<p class="mute"><a href="#/experiments">See all six experiments, and the sales check</a></p>';
+}
+function emPair(o,money){return emFmt(o,money);}
+function emResultsPage(){
+ var E=S.em,v=emVerdict(),ph=rvPhase(),started=emStepCount()>0||!!E.cm,sd=emSent().length,h='<div class="phd"><h1>Results</h1><p class="mute">Your numbers, what they show, and what you learned. Counts, not percentages, while samples are small.</p>';
+ if(started)h+='<div class="rtally"><div><h3>You did</h3><p><b>'+emStepCount()+'</b>Steps done</p><p><b>'+sd+' of 3</b>Emails sent</p><p><b>'+(E.cm?"1":"0")+'</b>Plan committed</p></div><div><h3>Came back</h3><p><b>'+esc(emFmt(E.res.clicks))+'</b>Tracked clicks</p><p><b>'+esc(emFmt(E.res.unsub))+'</b>Unsubscribes</p><p><b>'+esc(emFmt(E.res.compl))+'</b>Spam complaints</p></div><div><h3>Sold</h3><p><b>'+esc(emFmt(E.res.orders))+'</b>Orders from your link or code</p><p><b>'+esc(emFmt(E.res.rev,true))+'</b>Revenue from those orders</p></div></div>';
+ h+='</div><!--/phd--><div class="rcols"><div>';
+ h+='<div class="card"><h2>Where you started</h2><p class="mute">The last 30 days before your sprint, from Week 1, step 2. "I can\'t see this" stays unknown and is never turned into zero.</p><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(emFmt(E.ls.size))+'</b>People on your list</div><div class="tile"><b style="font-size:20px">'+esc(emFmt(E.ls.sent30))+'</b>Emails sent</div><div class="tile"><b style="font-size:20px">'+esc(emFmt(E.ls.orders30))+'</b>Orders from email</div></div><p class="mute">Revenue from email: '+esc(emFmt(E.ls.rev30,true))+'.</p></div>';
+ h+='<div class="card"><h2>Your sprint so far</h2><p class="mute">'+esc(rvClock())+'</p>';
+ if(E.cm){var w=emWin();h+='<p>Your sequence: <strong>'+esc(E.cm.what)+'</strong>, '+sd+' of 3 sent.</p>'+(w?'<p class="mute">Watching until '+esc(dayLab(w.to))+'. Read your numbers from '+esc(dayLab(w.readOn))+'.</p>':'');}
+ else h+='<p class="mute">No plan is committed yet. You commit it in <a href="#/email/w2/5">Week 2, step 5</a>.</p>';
+ h+='</div>';
+ if(started)h+='<section class="rpnl gold rread"><small>What the evidence suggests</small><h2>'+(ph==="during"&&v.rule!=="M2"?"Provisional reading: ":"")+esc(v.label)+'</h2><p>'+esc(v.why[0]||"")+'</p><p class="mute">A reading, not a verdict. An improvement you can see is not proof that your emails caused it. <span class="tag">rule '+v.rule+'</span>'+(v.conf&&v.conf!=="none"?' <span class="tag">confidence: '+esc(v.conf)+'</span>':'')+'</p></section>';
+ h+='</div><div class="rside"><div class="card"><h2>Day 30 review</h2>'+(S.rv.done?'<p>Saved on '+esc(dayLab(S.rv.at))+': '+esc(S.rv.snap?S.rv.snap.label:"")+'.</p>':'<p class="mute">'+(started?"Look back at your sprint, see what the evidence suggests, and choose what to focus on next. You can open it at any time.":"Available once your sprint has started.")+'</p>')+'<p><a class="btn'+(S.rv.done?' ghost':'')+'" href="#/review">Open my Day 30 review</a></p></div>';
+ var c=emConfs(),learn=[];if(E.cf.length)learn.push("Things that could also explain your numbers: "+c.major.length+" major, "+c.minor.length+" minor");
+ if(E.nx){var nx=EMNEXT.filter(function(x){return x[0]===E.nx;})[0];if(nx)learn.push("What you decided next: "+nx[1]);}
+ h+='<div class="card"><h2>What you have learned</h2>'+(learn.length?learn.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join(""):'<p class="mute">Your own notes and choices from Weeks 2 to 4 appear here as you go.</p>')+'</div><div class="card"><h2>Past sprints</h2>'+rvPastHtml()+'</div>';
+ return h+'</div></div>';
+}
+function emReviewHead(){
+ var E=S.em,v=emVerdict(),rec=emRec(v),ph=rvPhase(),prov=ph==="during"||rec.provisional,sd=emSent().length;
+ var h='<a class="back" href="#/results">&larr; Results</a><h1>Your Day 30 review</h1><p class="mute">Email-to-Sale. A look at where you started, what you did, what the evidence suggests, and what to focus on next.</p>'+sprintBar(true);
+ h+='<div class="card"><h2>1. Where you started, and where you are now</h2><p class="mute">Your starting numbers are the 30 days before your sprint. Your sequence numbers cover this sequence only. We show them side by side and we do not label the difference as better or worse, because the two are not like for like.</p><div class="crow" style="display:block"><p style="margin:0"><strong>Orders from email</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(emFmt(E.ls.orders30))+'. This sequence: '+esc(emFmt(E.res.orders))+'.</p></div><div class="crow" style="display:block"><p style="margin:0"><strong>Revenue from email</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(emFmt(E.ls.rev30,true))+'. This sequence: '+esc(emFmt(E.res.rev,true))+'.</p></div></div>';
+ h+='<div class="card"><h2>2. What you did</h2><p>Steps completed: '+EMWKT.map(function(t,i){return "Week "+(i+1)+" "+rCount(emStepsOf(i),emDOf(i))+" of "+emStepsOf(i).length;}).join(", ")+'.</p><p>Emails sent: '+sd+' of 3. Unsubscribes and complaints are kept apart from sales.</p><div class="note info">You do not need to have finished every step. Anything unfinished stays saved and you can come back to it.</div></div>';
+ h+='<div class="card"><h2>3. What the evidence suggests</h2><div class="note '+v.cls+'"><strong>'+(prov?"Provisional reading: ":"")+esc(v.label)+'</strong> <span class="tag">rule '+v.rule+'</span>'+(v.conf&&v.conf!=="none"?' <span class="tag">confidence: '+esc(v.conf)+'</span>':'')+'</div><h3>What the numbers show</h3>'+v.why.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("")+'<h3>What remains uncertain</h3>'+v.limits.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("")+'<p style="margin:4px 0">This is a reading, not a verdict. The thresholds behind it are provisional starting points, not guarantees.</p><h3>What to focus on next</h3><div class="note info"><strong>'+esc(rec.t)+'</strong><br>'+esc(rec.b)+'</div><p><strong>First small action:</strong> '+esc(rec.first)+'</p>'+(rec.extra?'<p>'+esc(rec.extra)+'</p>':'')+'<p class="mute"><strong>Evidence:</strong> '+esc(rec.basis)+'</p><p class="mute"><strong>Assumption:</strong> '+esc(rec.assume)+'</p></div>';
+ return h;
+}
+function emPastSummary(p){
+ if(p.exp!=="email"||!p.emx)return "";
+ var x=p.emx,keep=S.em;S.em=x;var h;try{var w=emWin();h=x.cm?'<p class="mute" style="margin:2px 0 6px">Sequence: '+esc(x.cm.what)+', '+emSent().length+' of 3 sent. Tracked clicks '+esc(emFmt(x.res.clicks))+', orders '+esc(emFmt(x.res.orders))+'.</p>':'<p class="mute" style="margin:2px 0 6px">No sequence was committed in this sprint.</p>';}finally{S.em=keep;}
+ return h;
+}
+function emPastFix(x){
+ var okd=function(y){return (typeof y==="string"&&(y===""||parseYmd(y)!=null))?y:"";},st=function(y,n){return typeof y==="string"?y.slice(0,n):"";},nm=function(y){return (typeof y==="number"&&isFinite(y)&&y>=0&&y<100000)?Math.floor(y):0;};
+ var rvt=rvfix({rv:{snap:x.snap,upd:x.upd,done:!!x.snap}}).rv;
+ return {exp:"email",sid:nm(x.sid),auto:x.auto===true,start:okd(x.start),archivedAt:okd(x.archivedAt),label:st(x.label,40),rule:st(x.rule,4),review:x.review===true,snap:rvt.snap,upd:rvt.upd,emx:emfix({em:x.emx}).em};
+}
+function emArchive(prev){
+ var snap=S.rv.snap,auto=false;if(!snap){snap=emSnap("day30");auto=true;}
+ var e={exp:"email",sid:prev.id,start:prev.start_day,archivedAt:today(),label:snap.label,rule:snap.rule,review:!!S.rv.done,auto:auto,snap:snap,upd:S.rv.upd.slice(0,20),emx:clone(S.em)};
+ S.past=(S.past||[]);if(S.past.length>=10)S.past.shift();S.past.push(e);
+}
+function pumDraft(){if(!UI.pum)UI.pum={i:-1,res:{clicks:{s:"",v:""},orders:{s:"",v:""},rev:{s:"",v:""},unsub:{s:"",v:""},compl:{s:"",v:""}}};return UI.pum;}
+function emPastLate(p,i){
+ if(!(UI.pum&&UI.pum.i===i))return '<p><button type="button" class="btn ghost" data-a="pum-open" data-i="'+i+'">Add late email numbers to this sprint</button></p>';
+ var u=pumDraft(),h='<p class="mute">Add what you can now see for this earlier sprint. They belong to this sprint only, and do not change your current sprint or the Day 30 position. Leave anything you do not want to change.</p>';
+ [["clicks","Tracked clicks"],["orders","Orders from your link or code"],["rev","Revenue from those orders"],["unsub","Unsubscribes"],["compl","Spam complaints"]].forEach(function(k){var o=u.res[k[0]],opts=[["value","A number"],["zero","Zero, I checked"],["unknown","I can't see this"]];h+='<div class="q"><strong>'+esc(k[1]+(k[0]==="rev"?" ("+sym(S.focus.currency).trim()+")":""))+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="pum-vs" data-k="'+k[0]+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="9" data-pum="'+k[0]+'" value="'+esc(o.v)+'" aria-label="'+esc(k[1])+'" style="max-width:160px">':'')+'</div>';});
+ return h+'<p class="row"><button type="button" class="btn" data-a="pum-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pum-cancel">Cancel</button></p>';
+}
+function pumAction(a,d){
+ var u=UI.pum||null;
+ if(a==="pum-open"){var i=+d.i,p=(S.past||[])[i];if(!p||p.exp!=="email"||!p.emx||!pastWinOpen(p))return;UI.pum=null;u=pumDraft();u.i=i;}
+ else if(a==="pum-cancel"){UI.pum=null;}
+ else if(a==="pum-vs"){u=pumDraft();if(!u.res[d.k]||!ETVS[d.v]||d.v==="")return;var o=u.res[d.k];o.s=o.s===d.v?"":d.v;if(o.s!=="value")o.v="";}
+ else if(a==="pum-save"){
+  if(!u)return;var p2=(S.past||[])[u.i];if(!p2||p2.exp!=="email"||!p2.emx||!pastWinOpen(p2))return;
+  var any=false;Object.keys(u.res).forEach(function(k){var o=u.res[k];if(o.s){any=true;p2.emx.res[k]={s:o.s,v:o.s==="value"?w4Clean(k,o.v):""};}});
+  if(!any)return;p2.emx.res.at=today();
+  var keep=S.em;S.em=p2.emx;var v;try{v=emVerdict();}finally{S.em=keep;}
+  var e={at:today(),label:v.label,rule:v.rule,ctr:{msgs:0,resp:0,opp:0},res:{},kind:"update",asOf:"",late:false,prov:false};
+  p2.upd=p2.upd||[];if(p2.upd.length&&p2.upd[p2.upd.length-1].at===e.at)p2.upd[p2.upd.length-1]=e;else if(p2.upd.length<RVMAX)p2.upd.push(e);else return;
+  UI.pum=null;save();
+ }
+ else return;
+ render();
+}
+function pumInput(t){var u=pumDraft(),k=String(t.dataset.pum),o=u.res[k];if(o&&o.s==="value"){var c=w4Clean(k,t.value);o.v=c;if(c!==t.value)t.value=c;}}
+
+/* --- actions and input --- */
+function emSetPath(path,val){
+ var p=String(path).split("."),o=S.em;for(var i=0;i<p.length-1;i++){o=o[/^\d$/.test(p[i])?+p[i]:p[i]];if(o==null)return false;}
+ o[/^\d$/.test(p[p.length-1])?+p[p.length-1]:p[p.length-1]]=val;return true;
+}
+var EMTXT=/^(of\.(product|who|goal|ref)|mk\.[0-2]\.(subj|hook|val|ask|ps))$/;
+function emAddConf(){
+ var E=S.em,u=UI.emf||{};if(!E.cm||E.cf.length>=60)return false;
+ var d=u.d||today();if(parseYmd(d)==null||d>today()||d<addDays(E.cm.sch[0],-7))return false;
+ if(!emConfKind(u.k))return false;if(u.k==="other"&&u.maj!==true&&u.maj!==false)return false;
+ E.cf.push({id:E.nid++,d:d,at:today(),k:u.k,maj:u.k==="other"?u.maj===true:true,note:String(u.note||"").trim().slice(0,300),wd:""});UI.emf=null;return true;
+}
+function emLogDate(i,v){
+ var E=S.em;if(!E.cm||!(i>=0&&i<3))return false;
+ if(v===""){E.sd[i].d="";E.sd[i].n={s:"",v:""};return true;}
+ if(parseYmd(v)==null||v>today()||v<E.cm.at)return false;
+ if(rvCur()&&v<rvStart())return false;
+ E.sd[i].d=v;return true;
+}
+function emAction(a,d){
+ var E=S.em;
+ if(a==="em-done"){var st=[E.steps,E.steps2,E.st3,E.st4][(+d.w)-1];if(!st||!/^[1-5]$/.test(String(d.n))||+d.n>EMSTEPS[(+d.w)-1].length)return;st[d.n]=!st[d.n];save();}
+ else if(a==="em-dec"){var w=+d.w;if(w===1&&d.v==="next")E.dec=E.dec===d.v?"":d.v;else if(w===2&&d.v==="next")E.dec2=E.dec2===d.v?"":d.v;else if(w===3&&d.v==="next")E.dec3=E.dec3===d.v?"":d.v;else if(w===4&&d.v==="done")E.dec4=E.dec4===d.v?"":d.v;else return;save();}
+ else if(a==="em-q"){UI.emq=UI.emq||{};UI.emq[d.q]=d.v;}
+ else if(a==="em-src"){if(EMS.f.ls.f.src.v.indexOf(d.v)<0||d.v==="")return;E.ls.src=E.ls.src===d.v?"":d.v;save();}
+ else if(a==="em-ck"){if(!EMCK.some(function(x){return x[0]===d.k;})||["yes","no","unsure"].indexOf(d.v)<0)return;E.ck[d.k]=E.ck[d.k]===d.v?"":d.v;save();}
+ else if(a==="em-trk"){if(["link","code","none"].indexOf(d.v)<0||E.cm)return;E.of.trk=E.of.trk===d.v?"":d.v;save();}
+ else if(a==="em-vs"){if(!EMVSPATH.test(String(d.p))||!ETVS[d.v]||d.v==="")return;if(/^sd\./.test(d.p)&&!E.cm)return;if(/^res\./.test(d.p)&&!E.cm)return;var o=emGet(d.p);if(!o)return;o.s=o.s===d.v?"":d.v;if(o.s!=="value")o.v="";if(/^res\./.test(d.p))E.res.at=today();save();}
+ else if(a==="em-tick"){if(E.cm||!EMTICKS.some(function(t){return t[0]===d.k;}))return;if(E.ticks[d.k])delete E.ticks[d.k];else E.ticks[d.k]=true;save();}
+ else if(a==="em-confirm"){if(!emReady().ok)return;UI.emc=true;}
+ else if(a==="em-cancel"){UI.emc=false;}
+ else if(a==="em-commit"){if(!UI.emc)return;UI.emc=false;if(!emCommit())return;save();}
+ else if(a==="em-fk"){if(!emConfKind(d.v))return;UI.emf=UI.emf||{};UI.emf.k=UI.emf.k===d.v?"":d.v;if(UI.emf.k!=="other")delete UI.emf.maj;}
+ else if(a==="em-fmaj"){UI.emf=UI.emf||{};if(UI.emf.k!=="other"||(d.v!=="yes"&&d.v!=="no"))return;UI.emf.maj=d.v==="yes";}
+ else if(a==="em-fadd"){if(!emAddConf())return;save();}
+ else if(a==="em-fwd"){var c=E.cf.filter(function(x){return x.id===+d.id;})[0];if(!c||c.wd)return;c.wd=today();save();}
+ else if(a==="em-nx"){if(!EMNEXT.some(function(x){return x[0]===d.v;}))return;E.nx=E.nx===d.v?"":d.v;save();}
+ else if(a==="em-plist"){if(d.v!=="yes"&&d.v!=="no")return;E.prep.list=E.prep.list===d.v?"":d.v;if(E.prep.list!=="yes")E.prep.tool=false;save();}
+ else if(a==="em-ptool"){if(E.prep.list!=="yes")return;E.prep.tool=!E.prep.tool;save();}
+ else return;
+ render();
+}
+function emInput(t){
+ var E=S.em,k=String(t.dataset.em);
+ if(k==="f:d"){var v=String(t.value||"");UI.emf=UI.emf||{};if(v===""||parseYmd(v)!=null)UI.emf.d=v;return;}
+ if(k==="f:note"){UI.emf=UI.emf||{};UI.emf.note=t.value.slice(0,300);return;}
+ if(k.indexOf("n:")===0){var p=k.slice(2);if(!EMVSPATH.test(p))return;var o=emGet(p);if(o&&o.s==="value"){var c=w4Clean("n",t.value);o.v=c;if(c!==t.value)t.value=c;if(/^res\./.test(p)&&E.cm)E.res.at=today();save();}return;}
+ if(E.cm&&(/^(of|mk)\./.test(k)||/^sch\./.test(k)))return;
+ if(EMTXT.test(k)){var n=/ps$|ask$/.test(k)?300:(/subj$/.test(k)?100:(/hook$/.test(k)?400:(/val$/.test(k)?600:200)));if(/^of\.(product)$/.test(k))n=120;emSetPath(k,String(t.value).slice(0,n));save();return;}
+ if(/^sch\.[0-2]$/.test(k)){var dv=String(t.value||"");if(dv===""||parseYmd(dv)!=null){emSetPath(k,dv);save();render();}return;}
+ if(k==="ls.last"){var lv=String(t.value||"");if(lv===""||(parseYmd(lv)!=null&&lv<=today())){E.ls.last=lv;save();}return;}
+ var m=/^sd\.([0-2])\.d$/.exec(k);if(m){if(emLogDate(+m[1],String(t.value||""))){save();render();}return;}
+}
+
+/* --- the experiment adapter, for Email-to-Sale (outer wrappers: Email first, then Etsy, then Partnership) --- */
+EXPKEY.email="email";EXPOPEN.email=true;
+var _rvExp5=rvExp;rvExp=function(){return emActive()?"email":_rvExp5();};
+var _xaName5=xaName;xaName=function(){return emActive()?"Email-to-Sale":_xaName5();};
+var _xaTotal5=xaTotal;xaTotal=function(){return emActive()?EMTOTAL:_xaTotal5();};
+var _xaW45=xaW4;xaW4=function(){return emActive()?"#/email/w4/2":_xaW45();};
+var _xaW4S5=xaW4Step;xaW4Step=function(){return emActive()?2:_xaW4S5();};
+var _sprHasWork5=sprHasWork;sprHasWork=function(){return emActive()?emHasWork():_sprHasWork5();};
+var _rvSnap5=rvSnap;rvSnap=function(k){return emActive()?emSnap(k):_rvSnap5(k);};
+var _tabOf5=tabOf;tabOf=function(r){r=r||"#/";if(/^#\/email(\/|$)/.test(r))return emActive()?"sprint":"exp";return _tabOf5(r);};
+var _rWeeks5=rWeeks;rWeeks=function(){return emActive()?emWeeks():_rWeeks5();};
+var _rTrack5=rTrack;
+rTrack=function(){
+ if(!emActive())return _rTrack5();
+ return '<div class="rweeks">'+emWeeks().map(function(w){var inner='<small>Week '+w.n+'</small><b>'+esc(w.title)+'</b>'+rBars(w)+'<em>'+esc(w.status)+'</em>';return w.open?'<a class="rwk '+w.state+'" href="#/email/w'+w.n+'">'+inner+'</a>':'<div class="rwk later">'+inner+'</div>';}).join("")+'</div>';
+};
+var _rNext5=rNext;
+rNext=function(){
+ if(!(emActive()&&(SPR.loaded?rvPhase():"during")==="during"))return _rNext5();
+ var wk=emCurWeek(),W=emWeeks()[wk-1],first=W.first;
+ if(!first)return {k:"Your next step",t:"Open your results",d:"You have finished every step. Your results, your evidence reading and your Day 30 review are in one place.",link:"#/results",b:"Open my results"};
+ var s=W.L[first-1];
+ return {k:"Your next step",t:s.t,d:"You will need: "+s.b+" Everything saves as you go.",m:s.m,link:emWeekBase(wk)+first,b:"Continue Week "+wk+", step "+first,w:wk,n:first};
+};
+var _rHomeList5=rHomeList;
+rHomeList=function(nx){
+ var ph=SPR.loaded?rvPhase():"during";
+ if(!emActive()||ph!=="during")return _rHomeList5(nx);
+ var W=emWeeks()[emCurWeek()-1];
+ return '<div class="card"><h2>Week '+W.n+': '+esc(W.title)+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,emWeekBase(W.n)+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+};
+var _rSoFar5=rSoFar;
+rSoFar=function(){
+ if(!emActive())return _rSoFar5();
+ var E=S.em,h='<div class="card"><h2>Your sprint so far</h2>';
+ if(!emStepCount()&&!E.cm)return h+'<p class="mute">Your numbers appear here once you begin. What you did, what came back and what sold are always kept apart.</p></div>';
+ h+='<div class="tiles"><div class="tile"><b>'+emStepCount()+'</b><span>Steps done</span></div><div class="tile"><b>'+emSent().length+' of 3</b><span>Emails sent</span></div><div class="tile"><b aria-hidden="true">'+(E.cm?"&#10003;":"&ndash;")+'</b><span>Plan committed<span class="sr">: '+(E.cm?"yes":"not yet")+'</span></span></div></div>';
+ return h+'<p><a class="link" href="#/results">Open your results</a></p></div>';
+};
+var _home5=home;home=function(){return emActive()?emMySprint():_home5();};
+var _resultsPage5=resultsPage;resultsPage=function(){return emActive()?emResultsPage():_resultsPage5();};
+var _reviewPage5=reviewPage;
+reviewPage=function(){
+ if(!emActive())return _reviewPage5();
+ var tail=_reviewPage5(),i=tail.indexOf('<div class="card"><h2>4. Complete your review</h2>');
+ return emReviewHead()+(i>-1?tail.slice(i):"");
+};
+var _etBlockP5=etBlockP;etBlockP=function(){return emActive()?/^#\/(step\/[1-7]|w[234]\/[1-6])$/.test(route||""):_etBlockP5();};
+var _etBlockHtml5=etBlockHtml;etBlockHtml=function(){return emActive()?_etBlockHtml5().replace("This is your Etsy sprint","This is your email sprint"):_etBlockHtml5();};
 
 /* ---------- H1: navigation shell (14 Nov 2026). Home, My Sprint, Experiments, Results, Community (when switched on), Profile. ---------- */
 var NAVI={
@@ -3714,6 +4294,8 @@ document.addEventListener("click",function(e){
  if(a.indexOf("et3-")===0){et3Action(a,d);return;}
  if(a.indexOf("et4-")===0){et4Action(a,d);return;}
  if(a.indexOf("pue-")===0){puEAction(a,d);return;}
+ if(a.indexOf("pum-")===0){pumAction(a,d);return;}
+ if(a.indexOf("em-")===0){emAction(a,d);return;}
  if(a.indexOf("et-")===0){etAction(a,d,t);return;}
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
@@ -3757,6 +4339,8 @@ document.addEventListener("input",function(e){
  else if(t.dataset.pu){puInput(t);}
  else if(t.dataset.et){etInput(t);}
  else if(t.dataset.pue){puEInput(t);}
+ else if(t.dataset.pum){pumInput(t);}
+ else if(t.dataset.em){emInput(t);}
  else if(t.dataset.sk){S.sketch[t.dataset.sk]=S.sketch[t.dataset.sk]||{};S.sketch[t.dataset.sk].note=t.value;save();}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="signin"&&e.target.dataset&&e.target.dataset.auth){e.preventDefault();if(e.target.dataset.auth==="email")sendCode();else if(e.target.dataset.auth==="code")verifyCode();else if(e.target.dataset.auth==="pw")pwLogin();}});
@@ -4207,7 +4791,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,emActive:emActive,emPrepReady:emPrepReady,emPrep:emPrep,emRoute:emRoute,emWeeks:emWeeks,emWeekDone:emWeekDone,emCurWeek:emCurWeek,emStepCount:emStepCount,emHasWork:emHasWork,emStart:emStart,emFresh:emFresh,emArchive:emArchive,emPastFix:emPastFix,emRec:emRec,emMySprint:emMySprint,emResultsPage:emResultsPage,emReviewHead:emReviewHead,emPastLate:emPastLate,pumAction:pumAction,pumInput:pumInput,emPastSummary:emPastSummary,emAction:emAction,emInput:emInput,emfix:emfix,emVerdict:emVerdict,emSnap:emSnap,emListCheck:emListCheck,emSchCheck:emSchCheck,emDraftCheck:emDraftCheck,emCompose:emCompose,emReady:emReady,emCommit:emCommit,emSent:emSent,emWin:emWin,emConfs:emConfs,emRecip:emRecip,emCaveats:emCaveats,emRouteInner:emRouteInner,emHome:emHome,em1s1:em1s1,em1s2:em1s2,em1s3:em1s3,em1s4:em1s4,em1s5:em1s5,em2s1:em2s1,em2s2:em2s2,em2s3:em2s3,em2s4:em2s4,em2s5:em2s5,em3s1:em3s1,em3s2:em3s2,em3s3:em3s3,em3s4:em3s4,em4s1:em4s1,em4s2:em4s2,em4s3:em4s3,em4s4:em4s4,emLogDate:emLogDate,emAddConf:emAddConf,xaNameOf:xaNameOf,pastSummary:pastSummary,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
