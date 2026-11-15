@@ -58,8 +58,8 @@ async function signOutAll(){
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function keysOf(o){var m={};Object.keys(o).forEach(function(k){m[k]=JSON.stringify(o[k]);});return m;}
 function changedKeys(){var out=[];if(!S)return out;Object.keys(S).forEach(function(k){if(SYNC.bk[k]!==JSON.stringify(S[k]))out.push(k);});return out;}
-function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF(),past:[],chk:CHKDEF(),et:ETDEF(),em:EMDEF()};}
-function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return emfix(etfix(d5fix(rvfix(w4fix(w3fix(w2fix(o)))))));}
+function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF(),past:[],chk:CHKDEF(),et:ETDEF(),em:EMDEF(),sts:STSDEF()};}
+function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return stsfix(emfix(etfix(d5fix(rvfix(w4fix(w3fix(w2fix(o))))))));}
 
 /* ---------- local mirror: survives a closed tab or a dropped connection ---------- */
 function mirrorKey(){return ME?"wsl_mirror_"+ME.id:null;}
@@ -887,7 +887,7 @@ function render(){
   var m=(route||"#/").match(/^#\/step\/(\d)/),m2=(route||"#/").match(/^#\/w2\/([1-6])$/),m3=(route||"#/").match(/^#\/w3\/([1-6])$/),m4=(route||"#/").match(/^#\/w4\/([1-6])$/);
   if(route==="#/admin"&&ME&&ME.admin){html=adminHtml();if(!ADMIN.members&&!ADMIN.busy)adminLoad();}
   else if(/^#\/community/.test(route)&&FLAGS.community===true)html=communityHtml();
-  else if(etBlockP())html=etBlockHtml();else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(/^#\/etsy(\/w[1-4])?(\/[1-6])?$/.test(route))html=etRoute();else if(/^#\/email(\/w[1-4])?(\/[1-5])?$/.test(route))html=emRoute();else if(route==="#/profile")html=profilePage();else html=homeHub();
+  else if(etBlockP())html=etBlockHtml();else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(/^#\/etsy(\/w[1-4])?(\/[1-6])?$/.test(route))html=etRoute();else if(/^#\/email(\/w[1-4])?(\/[1-5])?$/.test(route))html=emRoute();else if(/^#\/show(\/w[1-4])?(\/[1-5])?$/.test(route))html=stsRoute();else if(route==="#/profile")html=profilePage();else html=homeHub();
   html=rHead(html);
  }
  var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);try{rEnhance();}catch(e){}try{shellNav();}catch(e){}try{comPhotoFill();}catch(e){}
@@ -2199,7 +2199,7 @@ function rvPastHtml(){
   h+=pastSummary(p);(p.upd||[]).forEach(function(u){h+=rvUpdRow(u,p.exp);});
   if(open){
    h+='<div class="note info">The update window for this earlier sprint is open until '+esc(dayLab(pastEndDay(p)))+'. Results you add here belong to this sprint only. They do not change your current sprint or your Day 30 position.</div>';
-   if(p.exp==="etsy"){h+=etPastLate(p,i);}else if(p.exp==="email"){h+=emPastLate(p,i);}else if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
+   if(p.exp==="etsy"){h+=etPastLate(p,i);}else if(p.exp==="email"){h+=emPastLate(p,i);}else if(p.exp==="show"){h+=stsPastLate(p,i);}else if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
    else h+='<p><button type="button" class="btn ghost" data-a="pu-open" data-i="'+i+'">Add a late result to this sprint</button></p>';
   } else if(today()>pastEndDay(p))h+='<p class="mute">The update window for this sprint closed on '+esc(dayLab(pastEndDay(p)))+'.</p>';
   rows.push(h+'</div>');
@@ -3011,8 +3011,8 @@ function etRouteInner(){
    back at the functions that were already there. Wrappers capture the earlier definition and fall through to it
    unless the sprint in progress is an Etsy one. */
 var EXPKEY={partnership:"part",etsy:"etsy"};
-function xaNameOf(e){return e==="etsy"?"Etsy Sales Bottleneck":(e==="email"?"Email-to-Sale":"Partnership-to-Sales");}
-function pastSummary(p){return p.exp==="etsy"?etPastSummary(p):(p.exp==="email"?emPastSummary(p):"");}
+function xaNameOf(e){return e==="etsy"?"Etsy Sales Bottleneck":(e==="email"?"Email-to-Sale":(e==="show"?"Show-to-Sell":"Partnership-to-Sales"));}
+function pastSummary(p){return p.exp==="etsy"?etPastSummary(p):(p.exp==="email"?emPastSummary(p):(p.exp==="show"?stsPastSummary(p):""));}
 EXPOPEN.etsy=true;
 var ETWKT=["Diagnose","Change one thing","Hold and watch","Read the result"];
 var ETTOTAL=24;
@@ -3085,7 +3085,7 @@ function etRec(v){
  return {t:t,b:b,first:f,extra:x,basis:bs,assume:as,provisional:rvPhase()==="during"||r==="E2"};
 }
 function rvUpdRow(u,exp){
- if(exp==="etsy"||exp==="email")return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">'+(exp==="etsy"?"Etsy":"Email")+' evidence reading updated</span></span><span class="tag">'+esc(u.label)+'</span></div>';
+ if(exp==="etsy"||exp==="email"||exp==="show")return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">'+(exp==="etsy"?"Etsy":(exp==="show"?"Show-to-Sell":"Email"))+' evidence reading updated</span></span><span class="tag">'+esc(u.label)+'</span></div>';
  return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';
 }
 /* ===== ETSY E4 LOGIC END ===== */
@@ -3097,8 +3097,9 @@ var _sprArchive=sprArchive;
 sprArchive=function(prev){
  if(prev&&prev.experiment==="etsy"){etArchive(prev);etResetP();}
  else if(prev&&prev.experiment==="email"){emArchive(prev);etResetP();}
+ else if(prev&&prev.experiment==="show"){stsArchive(prev);etResetP();}
  else{_sprArchive(prev);}
- S.et=etFresh(S.et.prep);S.em=emFresh(S.em.prep);
+ S.et=etFresh(S.et.prep);S.em=emFresh(S.em.prep);S.sts=stsFresh(S.sts.prep);
 };
 var _d5fix=d5fix;
 d5fix=function(o){
@@ -3106,6 +3107,7 @@ d5fix=function(o){
  src.forEach(function(x){
   if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="etsy"){out.push(etPastFix(x));}
   else if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="email"){out.push(emPastFix(x));}
+  else if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="show"){out.push(stsPastFix(x));}
   else{var t=_d5fix({past:[x]});if(t.past.length)out.push(t.past[0]);}
  });
  var r=_d5fix(o);r.past=out.slice(-10);return r;
@@ -3171,37 +3173,39 @@ experimentsPage=function(){
   if(!open)return c+'<p class="rxm"><strong>Coming soon.</strong> Not open yet, so it cannot be started.</p></div></li>';
   if(!SPR.loaded)return c+'<p class="rxm">We could not check your sprint just now. Please refresh the page.</p></div></li>';
   if(ph==="during"){c+=cx===x[0]?'<p class="rxm"><strong>Your current experiment.</strong> '+esc(rvClock())+'. Find it under <a href="#/sprint">My Sprint</a>. You can start your next sprint after Day 30.</p>':'<p class="rxm">You already have a sprint running. You can start this one after Day 30.</p>';return c+'</div></li>';}
-  var key=x[0]==="etsy"?"etsy":(x[0]==="email"?"email":"partnership"),label=ph==="notstarted"?"Start my 30-day sprint":"Start another sprint";
+  var key=x[0]==="etsy"?"etsy":(x[0]==="email"?"email":(x[0]==="show"?"show":"partnership")),label=ph==="notstarted"?"Start my 30-day sprint":"Start another sprint";
   if(key==="etsy"&&!etPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a live Etsy listing that you can measure. Your 30 days do not start until you have one and press start yourself.</p><p><a class="btn ghost" href="#/etsy">Prepare for the Etsy experiment</a></p></div></li>';
   if(key==="email"&&!emPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a list of people who agreed to hear from you, and a tool to send from. Your 30 days do not start until you are ready and press start yourself.</p><p><a class="btn ghost" href="#/email">Prepare for Email-to-Sale</a></p></div></li>';
+  if(key==="show"&&!stsPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a product people can buy that you can show in use, and somewhere of your own to publish. Your 30 days do not start until you are ready and press start yourself.</p><p><a class="btn ghost" href="#/show">Prepare for Show-to-Sell</a></p></div></li>';
   c+=(ph==="notstarted"?'<p class="rxm">Ready when you are. Your 30 days begin only when you press the button.</p>':'<p class="rxm">Your last sprint is complete. You can choose when to start another, and it will not start by itself.</p>')+sprConfirmX(key,label);
   return c+'</div></li>';
  }
  var open="",rest="";EXPX.forEach(function(x,i){if(EXPOPEN[x[0]])open+=card(x,i);else rest+=card(x,i);});
  var first=ph==="notstarted"&&!(S.chk&&S.chk.done);if(first)h+='<div class="rchk">'+chkCard()+'</div>';h+='<ul class="rxgrid">'+open+'</ul>';
- h+='<div class="note warn"><strong>Temporary test limitation.</strong> In this test build Partnership-to-Sales, the Etsy Sales Bottleneck and Email-to-Sale can be started. The other three will become available as they are built. You will always be able to choose any experiment that is open.</div>';
+ h+='<div class="note warn"><strong>Temporary test limitation.</strong> In this test build Partnership-to-Sales, the Etsy Sales Bottleneck, Email-to-Sale and Show-to-Sell can be started. The other two will become available as they are built. You will always be able to choose any experiment that is open.</div>';
  if(!first)h+='<div class="rchk">'+chkCard()+'</div>';
  return h+'<ul class="rxgrid">'+rest+'</ul>';
 };
 var _sprAction=sprAction;
 sprAction=function(a,d,t){
- if(a==="spr-askx"){if(d.x!=="etsy"&&d.x!=="partnership"&&d.x!=="email")return;UI.sprConf=d.x;UI.sprErr="";render();}
- else if(a==="spr-gox"){UI.sprX=d.x==="etsy"?"etsy":(d.x==="email"?"email":"partnership");sprGo();}
+ if(a==="spr-askx"){if(d.x!=="etsy"&&d.x!=="partnership"&&d.x!=="email"&&d.x!=="show")return;UI.sprConf=d.x;UI.sprErr="";render();}
+ else if(a==="spr-gox"){UI.sprX=d.x==="etsy"?"etsy":(d.x==="email"?"email":(d.x==="show"?"show":"partnership"));sprGo();}
  else if(a==="spr-go"){UI.sprX="partnership";sprGo();}
  else _sprAction(a,d,t);
 };
 sprGo=async function(){
  if(UI.sprBusy)return;
- var key=UI.sprX==="etsy"?"etsy":(UI.sprX==="email"?"email":"partnership");
+ var key=UI.sprX==="etsy"?"etsy":(UI.sprX==="email"?"email":(UI.sprX==="show"?"show":"partnership"));
  if(key==="etsy"&&!etPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Etsy preparation checklist first.";render();return;}
  if(key==="email"&&!emPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Email-to-Sale preparation checklist first.";render();return;}
+ if(key==="show"&&!stsPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Show-to-Sell preparation checklist first.";render();return;}
  UI.sprBusy=true;UI.sprErr="";render();
  var prev=rvCur(),ph=rvPhase();
  var r=await sb.rpc("start_sprint",{p_experiment:key,p_day:today()});
  UI.sprBusy=false;UI.sprConf=false;
  if(r.error){UI.sprErr=sprMsg(r.error.message);render();return;}
  if(prev&&(ph==="window"||ph==="closed"))sprArchive(prev);
- if(key==="etsy")etStart();if(key==="email")emStart();
+ if(key==="etsy")etStart();if(key==="email")emStart();if(key==="show")stsStart();
  await sprLoad();
  save();toast("Day 1 begins today. Good luck.");render();
 };
@@ -3741,7 +3745,7 @@ function emPrep(){
  else if(ph==="during")h+='<div class="note info">You already have a sprint running. You can start Email-to-Sale after Day 30, if you wish.</div>';
  else if(ready)h+='<div class="card"><h2>Ready when you are</h2><p>You have a list and a tool. You will check the list properly in Week 1.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("email",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
  else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both are needed: a list of people who agreed to hear from you, and a tool to send from.</div>';
- h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It does not need a list. It borrows other people\'s audiences.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p class="mute">Show-to-Sell, Find Your Buyers and LIVE Sales are coming soon, and are not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It does not need a list. It borrows other people\'s audiences.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p><strong>Show-to-Sell</strong> <span class="tag">open now</span><br><span class="mute">For products that are easy to show in use.</span></p><p class="mute">Find Your Buyers and LIVE Sales are coming soon, and are not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
  return h;
 }
 function emMySprint(){
@@ -3922,6 +3926,613 @@ reviewPage=function(){
 };
 var _etBlockP5=etBlockP;etBlockP=function(){return emActive()?/^#\/(step\/[1-7]|w[234]\/[1-6])$/.test(route||""):_etBlockP5();};
 var _etBlockHtml5=etBlockHtml;etBlockHtml=function(){return emActive()?_etBlockHtml5().replace("This is your Etsy sprint","This is your email sprint"):_etBlockHtml5();};
+
+/* ---------- Show-to-Sell: show your product in use, with three short demos, and see which demo sells. ----------
+   Built on the shared sprint (clock, Home, My Sprint, Results, Day 30 review, update window, Past sprints) through the same
+   experiment adapter as the Etsy and Email experiments. One measurable experiment: three demos of one product, published in
+   one place, each with its own way of counting sales. The app never posts or publishes anything for the member. */
+var STSSTEPS=[
+ [{n:1,t:"How showing your product in use helps people buy",m:20,b:"Nothing. A short lesson and a quick check."},
+  {n:2,t:"Your product and where you start",m:25,b:"Your shop or payment tool, for the last 30 days."},
+  {n:3,t:"Choose one place to show your demos",m:20,b:"The one place where your buyers already look."},
+  {n:4,t:"Decide how you will count a sale for each demo",m:30,b:"A link or a code for each demo, so each sale can be traced."},
+  {n:5,t:"Week 1 review",m:15,b:"Whatever you have done so far."}],
+ [{n:1,t:"What makes a short demo work",m:20,b:"Nothing. A short lesson."},
+  {n:2,t:"Plan demo 1",m:40,b:"Your product, and one thing to show."},
+  {n:3,t:"Plan demo 2",m:35,b:"Your product, and a different thing to show."},
+  {n:4,t:"Plan demo 3",m:35,b:"Your product, and a third thing to show."},
+  {n:5,t:"Final checks, publish dates and commit",m:30,b:"Your three demos, made and ready to publish."}],
+ [{n:1,t:"Publish, then hold steady",m:15,b:"Nothing. A short read."},
+  {n:2,t:"Publish log",m:20,b:"The day each demo went out."},
+  {n:3,t:"What else could explain the numbers?",m:20,b:"Anything you remember changing or happening."},
+  {n:4,t:"Week 3 review",m:15,b:"Whatever you have done so far."}],
+ [{n:1,t:"How to read three small results side by side",m:25,b:"Nothing. A short lesson."},
+  {n:2,t:"Record your numbers for each demo",m:35,b:"The place you published, and your orders for each link or code."},
+  {n:3,t:"Which demo sold? Your evidence verdict",m:20,b:"The numbers from step 2."},
+  {n:4,t:"Decide what is next",m:25,b:"Your verdict."}]
+];
+var STSWKT=["Prepare","Plan and make","Publish and watch","Read the result"];
+var STSWKD=["Get your product, the place you will show it and how you will count sales ready.","Plan and make three short demos, each showing one thing.","Publish them, leave things alone, and note anything else that could matter.","Record your numbers for each demo, read which one sold, and decide what is next."];
+var STSTOTAL=18;
+/* Provisional testing settings, kept in one place so they can be changed after review against real results. They are not
+   validated industry benchmarks and not guarantees. minViews is the least needed to describe a result at all; confViews is where
+   a reading becomes steadier. Neither is strong evidence by itself. */
+var STSCFG={minViews:50,confViews:300,minClicks:10,smallOrders:3,leadOrders:3,leadGap:2,watchDays:7,unevenViews:2,unevenDays:1.5};
+var STSK=["views","clicks","orders","rev"];
+var STSCH=[["tiktok","TikTok"],["insta","Instagram"],["youtube","YouTube"],["facebook","Facebook"],["pinterest","Pinterest"],["shop","My shop or product page"],["other","Somewhere else"]];
+var STSFMT=[["video","A short video"],["photos","Photos or a carousel"],["screen","A screen recording"],["before","A real before and after"]];
+var STSIN=[["people","Another person (their face or voice)"],["place","Someone else's home, shop or private place"],["music","Music or sound I did not make"],["brand","Another brand's logo, product or content"]];
+var STSTRK=[["link","A different link for each demo"],["code","A different code for each demo"],["ask","I will ask each buyer which demo they saw"],["none","I cannot track it yet"]];
+var STSTRKL={link:"A link for each demo",code:"A code for each demo",ask:"Asking each buyer",none:"Not yet"};
+var STSTICKS=[["claims","Each demo shows only what the product really does. Nothing is staged to look better than it is, and there are no promises I cannot keep."],["perm","I have permission for every person, private place, piece of music or other brand that appears."],["track","I have set up how I will count sales for each demo, and tested it."],["same","All three demos offer the same product at the same price."],["plan","I will publish all three in the same place on my chosen dates, and change nothing else in between."],["proof","I understand three demos is a small test and not proof."]];
+var STSCONF=[["price","I changed the price"],["promo","I ran a sale or another promotion"],["boost","I paid to boost or advertise one of the demos"],["extra","I published other posts about the same product"],["partner","Someone else shared or reposted one of the demos"],["stock","The product was out of stock, or the page was not working"],["season","A major seasonal or holiday period"],["ext","A mention or press that sent unusual traffic"],["other","Something else"]];
+var STSNEXT=[["more","Make more demos like the one with the most orders"],["repeat","Run the same three again, to see if it repeats"],["improve","Change one thing and try three new demos"],["page","Work on my page, price or offer first"],["other","Take what I learned to a different experiment"],["unsure","I am not sure yet"]];
+var STSS=(function(){
+ var s=function(n){return {t:"s",n:n};},v={t:"v"},b={t:"b"},d={t:"d"},e=function(a){return {t:"e",v:a};};
+ var demo={t:"o",f:{one:s(120),fmt:e([""].concat(STSFMT.map(function(x){return x[0];}))),hook:s(200),shown:s(500),ask:s(200),inn:{t:"m",k:/^(people|place|music|brand)$/,i:b},perm:b}};
+ return {t:"o",f:{
+  prep:{t:"o",f:{prod:e(["","yes","no"]),place:b}},
+  steps:{t:"m",k:/^[1-5]$/,i:b},steps2:{t:"m",k:/^[1-5]$/,i:b},st3:{t:"m",k:/^[1-4]$/,i:b},st4:{t:"m",k:/^[1-4]$/,i:b},
+  dec:e(["","next"]),dec2:e(["","next"]),dec3:e(["","next"]),dec4:e(["","done"]),
+  pr:{t:"o",f:{product:s(120),who:s(200)}},
+  bl:{t:"o",f:{orders30:v,rev30:v,posts30:v}},
+  wh:{t:"o",f:{ch:e([""].concat(STSCH.map(function(x){return x[0];}))),name:s(120),aud:v}},
+  tk:{t:"o",f:{trk:e(["","link","code","ask","none"]),refs:{t:"a",n:3,i:s(200)}}},
+  dm:{t:"a",n:3,i:demo},
+  ticks:{t:"m",k:/^(claims|perm|track|same|plan|proof)$/,i:b},
+  sch:{t:"a",n:3,i:d},
+  cm:{t:"c"},
+  pb:{t:"a",n:3,i:{t:"o",f:{d:d}}},
+  cf:{t:"a",n:60,i:{t:"o",f:{id:{t:"n"},d:d,at:d,k:e(STSCONF.map(function(x){return x[0];})),maj:b,note:s(300),wd:d}}},
+  nid:{t:"n"},
+  res:{t:"o",f:{d:{t:"a",n:3,i:{t:"o",f:{views:v,clicks:v,orders:v,rev:v}}},at:d}},
+  nx:e([""].concat(STSNEXT.map(function(x){return x[0];})))
+ }};
+})();
+function STSDEF(){return emDef(STSS);}
+function stsDemoClean(m){return emClean(STSS.f.dm.i,m,emDef(STSS.f.dm.i));}
+function stsfix(o){
+ var w=(o.sts&&typeof o.sts==="object"&&!Array.isArray(o.sts))?o.sts:{},r=emClean(STSS,w,STSDEF());
+ // the confounder list: unique ids, only valid entries, "other" keeps its own severity
+ var seen={},maxId=0;r.cf=(Array.isArray(w.cf)?w.cf.slice(0,60):[]).filter(function(x){return x&&typeof x==="object"&&typeof x.id==="number"&&x.id===Math.floor(x.id)&&x.id>0&&x.id<=100000&&typeof x.d==="string"&&parseYmd(x.d)!=null&&typeof x.at==="string"&&parseYmd(x.at)!=null&&STSCONF.some(function(c){return c[0]===x.k;})&&!seen[x.id]&&(seen[x.id]=1);}).map(function(x){if(x.id>maxId)maxId=x.id;return {id:x.id,d:x.d,at:x.at,k:x.k,maj:x.k==="other"?x.maj===true:true,note:typeof x.note==="string"?x.note.slice(0,300):"",wd:(typeof x.wd==="string"&&parseYmd(x.wd)!=null)?x.wd:""};});
+ r.nid=Math.max(maxId+1,(typeof w.nid==="number"&&w.nid===Math.floor(w.nid)&&w.nid>0&&w.nid<=100001)?w.nid:1);
+ // the committed plan: needs three valid publish dates in order, each on a later day, and a commit date
+ var c=w.cm;r.cm=null;
+ if(c&&typeof c==="object"&&!Array.isArray(c)&&typeof c.at==="string"&&parseYmd(c.at)!=null&&Array.isArray(c.sch)&&c.sch.length===3&&c.sch.every(function(x){return typeof x==="string"&&parseYmd(x)!=null;})&&c.sch[0]<c.sch[1]&&c.sch[1]<c.sch[2]){
+  var st=function(y,n){return typeof y==="string"?y.slice(0,n):"";};
+  r.cm={at:c.at,sch:c.sch.slice(0,3),dm:(Array.isArray(c.dm)?c.dm:[]).slice(0,3).map(stsDemoClean),trk:STSS.f.tk.f.trk.v.indexOf(c.trk)>-1?c.trk:"",refs:(Array.isArray(c.refs)?c.refs:[]).slice(0,3).map(function(x){return st(x,200);}),what:st(c.what,200),where:st(c.where,200)};
+  while(r.cm.dm.length<3)r.cm.dm.push(stsDemoClean(null));
+  while(r.cm.refs.length<3)r.cm.refs.push("");
+ }
+ o.sts=r;return o;
+}
+/* ===== SHOW LOGIC START: pure rules, checked by dev/show_e6_tests.js ===== */
+function stsN(o){var s=vstate(o);return s==="pos"?+o.v:(s==="zero"?0:null);}
+function stsFmt(o,money){var s=vstate(o),c=money?sym(S.focus.currency):"";return s==="pos"?c+String(+o.v):(s==="zero"?c+"0 (confirmed)":"not seen");}
+function stsActive(){var c=rvCur();return !!c&&c.experiment==="show";}
+function stsPrepReady(){var p=S.sts.prep;return p.prod==="yes"&&p.place===true;}
+function stsStepsOf(i){return STSSTEPS[i];}
+function stsDOf(i){var E=S.sts;return [E.steps,E.steps2,E.st3,E.st4][i]||{};}
+function stsWeekDone(i){var E=S.sts,L=stsStepsOf(i),D=stsDOf(i);return L.every(function(s){return D[s.n];})||[E.dec==="next",E.dec2==="next",E.dec3==="next",E.dec4==="done"][i];}
+function stsCurWeek(){for(var i=0;i<4;i++){if(!stsWeekDone(i))return i+1;}return 4;}
+function stsWeekBase(w){return w===1?"#/show/":"#/show/w"+w+"/";}
+function stsStepCount(){var n=0;for(var i=0;i<4;i++)n+=rCount(stsStepsOf(i),stsDOf(i));return n;}
+function stsWeeks(){
+ var cur=stsCurWeek(),out=[];
+ for(var i=0;i<4;i++){
+  var L=stsStepsOf(i),D=stsDOf(i),n=rCount(L,D),tot=L.length,st=(i+1<cur)?"done":(i+1===cur?"now":"later"),first=0;
+  if(st==="now"){for(var j=0;j<tot;j++){if(!D[L[j].n]){first=L[j].n;break;}}}
+  out.push({n:i+1,title:STSWKT[i],L:L,D:D,done:n,total:tot,state:st,open:i===0||stsWeekDone(i-1),first:first,status:st==="later"?"Opens when you finish Week "+i:(st==="done"&&n===tot?"Done":n+" of "+tot+" steps done")});
+ }
+ return out;
+}
+function stsChLabel(k){var c=STSCH.filter(function(x){return x[0]===k;})[0];return c?c[1]:"";}
+function stsWhere(){var W=S.sts.wh,l=stsChLabel(W.ch);if(!l)return "";return (l+(W.name.trim()?": "+W.name.trim():"")).slice(0,200);}
+function stsDays(a,b){var x=parseYmd(a),y=parseYmd(b);if(x==null||y==null)return 0;return Math.round((y-x)/86400000);}
+function stsSchCheck(sch,at){
+ var r={ok:false,why:"",t:"",b:""},tod=at||today();
+ if(!Array.isArray(sch)||sch.length!==3||sch.some(function(x){return !x||parseYmd(x)==null;})){r.why="missing";r.t="Choose three publish dates";r.b="One for each demo.";return r;}
+ if(sch[0]<tod){r.why="past";r.t="The first publish date has passed";r.b="Choose today or a day ahead, so the plan is made before the publishing.";return r;}
+ if(!(sch[0]<sch[1]&&sch[1]<sch[2])){r.why="order";r.t="The dates must be in order";r.b="Demo 1, then 2, then 3, each on a later day, so each demo has a day of its own.";return r;}
+ var w={from:sch[0],to:addDays(sch[2],STSCFG.watchDays),readOn:addDays(sch[2],STSCFG.watchDays+1)};r.w=w;
+ if(rvCur()){
+  if(sch[0]<rvStart()){r.why="beforestart";r.t="That is before your sprint began";r.b="Your sprint began on "+dayLab(rvStart())+".";return r;}
+  if(w.to>rvEnd()){r.why="toolate";r.t="That runs past the end of your update window";r.b="Your three demos and the "+STSCFG.watchDays+" days of watching afterwards would end on "+dayLab(w.to)+", after your update window closes on "+dayLab(rvEnd())+". Publish sooner, or plan it for your next sprint.";return r;}
+  if(w.to>rvDay30())r.prov=true;
+ }
+ if(stsDays(sch[0],w.to)+1>=STSCFG.unevenDays*(STSCFG.watchDays+1))r.uneven=true;
+ r.ok=true;return r;
+}
+function stsDemoCheck(m){
+ var txt=[m.hook,m.shown,m.ask].join(" ").trim(),words=txt?txt.split(/\s+/).length:0,issues=[],notes=[];
+ if(!m.one.trim())issues.push("Say the one thing this demo shows.");
+ else if(/(\band\b|&|\+|,|;)/i.test(m.one))issues.push("That reads like more than one thing. One thing per demo keeps the comparison clear.");
+ if(!(m.hook.trim()||m.shown.trim()))issues.push("Describe what people will see.");
+ if(!m.ask.trim())issues.push("It needs one clear ask, such as where to buy.");
+ if(words>0&&words<12)issues.push("It is very short. A little more detail makes it easier to film or photograph.");else if(words>180)issues.push("It is long for a short demo. Aim to show one thing in under about a minute.");
+ if(/(guarantee|get rich|earn \$|earn £|100% (safe|sure)|cures?\b|miracle|risk[- ]free|best in the world|everyone loves|never fails|instant results)/i.test([m.one,txt].join(" ")))issues.push("Avoid promises you cannot keep, such as guarantees, cures or income claims. Show only what the product really does.");
+ if(Object.keys(m.inn).length&&m.perm!==true)issues.push("Something in this demo needs permission. Tick the permission box once you have it, or leave that thing out.");
+ if(m.fmt==="before")notes.push("A before and after must be real, of this product, and not edited to look better than it is.");
+ return {words:words,issues:issues,notes:notes,ok:issues.length===0};
+}
+function stsDemoFilled(m){return !!(m.one.trim()&&m.ask.trim()&&(m.hook.trim()||m.shown.trim()));}
+function stsReady(){
+ var E=S.sts,m=[];
+ if(E.cm)return {ok:false,done:true,miss:[]};
+ if(!E.pr.product.trim())m.push("The one product you are showing (Week 1, step 2)");
+ if(!E.wh.ch)m.push("The one place you will publish (Week 1, step 3)");
+ if(!E.tk.trk)m.push("How you will count a sale for each demo (Week 1, step 4)");
+ if(E.tk.trk==="link"||E.tk.trk==="code"){var rf=E.tk.refs.map(function(x){return x.trim().toLowerCase();}).filter(function(x){return !!x;});if(rf.some(function(x,i){return rf.indexOf(x)!==i;}))m.push("Each demo needs its own link or code, and two are the same (Week 1, step 4)");}
+ [0,1,2].forEach(function(i){
+  if(!stsDemoFilled(E.dm[i]))m.push("Demo "+(i+1)+" needs the one thing it shows, what people will see and one ask (Week 2, step "+(i+2)+")");
+  else if(Object.keys(E.dm[i].inn).length&&E.dm[i].perm!==true)m.push("Demo "+(i+1)+" shows something that needs permission, and it is not confirmed yet (Week 2, step "+(i+2)+")");
+ });
+ var ones=E.dm.map(function(x){return x.one.trim().toLowerCase();}).filter(function(x){return !!x;});
+ if(ones.some(function(x,i){return ones.indexOf(x)!==i;}))m.push("Each demo should show a different thing, and two are the same (Week 2)");
+ if(STSTICKS.some(function(x){return E.ticks[x[0]]!==true;}))m.push("All six checks ticked (step 5)");
+ var sc=stsSchCheck(E.sch);if(!sc.ok)m.push("Valid publish dates (step 5): "+sc.t);
+ return {ok:m.length===0,done:false,miss:m,sc:sc};
+}
+function stsCommit(){
+ var E=S.sts,r=stsReady();if(!r.ok)return false;
+ E.cm={at:today(),sch:E.sch.slice(0,3),dm:E.dm.map(function(m){return stsDemoClean(clone(m));}),trk:E.tk.trk,refs:E.tk.refs.slice(0,3),what:E.pr.product.trim().slice(0,200),where:stsWhere()};
+ return true;
+}
+function stsOut(){return S.sts.pb.filter(function(x){return !!x.d;});}
+function stsWin(){
+ var E=S.sts;if(!E.cm)return null;var pd=stsOut().map(function(x){return x.d;}).sort();
+ var last=pd.length?pd[pd.length-1]:E.cm.sch[2],first=pd.length?pd[0]:E.cm.sch[0];
+ var to=addDays(last,STSCFG.watchDays);
+ return {from:first,to:to,readOn:addDays(last,STSCFG.watchDays+1),allOut:pd.length===3,spread:stsDays(first,last),days:E.pb.map(function(x){return x.d?stsDays(x.d,to)+1:null;})};
+}
+/* how long each demo was out by the end of the watching period. Demos go out on different days, so this is never exactly equal. */
+function stsExposure(){
+ var w=stsWin();if(!w||!w.allOut)return null;var d=w.days,mx=Math.max.apply(null,d),mn=Math.min.apply(null,d);
+ return {days:d,max:mx,min:mn,uneven:mx>=STSCFG.unevenDays*mn};
+}
+function stsConfKind(k){return STSCONF.filter(function(x){return x[0]===k;})[0]||null;}
+function stsConfMajor(c){return c.k==="other"?c.maj===true:!!stsConfKind(c.k);}
+function stsConfs(asOf){
+ var E=S.sts,w=stsWin(),r={major:[],minor:[],outside:[]};
+ E.cf.forEach(function(c){
+  if(c.wd&&(!asOf||c.wd<=asOf))return;if(asOf&&c.at>asOf)return;
+  var lo=E.cm?addDays(E.cm.sch[0],-7):"";
+  if(!w||c.d<lo||c.d>w.to){r.outside.push(c);return;}
+  (stsConfMajor(c)?r.major:r.minor).push(c);
+ });
+ return r;
+}
+function stsNums(asOf){
+ var E=S.sts,known=!(asOf&&(!E.res.at||E.res.at>asOf));
+ return [0,1,2].map(function(i){var o={};STSK.forEach(function(k){var x=E.res.d[i][k];o[k]=known?{s:x.s,v:x.v}:{s:"",v:""};});return o;});
+}
+function stsSum(nm,k){var n=0,c=0;nm.forEach(function(x){var y=stsN(x[k]);if(y!==null){n+=y;c++;}});return {n:Math.round(n*100)/100,k:c};}
+function stsFmtSum(s,money){var c=money?sym(S.focus.currency):"";if(s.k===0)return "not seen";if(s.k===3)return s.n===0?c+"0 (confirmed)":c+String(s.n);return c+String(s.n)+" from "+s.k+" of 3 demos";}
+function stsList(a){return a[0]+", "+a[1]+" and "+a[2];}
+function stsDemoName(i){var c=S.sts.cm,o=c&&c.dm[i]?c.dm[i].one.trim():"";return "Demo "+(i+1)+(o?" ("+o+")":"");}
+/* which demo sold: a plain comparison of three small counts. A demo is only called ahead when its lead is more than chance alone would easily give. */
+function stsCompare(nm){
+ var o=nm.map(function(x){return stsN(x.orders);});
+ if(o.some(function(x){return x===null;}))return {kind:"unknown",lead:-1,orders:o,line:"Orders are not recorded for every demo, so the three cannot be compared yet."};
+ var top=Math.max.apply(null,o),tot=o[0]+o[1]+o[2];
+ if(tot===0)return {kind:"none",lead:-1,orders:o,line:"No demo has an order recorded, so there is no difference between them to read."};
+ var lead=[0,1,2].filter(function(i){return o[i]===top;}),rest=o.slice().sort(function(a,b){return b-a;}),second=rest[1];
+ if(lead.length>1)return {kind:"tie",lead:-1,orders:o,line:(lead.length===3?"All three demos":"Demos "+(lead[0]+1)+" and "+(lead[1]+1))+" had the same number of orders ("+top+" each), so no demo is ahead."};
+ var others=[0,1,2].filter(function(i){return i!==lead[0];}).map(function(i){return o[i];});
+ if(top>=STSCFG.leadOrders&&top-second>=STSCFG.leadGap)return {kind:"clear",lead:lead[0],orders:o,line:stsDemoName(lead[0])+" had the most orders: "+top+", against "+others[0]+" and "+others[1]+"."};
+ return {kind:"ahead",lead:lead[0],orders:o,line:stsDemoName(lead[0])+" had the most orders ("+top+", against "+others[0]+" and "+others[1]+"), but the counts are too small and too close to say it is really ahead."};
+}
+function stsCaveats(nm,od){
+ var E=S.sts,lines=[],conf="fair",vs=nm.map(function(x){return stsN(x.views);}),minV=Math.min.apply(null,vs),maxV=Math.max.apply(null,vs),ex=stsExposure(),uneven=false;
+ if(minV<STSCFG.confViews){conf="limited";lines.push("At least one demo was seen fewer than about "+STSCFG.confViews+" times. With views this low, a few people either way can change the picture, so this is too limited to support a confident conclusion. Treat it as a hint.");}
+ if(od>0&&od<STSCFG.smallOrders){if(conf==="fair")conf="lower";lines.push("Orders are a very small count ("+od+" in total). One or two orders are well within chance.");}
+ if(minV>0&&maxV>=STSCFG.unevenViews*minV){uneven=true;if(conf==="fair")conf="lower";lines.push("Your demos were seen by very different numbers of people (from "+minV+" to "+maxV+" views), so their orders are not like for like.");}
+ if(ex&&ex.uneven){uneven=true;if(conf==="fair")conf="lower";lines.push("Your demos were out for "+stsList(ex.days)+" days by the end of the watching period. The one that was out longest had much more time to be seen and to sell, so their orders are not like for like.");}
+ else if(ex)lines.push("Your demos were published on different days, so they were out for "+stsList(ex.days)+" days by the end of the watching period. That is close, but it is not exactly the same chance to be seen.");
+ if(E.cm&&E.cm.trk==="ask"){if(conf==="fair")conf="lower";lines.push("You counted sales by asking buyers which demo they saw. Memory is not exact, so treat the split between demos as a rough guide.");}
+ return {conf:conf,lines:lines,uneven:uneven};
+}
+function stsVerdict(asOf){
+ var E=S.sts,cm=E.cm,small="Three demos in one place is a small test. It shows what happened, not what will always happen.";
+ var fin=function(v,c,cmp){v.conf=c;v.cmp=cmp||null;v.strength=c==="fair"?"There is enough here to describe what happened, and it is a fair first reading for a small test. It is still not strong evidence.":((c==="limited"||c==="lower")?"There is enough here to describe what happened. There is not enough to draw a firm conclusion.":(v.rule==="S4"?"There is not yet enough here to describe a result.":""));return v;};
+ if(!cm)return fin(vmk("Insufficient evidence","info","S1",["No demos are planned and committed yet, so there is nothing to read."],["This says nothing about your product or your demos, because nothing has been tested."],["Finish Week 2 and commit your three demos."]),"none");
+ var w=stsWin(),t=asOf||today();
+ if(!w.allOut||t<w.readOn)return fin(vmk("Insufficient evidence","info","S2",[w.allOut?"Your three demos are out, and people can still respond until "+dayLab(w.to)+".":"Not all three demos are logged as published yet."],["A result read before people have had time to respond would be a guess."],[w.allOut?"Wait until "+dayLab(w.readOn)+", then record your numbers.":"Publish the rest of your demos and log each one. Resist changing the offer meanwhile."]),"none");
+ var nm=stsNums(asOf),vw=stsSum(nm,"views"),od=stsSum(nm,"orders"),ck=stsSum(nm,"clicks"),cmp=stsCompare(nm);
+ if(vw.k<3||od.k<3||cm.trk==="none"){
+  var why=[];if(od.k<3)why.push("Orders are not recorded for every demo.");if(vw.k<3)why.push("Views are not recorded for every demo.");if(cm.trk==="none")why.push("You said you could not track which demo a sale came from.");
+  return fin(vmk("Mixed or unclear","warn","S3",why,["Without these the three demos cannot be compared. A number you could not see is kept as unknown, and is never read as zero.","If a sale cannot be traced to a demo, we cannot say which demo sold."],["Record what you can see for each demo. For next time, give each demo a link or a code that only it uses."]),"unclear",cmp);
+ }
+ var vs=nm.map(function(x){return stsN(x.views);}),os=cmp.orders,minV=Math.min.apply(null,vs);
+ var nums="Views: "+stsList(vs)+". Orders: "+stsList(os)+"."+(ck.k===3?" Clicks: "+stsList(nm.map(function(x){return stsN(x.clicks);}))+".":"");
+ if(minV<STSCFG.minViews)return fin(vmk("Insufficient evidence","info","S4",[nums,"At least one demo was seen fewer than "+STSCFG.minViews+" times."],["That is too few views to compare three demos. A few people either way changes everything.","The settings used are provisional starting points that will be reviewed against real results: "+STSCFG.minViews+" views for each demo is the least needed to describe a result, and about "+STSCFG.confViews+" is where a reading becomes steadier. Neither is strong evidence by itself."],["Leave the demos up for longer, or show them where more of your buyers will see them, before deciding anything."]),"none",cmp);
+ var cf=stsConfs(asOf),cav=stsCaveats(nm,od.n);
+ if(cf.major.length){
+  return fin(vmk("Mixed or unclear","warn","S5",[nums,"You logged "+cf.major.length+" major thing"+(cf.major.length===1?"":"s")+" around your demos that could also explain the numbers: "+cf.major.map(function(c){return (stsConfKind(c.k)||["","?"])[1].toLowerCase();}).join("; ")+"."],["Because something else changed or happened, the numbers cannot be put down to your demos alone. Even with orders, this would not be called promising.",small].concat(cav.lines),["Write down what happened and when. For a cleaner answer, run three demos again with nothing else changing."]),"unclear",cmp);
+ }
+ if(od.n>0){
+  var nx=cmp.kind==="clear"?"Make one or two more demos that show the same thing as "+stsDemoName(cmp.lead)+", and see whether they sell too.":"Run the same three again, or the closest two, to see whether one pulls ahead.";
+  var obs=[];
+  if(cmp.kind==="clear")obs.push("Demo "+(cmp.lead+1)+" had more orders in this test. That describes what happened. It is not proof that this demo is better, or that it caused the extra orders.");
+  if(cmp.kind==="tie"&&cav.uneven)obs.push("The same number of orders does not mean these demos did equally well, because they did not have the same chance to be seen.");
+  return fin(vmk("Promising","ok","S6",[nums,cmp.line],["What you can see is orders after your demos. That is not the same as proof that a demo caused them. Some of these people may have bought anyway.",small,"This is encouraging. It is not proof."].concat(obs,cav.lines),[nx]),cav.conf,cmp);
+ }
+ if(ck.n>=STSCFG.minClicks)return fin(vmk("Traffic but no sales","warn","S7",[nums,"People clicked through from your demos, and you confirmed no orders."],["This shows the demos brought interest to your page. It does not show why nobody bought.",small].concat(cav.lines),["Look at what people saw after clicking: the page, the price and the offer. Change one of those, then show it again."]),cav.conf,cmp);
+ if(minV<STSCFG.confViews)return fin(vmk("Insufficient evidence","info","S8",[nums,"With views this low, "+(ck.k===3?"few clicks and no orders":"no orders")+" are within what chance could produce."],["This does not mean your demos or your product did not work. Too few people saw them to tell, so the evidence is limited.",small].concat(cav.lines),["Show the demos to more people, or change one thing and try again, before deciding anything."]),"limited",cmp);
+ return fin(vmk("Approach needs reviewing","warn","S8",[nums,ck.k===3?"Plenty of people saw the demos, few clicked and nobody ordered.":"Plenty of people saw the demos and nobody ordered. Clicks were not recorded for every demo."],["This does not mean the idea is wrong. Three demos is one try.",small].concat(cav.lines),["Try changing one thing next: what you show, how the demo opens, or where you publish."]),cav.conf,cmp);
+}
+function stsSnap(kind){
+ var asOf=null,late=false,prov=false;
+ if(kind==="day30"&&rvCur()){if(rvPhase()==="during")prov=true;else asOf=rvDay30();}
+ if(asOf){var w=stsWin();if(w&&w.to>asOf)prov=true;if(S.sts.res.at&&S.sts.res.at>asOf)late=true;}
+ var v=stsVerdict(asOf||null);
+ return {at:today(),label:v.label,rule:v.rule,ctr:{msgs:0,resp:0,opp:0},res:{},kind:kind==="day30"?"day30":"update",asOf:asOf||"",late:late,prov:prov||v.rule==="S2"};
+}
+function stsHasRes(){return S.sts.res.d.some(function(x){return STSK.some(function(k){return !!x[k].s;});});}
+function stsHasWork(){var E=S.sts;return !!E.cm||E.pb.some(function(x){return !!x.d;})||E.cf.length>0||stsHasRes();}
+function stsFresh(prep){var e=STSDEF();if(prep)e.prep=prep;return e;}
+function stsStart(){var prep=S.sts.prep;S.sts=stsFresh(prep);var pn=String(S.focus.product||"").trim();if(pn)S.sts.pr.product=pn.slice(0,120);}
+function stsRec(v){
+ var l=v.label,r=v.rule,t,b,f,x="",bs,as,ck=v.cmp?v.cmp.kind:"";
+ if(l==="Promising"){
+  if(ck==="clear"){t="Make another demo like the one with the most orders, then compare";b="One demo had more orders than the other two in this test. Showing the same thing again is how you find out whether it happens again.";f="Plan one new demo that shows the same thing in a slightly different way, with its own link or code.";bs="Orders were recorded, one demo led by more than the provisional margin, and no major confounder was logged.";as="We are assuming what that demo showed, not its timing or luck, led to those orders. Your numbers cannot prove that.";}
+  else{t="Run them again before picking a favourite";b="Orders came after your demos, but no demo is clearly ahead. A second round shows whether one pulls away.";f="Publish the same three again, or the closest two, each with its own link or code.";bs="Orders were recorded with no major confounder logged, and the demos were too close to separate.";as="We are assuming your demos, not something else, led to those orders. Your numbers cannot prove that.";}
+ }
+ else if(l==="Traffic but no sales"){t="Improve what people see after the click";b="People clicked, so the demos did their job. The next place to look is the page, the price or the offer.";f="Choose one of the page, the price or how the offer is described, change only that, and show it again.";bs="Clicks reached the provisional threshold and no orders were confirmed.";as="We are assuming the page and offer, not the demos, are the weak point. Your numbers cannot confirm that.";}
+ else if(l==="Approach needs reviewing"){t="Change one thing, then show it again";b="Plenty of people saw the demos and few acted. That is one try, not the end of the idea.";f="Change one thing: what you show, how the demo opens, or where you publish.";x="If reaching the right people is the constraint, Partnership-to-Sales is open now and can widen who sees your product. Find Your Buyers is coming soon and is not open yet.";bs="No orders and few recorded clicks, with at least "+STSCFG.confViews+" views for each demo.";as="We are assuming the demos, not the audience, were what to change. The people who saw them may simply not be your buyers.";}
+ else if(l==="Mixed or unclear"){t=r==="S3"?"Fill the gaps, then read it again":"Run it again with steady conditions";b="Something else changed, or a sale could not be traced to a demo, so the three cannot be compared cleanly.";f=r==="S3"?"Record the missing numbers, and give each demo its own link or code next time.":"Write down what else happened, then publish three demos again with nothing else changing.";bs=r==="S3"?"Some key numbers or the tracking were missing.":"Something else could explain the numbers.";as="We are assuming nothing else needed to be considered. If something did, please log it.";}
+ else{t=(r==="S4"||r==="S8")?"Reach more people first":"Wait for your demos to finish";b=(r==="S4"||r==="S8")?"Too few people saw the demos to read a result. That says nothing about your demos, only that the numbers are small.":"Your result cannot be read yet.";f=(r==="S1")?"Finish Week 2 and commit your three demos.":(r==="S2"?"Publish the rest, log each one, and come back after the watching period.":"Leave the demos up for longer, or show them where more of your buyers look.");x=(r==="S4"||r==="S8")?"Partnership-to-Sales is open now and can widen who sees your product. You are free to choose it, or another experiment that is open.":"";bs=(r==="S4"||r==="S8")?"Views were below the provisional minimum, or the evidence is limited.":"There is not enough yet to read.";as="We are assuming more views will give a steadier picture.";}
+ return {t:t,b:b,first:f,extra:x,basis:bs,assume:as,provisional:rvPhase()==="during"||r==="S2"};
+}
+/* ===== SHOW LOGIC END ===== */
+
+/* --- screens --- */
+function stsShell(wk,n,body){
+ var st=stsStepsOf(wk-1),s=st[n-1],dn=stsDOf(wk-1)[n],base="#/show/w"+wk;
+ var h='<a class="back" href="'+base+'">&larr; Show-to-Sell, Week '+wk+'</a><h1>Week '+wk+' &middot; Step '+n+' of '+st.length+'</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p><p class="mute">You will need: '+esc(s.b)+' Everything saves automatically.</p>'+body;
+ h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="sts-done" data-w="'+wk+'" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<st.length?'<a class="btn ghost" href="#/show/w'+wk+'/'+(n+1)+'">Next step &rarr;</a>':'')+'</div>';
+ return h;
+}
+function stsNumRow(path,lab,o,money){
+ var opts=[["value","A number"],["zero","Zero, I checked"],["unknown","I can't see this"]];
+ return '<div class="q"><strong>'+esc(lab+(money?" ("+sym(S.focus.currency).trim()+")":""))+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="sts-vs" data-p="'+path+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="9" data-sts="n:'+path+'" value="'+esc(o.v)+'" aria-label="'+esc(lab)+'" style="max-width:160px">':'')+'</div>';
+}
+function stsGet(path){
+ var p=String(path).split("."),o=S.sts;for(var i=0;i<p.length;i++){if(o==null)return null;o=o[/^\d$/.test(p[i])?+p[i]:p[i]];}return o;
+}
+var STSVSPATH=/^(bl\.(orders30|rev30|posts30)|wh\.aud|res\.d\.[0-2]\.(views|clicks|orders|rev))$/;
+function stsHome(wk){
+ wk=wk||1;var st=stsStepsOf(wk-1),d=rCount(st,stsDOf(wk-1)),dn=stsDOf(wk-1),base=stsWeekBase(wk);
+ var h='<a class="back" href="#/sprint">&larr; My Sprint</a><h1>Show-to-Sell</h1><p class="mute">Week '+wk+' of 4: '+esc(STSWKT[wk-1])+'. '+esc(STSWKD[wk-1])+'</p><div class="card"><strong>'+d+' of '+st.length+' steps done</strong><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/st.length*100)+'%"></i></div></div>';
+ h+='<div class="card"><h2>The steps</h2>'+st.map(function(s){var x=dn[s.n];return '<a class="step'+(x?' done':'')+'" href="'+base+s.n+'"><span class="n">'+(x?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(x?"Done":"Open")+'</span></a>';}).join("")+'</div>';
+ return h;
+}
+var STSQUIZ=[["a","You have three ideas for a demo. What is the fairest way to find out which one sells?",[["a1","Put all three ideas into one long video"],["a2","Make three short demos, each showing one thing, each with its own link or code"],["a3","Post one, and guess about the other two"]],"a2","One thing per demo, and a separate way of counting sales for each, is what lets you compare them."],["b","Your demo makes the product look better than it really is. What happens?",[["b1","More sales, with no downside"],["b2","Buyers feel misled, and it can break advertising rules"],["b3","Nothing, everyone does it"]],"b2","Show only what the product really does. An honest demo sells to people who will be glad they bought."]];
+function sts1s1(){
+ return stsShell(1,1,LC("sts1s1.lesson")+'<div class="card"><h2>Quick check</h2>'+STSQUIZ.map(function(q){return '<div class="q"><strong>'+esc(q[1])+'</strong><div class="row" style="flex-direction:column;align-items:stretch">'+q[2].map(function(o){return '<button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(UI.stsq&&UI.stsq[q[0]]===o[0])+'" data-a="sts-q" data-q="'+q[0]+'" data-v="'+o[0]+'">'+esc(o[1])+'</button>';}).join("")+'</div>'+(UI.stsq&&UI.stsq[q[0]]?'<div class="note '+(UI.stsq[q[0]]===q[3]?"ok":"info")+'" aria-live="polite">'+(UI.stsq[q[0]]===q[3]?"Good. ":"Have another look. ")+esc(q[4])+'</div>':'')+'</div>';}).join("")+'</div>');
+}
+function sts1s2(){
+ var E=S.sts,lk=!!E.cm,h=LC("sts1s2.lesson")+'<div class="card"><h2>The one product you will show</h2><label for="stsp">Which product?</label><input id="stsp" type="text" maxlength="120" data-sts="pr.product" value="'+esc(E.pr.product)+'"'+(lk?' readonly':'')+'>'+(String(S.focus.product||"").trim()&&E.pr.product===String(S.focus.product).trim().slice(0,120)?'<p class="mute">Pre-filled from your product details. Please check it.</p>':'')+'<label for="stsw">Who is it for?</label><input id="stsw" type="text" maxlength="200" data-sts="pr.who" value="'+esc(E.pr.who)+'" placeholder="For example: new freelancers who want a simple budget"></div>';
+ h+='<div class="card"><h2>Where you start (the last 30 days)</h2><p class="mute">This is your starting point for this product. If you cannot see a number, say so, and it is kept as unknown. It is never read as zero.</p>'+stsNumRow("bl.orders30","Orders for this product",E.bl.orders30)+stsNumRow("bl.rev30","Revenue from this product",E.bl.rev30,true)+stsNumRow("bl.posts30","Times you showed or posted about this product",E.bl.posts30)+'</div>';
+ return stsShell(1,2,h);
+}
+function sts1s3(){
+ var E=S.sts,lk=!!E.cm,h=LC("sts1s3.lesson")+'<div class="card"><h2>The one place</h2><p class="mute">All three demos go in the same place, so the only thing that differs is what each demo shows.</p><div class="row">'+STSCH.map(function(x){return '<button type="button" class="chip" aria-pressed="'+(E.wh.ch===x[0])+'" data-a="sts-ch" data-v="'+x[0]+'"'+(lk?' disabled':'')+'>'+esc(x[1])+'</button>';}).join("")+'</div><label for="stsn">Your account or page name there (optional, only you see this)</label><input id="stsn" type="text" maxlength="120" data-sts="wh.name" value="'+esc(E.wh.name)+'"'+(lk?' readonly':'')+'>'+stsNumRow("wh.aud","People who follow you or visit there now (optional)",E.wh.aud)+'<p class="mute">The Sales Lab never posts or publishes anything for you. You publish from your own account.</p></div>';
+ return stsShell(1,3,h);
+}
+function sts1s4(){
+ var E=S.sts,lk=!!E.cm,h=LC("sts1s4.lesson")+'<div class="card"><h2>How will you count a sale for each demo?</h2><div class="row" style="flex-direction:column;align-items:stretch">'+STSTRK.map(function(x){return '<button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(E.tk.trk===x[0])+'" data-a="sts-trk" data-v="'+x[0]+'"'+(lk?' disabled':'')+'>'+esc(x[1])+'</button>';}).join("")+'</div>';
+ if(E.tk.trk==="none")h+='<div class="note warn">That is honest, and it means your result will be read as unclear, because a sale cannot be traced to a demo. A link or a code for each demo takes a few minutes to set up.</div>';
+ else if(E.tk.trk==="ask")h+='<div class="note info">That can work for a small number of orders. Memory is not exact, so your result will be read with a little more care.</div>';
+ else if(E.tk.trk)h+=[0,1,2].map(function(i){return '<label for="stsr'+i+'">Demo '+(i+1)+': its '+(E.tk.trk==="link"?"link":"code")+' (optional, only you see this)</label><input id="stsr'+i+'" type="text" maxlength="200" data-sts="tk.refs.'+i+'" value="'+esc(E.tk.refs[i])+'"'+(lk?' readonly':'')+'>';}).join("")+'<p class="mute">Each demo needs a different one. If two are the same, their sales cannot be told apart.</p>';
+ return stsShell(1,4,h+'</div>');
+}
+function stsSummary1(){
+ var E=S.sts;
+ return '<div class="card"><h2>Your Week 1 summary</h2><div class="crow"><span>Your product</span><strong>'+esc(E.pr.product||"Not chosen")+'</strong></div><div class="crow"><span>Where you will show it</span><strong>'+esc(stsWhere()||"Not chosen")+'</strong></div><div class="crow"><span>Counting sales</span><strong>'+esc(STSTRKL[E.tk.trk]||"Not chosen")+'</strong></div><div class="crow"><span>Orders in the last 30 days</span><strong>'+esc(stsFmt(E.bl.orders30))+'</strong></div><h3>Your decision</h3><p><button type="button" class="chip" aria-pressed="'+(E.dec==="next")+'" data-a="sts-dec" data-w="1" data-v="next">Ready for Week 2</button></p></div>';
+}
+function sts1s5(){return stsShell(1,5,LC("sts1s5.lesson")+stsSummary1());}
+function sts2s1(){return stsShell(2,1,LC("sts2s1.lesson"));}
+var STSDEMOHINT=[["How it works","Start with the product already in your hands or on the screen.","Show it being used, start to finish, in real time or close to it."],["The result it gives","Start with the finished result.","Show what the buyer ends up with, then how the product got them there."],["One question people ask","Start with the question, in their words.","Answer it by showing, not telling."]];
+function stsDemo(i,wk,n){
+ var E=S.sts,m=E.dm[i],lk=!!E.cm,c=stsDemoCheck(m),pre=STSDEMOHINT[i],ro=lk?' readonly':'',di=lk?' disabled':'';
+ var h=LC("sts2s"+(i+2)+".lesson")+'<div class="card"><h2>Demo '+(i+1)+'</h2><label for="stsO'+i+'">The one thing this demo shows</label><input id="stsO'+i+'" type="text" maxlength="120" data-sts="dm.'+i+'.one" value="'+esc(m.one)+'"'+ro+' placeholder="'+esc(pre[0])+'"><label>What kind of demo is it?</label><div class="row">'+STSFMT.map(function(x){return '<button type="button" class="chip" aria-pressed="'+(m.fmt===x[0])+'" data-a="sts-fmt" data-i="'+i+'" data-v="'+x[0]+'"'+di+'>'+esc(x[1])+'</button>';}).join("")+'</div><label for="stsH'+i+'">How it opens: the first thing people see or read</label><textarea id="stsH'+i+'" maxlength="200" style="min-height:60px" data-sts="dm.'+i+'.hook"'+ro+' placeholder="'+esc(pre[1])+'">'+esc(m.hook)+'</textarea><label for="stsV'+i+'">What people will see, step by step</label><textarea id="stsV'+i+'" maxlength="500" style="min-height:90px" data-sts="dm.'+i+'.shown"'+ro+' placeholder="'+esc(pre[2])+'">'+esc(m.shown)+'</textarea><label for="stsA'+i+'">The one ask</label><textarea id="stsA'+i+'" maxlength="200" style="min-height:50px" data-sts="dm.'+i+'.ask"'+ro+' placeholder="For example: tap the link to get yours.">'+esc(m.ask)+'</textarea></div>';
+ h+='<div class="card"><h2>Does anything else appear in it?</h2><p class="mute">Tick anything that will be seen or heard, apart from you and your own product.</p>'+STSIN.map(function(x){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(m.inn[x[0]]===true)+'" data-a="sts-in" data-i="'+i+'" data-k="'+x[0]+'"'+di+'>'+esc(x[1])+'</button></p>';}).join("");
+ if(Object.keys(m.inn).length)h+='<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(m.perm===true)+'" data-a="sts-perm" data-i="'+i+'"'+di+'>I have permission for each of these, or the right to use it.</button></p><p class="mute">Ask before you film or photograph someone, and use music the platform allows for business use. This is general guidance, not legal advice.</p>';
+ else h+='<p class="mute">Nothing ticked. That is fine if it is only you and your product.</p>';
+ h+='</div><div class="card"><h2>Script check</h2><p class="mute">'+c.words+' words planned.</p>'+(c.issues.length?'<div class="note info"><strong>Worth another look:</strong><ul>'+c.issues.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>':(stsDemoFilled(m)?'<div class="note ok">That reads well for one short demo.</div>':''))+c.notes.map(function(x){return '<div class="note info">'+esc(x)+'</div>';}).join("")+'<p class="mute">This check only looks for common problems in your words. It cannot see your demo, and it is not confirmation that the demo meets advertising rules.</p></div>';
+ return stsShell(wk,n,h);
+}
+function sts2s2(){return stsDemo(0,2,2);}
+function sts2s3(){return stsDemo(1,2,3);}
+function sts2s4(){return stsDemo(2,2,4);}
+function sts2s5(){
+ var E=S.sts,lk=!!E.cm,h=LC("sts2s5.lesson");
+ if(lk)return stsShell(2,5,h+stsPlanLog());
+ h+='<div class="card"><h2>Six checks</h2><p class="mute">Tick each one when it is true.</p>'+STSTICKS.map(function(t){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(E.ticks[t[0]]===true)+'" data-a="sts-tick" data-k="'+t[0]+'">'+esc(t[1])+'</button></p>';}).join("")+'<p><strong>'+STSTICKS.filter(function(t){return E.ticks[t[0]]===true;}).length+' of 6 ticked.</strong></p></div>';
+ h+='<div class="card"><h2>When will you publish each one?</h2>'+[0,1,2].map(function(i){return '<label for="stsD'+i+'">Demo '+(i+1)+(E.dm[i].one.trim()?': '+esc(E.dm[i].one.trim()):'')+'</label><input id="stsD'+i+'" type="date" data-sts="sch.'+i+'" value="'+esc(E.sch[i])+'" min="'+esc(today())+'" style="max-width:200px">';}).join("");
+ var sc=stsSchCheck(E.sch);
+ if(sc.ok){h+='<div class="crow"><span>You will be watching until</span><strong>'+esc(dayLab(sc.w.to))+'</strong></div><div class="crow"><span>Read your numbers from</span><strong>'+esc(dayLab(sc.w.readOn))+'</strong></div>';if(sc.uneven)h+='<div class="note info">Your first demo would be out for much longer than your last one, so it would have more time to be seen. Publishing them closer together makes the comparison fairer.</div>';if(sc.prov)h+='<div class="note info">Your watching period runs past Day 30, so your Day 30 position will be provisional, and the rest is recorded as a post-sprint update in your 14 day update window.</div>';}
+ else if(E.sch.some(function(x){return !!x;}))h+='<div class="note '+(sc.why==="missing"?"info":"warn")+'"><strong>'+esc(sc.t)+'.</strong> '+esc(sc.b)+'</div>';
+ h+='</div>';
+ var r=stsReady();
+ h+='<div class="card"><h2>Ready to commit?</h2>';
+ if(r.ok)h+='<div class="note ok"><strong>Everything is in place.</strong></div>';else h+='<div class="note warn"><strong>Not quite yet. Still needed:</strong><ul>'+r.miss.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+ if(UI.stsc&&r.ok)h+='<div class="note info" aria-live="polite"><strong>Commit and lock your plan?</strong> Your three demos, your product, the place, how you will count sales and your dates will be locked and dated.</div><div class="row"><button type="button" class="btn" data-a="sts-commit">Yes, commit and lock</button><button type="button" class="btn ghost" data-a="sts-cancel">Not yet</button></div>';
+ else h+='<p><button type="button" class="btn"'+(r.ok?'':' disabled')+' data-a="sts-confirm">Commit my plan</button></p>';
+ return stsShell(2,5,h+'</div>');
+}
+function stsPlanLog(){
+ var c=S.sts.cm;if(!c)return "";
+ return '<div class="card"><h2>Your plan</h2><p class="mute">Committed on '+esc(dayLab(c.at))+'. This record is locked.</p><div class="crow"><span>Product</span><strong>'+esc(c.what)+'</strong></div><div class="crow"><span>Where</span><strong>'+esc(c.where)+'</strong></div><div class="crow"><span>Counting sales</span><strong>'+esc(STSTRKL[c.trk]||"")+'</strong></div>'+c.sch.map(function(d,i){return '<div class="crow"><span>Demo '+(i+1)+'</span><strong>'+esc(dayLab(d))+(c.dm[i].one?': '+esc(c.dm[i].one):'')+'</strong></div>';}).join("")+'</div>';
+}
+function stsStatus(){
+ var E=S.sts,w=stsWin();if(!E.cm)return '<div class="note warn"><strong>No plan is committed yet.</strong> Week 2 finishes with committing your three demos. <a href="#/show/w2/5">Go to Week 2, step 5</a></div>';
+ var n=stsOut().length;
+ return '<div class="card"><h2>Where you are</h2><div class="crow"><span>Demos logged as published</span><strong>'+n+' of 3</strong></div><div class="crow"><span>Watching until</span><strong>'+esc(dayLab(w.to))+'</strong></div><div class="crow"><span>Read your numbers from</span><strong>'+esc(dayLab(w.readOn))+'</strong></div>'+(w.allOut&&today()<w.readOn?'<div class="note info">All three are out. People can still respond, so please do not read your numbers as a result yet.</div>':'')+(rvCur()&&w.to>rvDay30()?'<div class="note info">Your watching period runs past Day 30, so your Day 30 position will be provisional, and the rest is recorded as a post-sprint update until '+esc(dayLab(rvEnd()))+'.</div>':'')+'</div>';
+}
+function sts3s1(){return stsShell(3,1,LC("sts3s1.lesson")+stsPlanLog()+stsStatus());}
+function sts3s2(){
+ var E=S.sts,h=LC("sts3s2.lesson");
+ if(!E.cm)return stsShell(3,2,h+stsStatus());
+ h+='<div class="card"><h2>Your publish log</h2><p class="mute">Record each demo when it goes out. The date cannot be before you committed, or in the future. You publish from your own account. The Sales Lab never posts for you.</p>';
+ [0,1,2].forEach(function(i){var x=E.pb[i];h+='<h3>Demo '+(i+1)+(E.cm.dm[i].one?': '+esc(E.cm.dm[i].one):'')+'</h3><p class="mute">Planned for '+esc(dayLab(E.cm.sch[i]))+'.</p><label for="stspb'+i+'">The day you published it</label><input id="stspb'+i+'" type="date" data-sts="pb.'+i+'.d" value="'+esc(x.d)+'" min="'+esc(E.cm.at)+'" max="'+esc(today())+'" style="max-width:200px">';});
+ return stsShell(3,2,h+'</div>'+stsStatus());
+}
+function stsConfHtml(){
+ var E=S.sts,h="";if(!E.cf.length)return '<p class="mute">Nothing logged. That is a fine answer if nothing changed.</p>';
+ E.cf.slice().sort(function(a,b){return a.d<b.d?-1:(a.d>b.d?1:a.id-b.id);}).forEach(function(c){var w=stsWin(),inw=w&&E.cm&&c.d>=addDays(E.cm.sch[0],-7)&&c.d<=w.to,mj=stsConfMajor(c),wd=!!c.wd,k=stsConfKind(c.k);h+='<div class="crow" style="display:block'+(wd?';opacity:.6':'')+'"><p><strong>'+esc(dayLab(c.d))+'</strong>: '+esc(k?k[1]:"")+' <span class="tag">'+(mj?"major":"minor")+'</span>'+(inw?'':' <span class="tag">outside your window, not counted</span>')+(wd?' <span class="tag">withdrawn '+esc(dayLab(c.wd))+'</span>':'')+'</p>'+(c.note?'<p style="white-space:pre-wrap">'+esc(c.note)+'</p>':'')+(wd?'':'<p><button type="button" class="chip sm" data-a="sts-fwd" data-id="'+c.id+'">Withdraw this entry</button></p>')+'</div>';});
+ return h;
+}
+function sts3s3(){
+ var E=S.sts,h=LC("sts3s3.lesson");if(!E.cm)return stsShell(3,3,h+stsStatus());
+ var u=UI.stsf||{};
+ h+='<div class="card"><h2>Log something that could also explain your numbers</h2><label for="stsfd">The day it happened</label><input id="stsfd" type="date" data-sts="f:d" value="'+esc(u.d||today())+'" max="'+esc(today())+'" min="'+esc(addDays(E.cm.sch[0],-7))+'" style="max-width:200px">'+STSCONF.map(function(x){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(u.k===x[0])+'" data-a="sts-fk" data-v="'+x[0]+'">'+esc(x[1])+'</button></p>';}).join("");
+ if(u.k==="other")h+='<label>Could this change your numbers a lot?</label><div class="row"><button type="button" class="chip" aria-pressed="'+(u.maj===true)+'" data-a="sts-fmaj" data-v="yes">Yes, it could</button><button type="button" class="chip" aria-pressed="'+(u.maj===false)+'" data-a="sts-fmaj" data-v="no">Probably not</button></div>';
+ h+='<label for="stsfn">A note (optional)</label><textarea id="stsfn" maxlength="300" data-sts="f:note" style="min-height:60px">'+esc(u.note||"")+'</textarea><p><button type="button" class="btn ghost" data-a="sts-fadd">Add to my list</button></p></div>';
+ var c=stsConfs();h+='<div class="card"><h2>Your list</h2><p><strong>'+c.major.length+' major, '+c.minor.length+' minor</strong> around your demos.</p>'+stsConfHtml()+'</div>';
+ return stsShell(3,3,h);
+}
+function sts3s4(){
+ var E=S.sts;return stsShell(3,4,LC("sts3s4.lesson")+'<div class="card"><h2>Your Week 3 summary</h2><div class="crow"><span>Demos logged as published</span><strong>'+stsOut().length+' of 3</strong></div><div class="crow"><span>Things that could explain the numbers</span><strong>'+(function(){var c=stsConfs();return c.major.length+" major, "+c.minor.length+" minor";})()+'</strong></div><h3>Your decision</h3><p><button type="button" class="chip" aria-pressed="'+(E.dec3==="next")+'" data-a="sts-dec" data-w="3" data-v="next">Ready to read my result in Week 4</button></p></div>');
+}
+function sts4s1(){return stsShell(4,1,LC("sts4s1.lesson")+LC("sts4s1.examples"));}
+function sts4s2(){
+ var E=S.sts,h=LC("sts4s2.lesson");if(!E.cm)return stsShell(4,2,h+stsStatus());
+ h+=rvCur()?rvPostNote():'';
+ h+='<div class="card"><h2>Your numbers, demo by demo</h2><p class="mute">Count each demo from the day it went out to '+esc(dayLab(stsWin().to))+'. Use the link or code that only that demo uses. If you cannot see a number, say so. It is kept as unknown and never read as zero.</p>';
+ [0,1,2].forEach(function(i){var x=E.res.d[i],p="res.d."+i+".";h+='<h3>Demo '+(i+1)+(E.cm.dm[i].one?': '+esc(E.cm.dm[i].one):'')+'</h3>'+stsNumRow(p+"views","Views",x.views)+stsNumRow(p+"clicks","Clicks on its link (if you can see them)",x.clicks)+stsNumRow(p+"orders","Orders from its link or code",x.orders)+stsNumRow(p+"rev","Revenue from those orders",x.rev,true);});
+ if(E.res.at)h+='<p class="mute">Last saved '+esc(dayLab(E.res.at))+(rvCur()&&E.res.at>rvDay30()?' <span class="tag">post-sprint update</span>':'')+'.</p>';
+ return stsShell(4,2,h+'</div>');
+}
+function stsDemoRows(nm){
+ var c=S.sts.cm;
+ return [0,1,2].map(function(i){var x=nm[i],o=c&&c.dm[i]?c.dm[i].one:"";return '<div class="crow" style="display:block"><p style="margin:0"><strong>Demo '+(i+1)+(o?': '+esc(o):'')+'</strong></p><p class="mute" style="margin:2px 0 8px">Views '+esc(stsFmt(x.views))+'. Clicks '+esc(stsFmt(x.clicks))+'. Orders '+esc(stsFmt(x.orders))+'. Revenue '+esc(stsFmt(x.rev,true))+'.</p></div>';}).join("");
+}
+function sts4s3(){
+ var E=S.sts,h=LC("sts4s3.lesson");if(!E.cm)return stsShell(4,3,h+stsStatus());
+ var v=stsVerdict(),cl={limited:"Limited. Too limited to support a confident conclusion.",lower:"Lower than usual. See the notes below.",fair:"Fair for a small test.",unclear:"Unclear.",none:""}[v.conf||"none"];
+ h+='<div class="card"><h2>Your evidence verdict</h2><div class="note '+v.cls+'"><strong>'+esc(v.label)+'</strong> <span class="tag">rule '+esc(v.rule)+'</span></div>'+(cl?'<p><strong>How much confidence?</strong> <span class="tag">'+esc(cl)+'</span></p>':'')+(v.strength?'<p>'+esc(v.strength)+'</p>':'')+'<h3>What the numbers show</h3><ul>'+v.why.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><h3>What they cannot show</h3><ul>'+v.limits.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><h3>A reasonable next step</h3><ul>'+v.next.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+ h+='<div class="card"><h2>Which demo sold?</h2><p>'+esc(v.cmp?v.cmp.line:"Your three demos cannot be compared yet.")+'</p>'+stsDemoRows(stsNums())+'<p class="mute">Counts, not percentages. With numbers this small, a percentage would look more exact than it is.</p></div>';
+ h+='<div class="card"><h2>What was considered</h2><div class="crow"><span>Major things logged</span><strong>'+stsConfs().major.length+'</strong></div><div class="crow"><span>Provisional settings used</span><strong>At least '+STSCFG.minViews+' views for each demo to describe a result, about '+STSCFG.confViews+' for a steadier reading, '+STSCFG.minClicks+' clicks before "Traffic but no sales", and at least '+STSCFG.leadOrders+' orders with '+STSCFG.leadGap+' more than the next before a demo is described as ahead</strong></div>'+(function(){var x=stsExposure();return x?'<div class="crow"><span>Days each demo was out</span><strong>'+esc(stsList(x.days))+'</strong></div>':'';})()+'<p class="mute">These are provisional testing assumptions, not proof of reliability and not a validated benchmark. Having enough to describe a result is not the same as strong evidence. Being ahead describes what happened in this test. It does not show that a demo is better, or that it caused the orders.</p></div>';
+ return stsShell(4,3,h);
+}
+function sts4s4(){
+ var E=S.sts,v=stsVerdict(),h=LC("sts4s4.lesson")+'<div class="card"><h2>Your verdict was: '+esc(v.label)+'</h2><h3>What would you like to do?</h3>'+STSNEXT.map(function(x){return '<p><button type="button" class="chip" aria-pressed="'+(E.nx===x[0])+'" data-a="sts-nx" data-v="'+x[0]+'">'+x[1]+'</button></p>';}).join("")+'<h3>Anything else?</h3><p><button type="button" class="chip" aria-pressed="'+(E.dec4==="done")+'" data-a="sts-dec" data-w="4" data-v="done">I am done with this experiment for now</button></p></div>';
+ return stsShell(4,4,h);
+}
+var STSROUTE=/^#\/show(?:\/(w[1-4]))?(?:\/([1-5]))?$/;
+function stsRouteInner(){
+ var m=STSROUTE.exec(route)||[],n=+(m[2]||0),wk=m[1]?+m[1].slice(1):(n?1:0);
+ if(!wk)return stsHome(1);
+ if(!n)return stsHome(wk);
+ var F=[null,[0,sts1s1,sts1s2,sts1s3,sts1s4,sts1s5],[0,sts2s1,sts2s2,sts2s3,sts2s4,sts2s5],[0,sts3s1,sts3s2,sts3s3,sts3s4],[0,sts4s1,sts4s2,sts4s3,sts4s4]];
+ return F[wk][n]?F[wk][n]():stsHome(wk);
+}
+function stsRoute(){
+ var m=STSROUTE.exec(route)||[],wk=m[1]||"",n=+(m[2]||0);
+ if(!stsActive())return stsPrep();
+ if(!wk&&!n)return stsMySprint();
+ var w=wk?+wk.slice(1):1;
+ if(w>1&&!stsWeekDone(w-2))return '<a class="back" href="#/sprint">&larr; My Sprint</a><h1>Week '+w+' is not open yet</h1><div class="note info">Week '+w+' opens when you finish Week '+(w-1)+'. <a href="#/show/w'+(w-1)+'">Go to Week '+(w-1)+'</a></div>';
+ return stsRouteInner();
+}
+function stsPrep(){
+ var P=S.sts.prep,ph=SPR.loaded?rvPhase():"",ready=stsPrepReady();
+ var h='<a class="back" href="#/experiments">&larr; Experiments</a><h1>Prepare for Show-to-Sell</h1><p class="mute">Get ready first. Nothing on this page starts your 30 days, and nothing here counts as completed experiment activity.</p>';
+ h+='<div class="card"><h2>What the experiment is</h2><p>Over four weeks you make three short demos of one product in use. Each demo shows one thing, and each has its own link or code. You publish them yourself, in one place, and count what each one brings. You read the result honestly, and decide what is next. The Sales Lab never posts or publishes anything for you.</p></div>';
+ h+='<div class="card"><h2>The four weeks, in plain words</h2><ol>'+STSWKT.map(function(t,i){return '<li><strong>Week '+(i+1)+': '+esc(t)+'.</strong> '+esc(STSWKD[i])+'</li>';}).join("")+'</ol><p class="mute">About 3 to 5 hours a week. You can read ahead, and you can go at your own pace inside each week.</p></div>';
+ h+='<div class="card"><h2>What you need before it can start</h2><p><strong>Do you have a product that people can buy today, and that you can show in use?</strong></p><div class="row"><button type="button" class="chip" aria-pressed="'+(P.prod==="yes")+'" data-a="sts-pprod" data-v="yes">Yes</button><button type="button" class="chip" aria-pressed="'+(P.prod==="no")+'" data-a="sts-pprod" data-v="no">Not yet</button></div><p style="margin-top:12px"><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(P.place===true)+'" data-a="sts-pplace">I have somewhere of my own to publish a demo, such as a social account or my shop page.</button></p>';
+ if(P.prod==="no")h+='<div class="note info"><strong>That is fine.</strong> A demo needs something people can buy once they have seen it. Come back when your product is on sale. Your 30 days will not start until then, and you choose when to begin.</div>';
+ h+='<p class="mute">You do not need to be on camera. Hands, a screen recording or photos can all show a product in use. The sprint starts only when you press the start button yourself.</p></div>';
+ if(!SPR.loaded)h+='<div class="note warn" role="status">We could not check your sprint just now. Please refresh the page.</div>';
+ else if(stsActive())h+='<div class="note ok">You are already on this experiment. <a href="#/sprint">Open My Sprint</a>.</div>';
+ else if(ph==="during")h+='<div class="note info">You already have a sprint running. You can start Show-to-Sell after Day 30, if you wish.</div>';
+ else if(ready)h+='<div class="card"><h2>Ready when you are</h2><p>You have a product to show and a place to show it. You will choose the details in Week 1.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("show",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
+ else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both are needed: a product people can buy that you can show in use, and somewhere of your own to publish.</div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It borrows other people\'s audiences, so you do not need your own.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p><strong>Email-to-Sale</strong> <span class="tag">open now</span><br><span class="mute">For anyone with a list of people who agreed to hear from them.</span></p><p class="mute">Find Your Buyers and LIVE Sales are coming soon, and are not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ return h;
+}
+function stsMySprint(){
+ var wk=stsCurWeek(),W=stsWeeks()[wk-1];
+ var h='<h1>My Sprint</h1><p class="mute">Show-to-Sell &middot; Week '+wk+' of 4</p>'+sprintBar(true);
+ h+='<div class="tabs rwpick">'+stsWeeks().map(function(w){var g=rSvg("-50 -50 100 100",rWeekG(w.n,w.open,"#fff"));return w.open?'<a class="chip rwb" aria-pressed="'+(w.n===wk)+'" href="#/show/w'+w.n+'">'+g+'<b>'+esc(w.title)+'</b>Week '+w.n+(w.state==="done"?' &#10003;':'')+'</a>':'<button type="button" class="chip rwb" disabled title="Opens when you finish Week '+(w.n-1)+'">'+g+'<b>'+esc(w.title)+'</b>Week '+w.n+'</button>';}).join("")+'</div>';
+ h+='<p class="mute"><strong>This week:</strong> '+esc(STSWKD[wk-1])+'</p>'+(wk===1?'<p class="mute">Week 2 opens when you finish Week 1 (choose "Ready for Week 2" in the last step).</p>':'');
+ var pn=String(S.focus.product||"").trim();if(pn)h+='<div class="note ok"><strong>Your product:</strong> '+esc(pn)+'</div>';
+ h+='<div class="card"><h2>Week '+W.n+': '+esc(W.title)+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,stsWeekBase(W.n)+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+ return h+'<p class="mute"><a href="#/experiments">See all six experiments, and the sales check</a></p>';
+}
+function stsResultsPage(){
+ var E=S.sts,v=stsVerdict(),ph=rvPhase(),started=stsStepCount()>0||!!E.cm,n=stsOut().length,nm=stsNums(),h='<div class="phd"><h1>Results</h1><p class="mute">Your numbers, what they show, and what you learned. Counts, not percentages, while samples are small.</p>';
+ if(started)h+='<div class="rtally"><div><h3>You did</h3><p><b>'+stsStepCount()+'</b>Steps done</p><p><b>'+n+' of 3</b>Demos published</p><p><b>'+(E.cm?"1":"0")+'</b>Plan committed</p></div><div><h3>Came back</h3><p><b>'+esc(stsFmtSum(stsSum(nm,"views")))+'</b>Views of your demos</p><p><b>'+esc(stsFmtSum(stsSum(nm,"clicks")))+'</b>Clicks on your links</p></div><div><h3>Sold</h3><p><b>'+esc(stsFmtSum(stsSum(nm,"orders")))+'</b>Orders from your demos</p><p><b>'+esc(stsFmtSum(stsSum(nm,"rev"),true))+'</b>Revenue from those orders</p></div></div>';
+ h+='</div><!--/phd--><div class="rcols"><div>';
+ h+='<div class="card"><h2>Where you started</h2><p class="mute">The last 30 days before your sprint, from Week 1, step 2. "I can\'t see this" stays unknown and is never turned into zero.</p><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(stsFmt(E.bl.orders30))+'</b>Orders for this product</div><div class="tile"><b style="font-size:20px">'+esc(stsFmt(E.bl.rev30,true))+'</b>Revenue</div><div class="tile"><b style="font-size:20px">'+esc(stsFmt(E.bl.posts30))+'</b>Times you showed it</div></div></div>';
+ h+='<div class="card"><h2>Your sprint so far</h2><p class="mute">'+esc(rvClock())+'</p>';
+ if(E.cm){var w=stsWin();h+='<p>Your demos: <strong>'+esc(E.cm.what)+'</strong>, '+n+' of 3 published'+(E.cm.where?' ('+esc(E.cm.where)+')':'')+'.</p>'+(w?'<p class="mute">Watching until '+esc(dayLab(w.to))+'. Read your numbers from '+esc(dayLab(w.readOn))+'.</p>':'')+'<h3>Demo by demo</h3>'+stsDemoRows(nm);}
+ else h+='<p class="mute">No plan is committed yet. You commit it in <a href="#/show/w2/5">Week 2, step 5</a>.</p>';
+ h+='</div>';
+ if(started)h+='<section class="rpnl gold rread"><small>What the evidence suggests</small><h2>'+(ph==="during"&&v.rule!=="S2"?"Provisional reading: ":"")+esc(v.label)+'</h2><p>'+esc(v.why[0]||"")+'</p>'+(v.cmp&&v.rule!=="S3"&&v.cmp.kind!=="unknown"?'<p>'+esc(v.cmp.line)+'</p>':'')+''+(v.strength?'<p>'+esc(v.strength)+'</p>':'')+'<p class="mute">A reading, not a verdict. Orders you can see after a demo are not proof that the demo caused them. <span class="tag">rule '+v.rule+'</span>'+(v.conf&&v.conf!=="none"?' <span class="tag">confidence: '+esc(v.conf)+'</span>':'')+'</p></section>';
+ h+='</div><div class="rside"><div class="card"><h2>Day 30 review</h2>'+(S.rv.done?'<p>Saved on '+esc(dayLab(S.rv.at))+': '+esc(S.rv.snap?S.rv.snap.label:"")+'.</p>':'<p class="mute">'+(started?"Look back at your sprint, see what the evidence suggests, and choose what to focus on next. You can open it at any time.":"Available once your sprint has started.")+'</p>')+'<p><a class="btn'+(S.rv.done?' ghost':'')+'" href="#/review">Open my Day 30 review</a></p></div>';
+ var c=stsConfs(),learn=[];if(E.cf.length)learn.push("Things that could also explain your numbers: "+c.major.length+" major, "+c.minor.length+" minor");
+ if(E.nx){var nx=STSNEXT.filter(function(x){return x[0]===E.nx;})[0];if(nx)learn.push("What you decided next: "+nx[1]);}
+ h+='<div class="card"><h2>What you have learned</h2>'+(learn.length?learn.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join(""):'<p class="mute">Your own notes and choices from Weeks 2 to 4 appear here as you go.</p>')+'</div><div class="card"><h2>Past sprints</h2>'+rvPastHtml()+'</div>';
+ return h+'</div></div>';
+}
+function stsReviewHead(){
+ var E=S.sts,v=stsVerdict(),rec=stsRec(v),ph=rvPhase(),prov=ph==="during"||rec.provisional,n=stsOut().length,nm=stsNums();
+ var h='<a class="back" href="#/results">&larr; Results</a><h1>Your Day 30 review</h1><p class="mute">Show-to-Sell. A look at where you started, what you did, what the evidence suggests, and what to focus on next.</p>'+sprintBar(true);
+ h+='<div class="card"><h2>1. Where you started, and where you are now</h2><p class="mute">Your starting numbers are the 30 days before your sprint. Your demo numbers cover these three demos only. We show them side by side and we do not label the difference as better or worse, because the two are not like for like.</p><div class="crow" style="display:block"><p style="margin:0"><strong>Orders for this product</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(stsFmt(E.bl.orders30))+'. From your three demos: '+esc(stsFmtSum(stsSum(nm,"orders")))+'.</p></div><div class="crow" style="display:block"><p style="margin:0"><strong>Revenue from this product</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(stsFmt(E.bl.rev30,true))+'. From your three demos: '+esc(stsFmtSum(stsSum(nm,"rev"),true))+'.</p></div></div>';
+ h+='<div class="card"><h2>2. What you did</h2><p>Steps completed: '+STSWKT.map(function(t,i){return "Week "+(i+1)+" "+rCount(stsStepsOf(i),stsDOf(i))+" of "+stsStepsOf(i).length;}).join(", ")+'.</p><p>Demos published: '+n+' of 3.</p><div class="note info">You do not need to have finished every step. Anything unfinished stays saved and you can come back to it.</div></div>';
+ h+='<div class="card"><h2>3. What the evidence suggests</h2><div class="note '+v.cls+'"><strong>'+(prov?"Provisional reading: ":"")+esc(v.label)+'</strong> <span class="tag">rule '+v.rule+'</span>'+(v.conf&&v.conf!=="none"?' <span class="tag">confidence: '+esc(v.conf)+'</span>':'')+'</div><h3>What the numbers show</h3>'+v.why.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("")+(E.cm?stsDemoRows(nm):'')+'<h3>What remains uncertain</h3>'+v.limits.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("")+''+(v.strength?'<p style="margin:4px 0">'+esc(v.strength)+'</p>':'')+'<p style="margin:4px 0">This is a reading, not a verdict. The thresholds behind it are provisional starting points, not guarantees.</p><h3>What to focus on next</h3><div class="note info"><strong>'+esc(rec.t)+'</strong><br>'+esc(rec.b)+'</div><p><strong>First small action:</strong> '+esc(rec.first)+'</p>'+(rec.extra?'<p>'+esc(rec.extra)+'</p>':'')+'<p class="mute"><strong>Evidence:</strong> '+esc(rec.basis)+'</p><p class="mute"><strong>Assumption:</strong> '+esc(rec.assume)+'</p></div>';
+ return h;
+}
+function stsPastSummary(p){
+ if(p.exp!=="show"||!p.stx)return "";
+ var x=p.stx,keep=S.sts;S.sts=x;var h;try{var nm=stsNums();h=x.cm?'<p class="mute" style="margin:2px 0 6px">Demos: '+esc(x.cm.what)+', '+stsOut().length+' of 3 published. Orders by demo: '+esc(stsList(nm.map(function(y){return stsFmt(y.orders);})))+'.</p>':'<p class="mute" style="margin:2px 0 6px">No demos were committed in this sprint.</p>';}finally{S.sts=keep;}
+ return h;
+}
+function stsPastFix(x){
+ var okd=function(y){return (typeof y==="string"&&(y===""||parseYmd(y)!=null))?y:"";},st=function(y,n){return typeof y==="string"?y.slice(0,n):"";},nm=function(y){return (typeof y==="number"&&isFinite(y)&&y>=0&&y<100000)?Math.floor(y):0;};
+ var rvt=rvfix({rv:{snap:x.snap,upd:x.upd,done:!!x.snap}}).rv;
+ return {exp:"show",sid:nm(x.sid),auto:x.auto===true,start:okd(x.start),archivedAt:okd(x.archivedAt),label:st(x.label,40),rule:st(x.rule,4),review:x.review===true,snap:rvt.snap,upd:rvt.upd,stx:stsfix({sts:x.stx}).sts};
+}
+function stsArchive(prev){
+ var snap=S.rv.snap,auto=false;if(!snap){snap=stsSnap("day30");auto=true;}
+ var e={exp:"show",sid:prev.id,start:prev.start_day,archivedAt:today(),label:snap.label,rule:snap.rule,review:!!S.rv.done,auto:auto,snap:snap,upd:S.rv.upd.slice(0,20),stx:clone(S.sts)};
+ S.past=(S.past||[]);if(S.past.length>=10)S.past.shift();S.past.push(e);
+}
+var PUSK=[["views","Views"],["clicks","Clicks on its link"],["orders","Orders from its link or code"],["rev","Revenue from those orders"]];
+function pusDraft(){if(!UI.pus)UI.pus={i:-1,d:[0,1,2].map(function(){var o={};STSK.forEach(function(k){o[k]={s:"",v:""};});return o;})};return UI.pus;}
+function stsPastLate(p,i){
+ if(!(UI.pus&&UI.pus.i===i))return '<p><button type="button" class="btn ghost" data-a="pus-open" data-i="'+i+'">Add late demo numbers to this sprint</button></p>';
+ var u=pusDraft(),opts=[["value","A number"],["zero","Zero, I checked"],["unknown","I can't see this"]],h='<p class="mute">Add what you can now see for this earlier sprint. They belong to this sprint only, and do not change your current sprint or the Day 30 position. Leave anything you do not want to change.</p>';
+ [0,1,2].forEach(function(n){var one=p.stx&&p.stx.cm&&p.stx.cm.dm[n]?p.stx.cm.dm[n].one:"";h+='<h3>Demo '+(n+1)+(one?': '+esc(one):'')+'</h3>';PUSK.forEach(function(k){var o=u.d[n][k[0]],lab=k[1]+(k[0]==="rev"?" ("+sym(S.focus.currency).trim()+")":"");h+='<div class="q"><strong>'+esc(lab)+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="pus-vs" data-n="'+n+'" data-k="'+k[0]+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="9" data-pus="'+n+'.'+k[0]+'" value="'+esc(o.v)+'" aria-label="'+esc("Demo "+(n+1)+": "+k[1])+'" style="max-width:160px">':'')+'</div>';});});
+ return h+'<p class="row"><button type="button" class="btn" data-a="pus-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pus-cancel">Cancel</button></p>';
+}
+function pusAction(a,d){
+ var u=UI.pus||null;
+ if(a==="pus-open"){var i=+d.i,p=(S.past||[])[i];if(!p||p.exp!=="show"||!p.stx||!pastWinOpen(p))return;UI.pus=null;u=pusDraft();u.i=i;}
+ else if(a==="pus-cancel"){UI.pus=null;}
+ else if(a==="pus-vs"){u=pusDraft();var n=+d.n;if(!(n===0||n===1||n===2)||STSK.indexOf(d.k)<0||!ETVS[d.v]||d.v==="")return;var o=u.d[n][d.k];o.s=o.s===d.v?"":d.v;if(o.s!=="value")o.v="";}
+ else if(a==="pus-save"){
+  if(!u)return;var p2=(S.past||[])[u.i];if(!p2||p2.exp!=="show"||!p2.stx||!pastWinOpen(p2))return;
+  var any=false;u.d.forEach(function(x,n2){STSK.forEach(function(k){var o2=x[k];if(o2.s){any=true;p2.stx.res.d[n2][k]={s:o2.s,v:o2.s==="value"?w4Clean(k,o2.v):""};}});});
+  if(!any)return;p2.stx.res.at=today();
+  var keep=S.sts;S.sts=p2.stx;var v;try{v=stsVerdict();}finally{S.sts=keep;}
+  var e={at:today(),label:v.label,rule:v.rule,ctr:{msgs:0,resp:0,opp:0},res:{},kind:"update",asOf:"",late:false,prov:false};
+  p2.upd=p2.upd||[];if(p2.upd.length&&p2.upd[p2.upd.length-1].at===e.at)p2.upd[p2.upd.length-1]=e;else if(p2.upd.length<RVMAX)p2.upd.push(e);else return;
+  UI.pus=null;save();
+ }
+ else return;
+ render();
+}
+function pusInput(t){var u=pusDraft(),m=/^([0-2])\.(views|clicks|orders|rev)$/.exec(String(t.dataset.pus));if(!m)return;var o=u.d[+m[1]][m[2]];if(o&&o.s==="value"){var c=w4Clean(m[2],t.value);o.v=c;if(c!==t.value)t.value=c;}}
+
+/* --- actions and input --- */
+function stsSetPath(path,val){
+ var p=String(path).split("."),o=S.sts;for(var i=0;i<p.length-1;i++){o=o[/^\d$/.test(p[i])?+p[i]:p[i]];if(o==null)return false;}
+ o[/^\d$/.test(p[p.length-1])?+p[p.length-1]:p[p.length-1]]=val;return true;
+}
+var STSTXT=[[/^pr\.product$/,120],[/^pr\.who$/,200],[/^wh\.name$/,120],[/^tk\.refs\.[0-2]$/,200],[/^dm\.[0-2]\.one$/,120],[/^dm\.[0-2]\.hook$/,200],[/^dm\.[0-2]\.shown$/,500],[/^dm\.[0-2]\.ask$/,200]];
+function stsAddConf(){
+ var E=S.sts,u=UI.stsf||{};if(!E.cm||E.cf.length>=60)return false;
+ var d=u.d||today();if(parseYmd(d)==null||d>today()||d<addDays(E.cm.sch[0],-7))return false;
+ if(!stsConfKind(u.k))return false;if(u.k==="other"&&u.maj!==true&&u.maj!==false)return false;
+ E.cf.push({id:E.nid++,d:d,at:today(),k:u.k,maj:u.k==="other"?u.maj===true:true,note:String(u.note||"").trim().slice(0,300),wd:""});UI.stsf=null;return true;
+}
+function stsLogDate(i,v){
+ var E=S.sts;if(!E.cm||!(i>=0&&i<3))return false;
+ if(v===""){E.pb[i].d="";return true;}
+ if(parseYmd(v)==null||v>today()||v<E.cm.at)return false;
+ if(rvCur()&&v<rvStart())return false;
+ E.pb[i].d=v;return true;
+}
+function stsAction(a,d){
+ var E=S.sts,i=+d.i,di=(i===0||i===1||i===2);
+ if(a==="sts-done"){var st=[E.steps,E.steps2,E.st3,E.st4][(+d.w)-1];if(!st||!/^[1-5]$/.test(String(d.n))||+d.n>STSSTEPS[(+d.w)-1].length)return;st[d.n]=!st[d.n];save();}
+ else if(a==="sts-dec"){var w=+d.w;if(w===1&&d.v==="next")E.dec=E.dec===d.v?"":d.v;else if(w===2&&d.v==="next")E.dec2=E.dec2===d.v?"":d.v;else if(w===3&&d.v==="next")E.dec3=E.dec3===d.v?"":d.v;else if(w===4&&d.v==="done")E.dec4=E.dec4===d.v?"":d.v;else return;save();}
+ else if(a==="sts-q"){UI.stsq=UI.stsq||{};UI.stsq[d.q]=d.v;}
+ else if(a==="sts-ch"){if(E.cm||!stsChLabel(d.v))return;E.wh.ch=E.wh.ch===d.v?"":d.v;save();}
+ else if(a==="sts-trk"){if(["link","code","ask","none"].indexOf(d.v)<0||E.cm)return;E.tk.trk=E.tk.trk===d.v?"":d.v;save();}
+ else if(a==="sts-fmt"){if(E.cm||!di||!STSFMT.some(function(x){return x[0]===d.v;}))return;E.dm[i].fmt=E.dm[i].fmt===d.v?"":d.v;save();}
+ else if(a==="sts-in"){if(E.cm||!di||!STSIN.some(function(x){return x[0]===d.k;}))return;if(E.dm[i].inn[d.k])delete E.dm[i].inn[d.k];else E.dm[i].inn[d.k]=true;if(!Object.keys(E.dm[i].inn).length)E.dm[i].perm=false;save();}
+ else if(a==="sts-perm"){if(E.cm||!di||!Object.keys(E.dm[i].inn).length)return;E.dm[i].perm=!E.dm[i].perm;save();}
+ else if(a==="sts-vs"){if(!STSVSPATH.test(String(d.p))||!ETVS[d.v]||d.v==="")return;if(/^res\./.test(d.p)&&!E.cm)return;var o=stsGet(d.p);if(!o)return;o.s=o.s===d.v?"":d.v;if(o.s!=="value")o.v="";if(/^res\./.test(d.p))E.res.at=today();save();}
+ else if(a==="sts-tick"){if(E.cm||!STSTICKS.some(function(t){return t[0]===d.k;}))return;if(E.ticks[d.k])delete E.ticks[d.k];else E.ticks[d.k]=true;save();}
+ else if(a==="sts-confirm"){if(!stsReady().ok)return;UI.stsc=true;}
+ else if(a==="sts-cancel"){UI.stsc=false;}
+ else if(a==="sts-commit"){if(!UI.stsc)return;UI.stsc=false;if(!stsCommit())return;save();}
+ else if(a==="sts-fk"){if(!stsConfKind(d.v))return;UI.stsf=UI.stsf||{};UI.stsf.k=UI.stsf.k===d.v?"":d.v;if(UI.stsf.k!=="other")delete UI.stsf.maj;}
+ else if(a==="sts-fmaj"){UI.stsf=UI.stsf||{};if(UI.stsf.k!=="other"||(d.v!=="yes"&&d.v!=="no"))return;UI.stsf.maj=d.v==="yes";}
+ else if(a==="sts-fadd"){if(!stsAddConf())return;save();}
+ else if(a==="sts-fwd"){var c=E.cf.filter(function(x){return x.id===+d.id;})[0];if(!c||c.wd)return;c.wd=today();save();}
+ else if(a==="sts-nx"){if(!STSNEXT.some(function(x){return x[0]===d.v;}))return;E.nx=E.nx===d.v?"":d.v;save();}
+ else if(a==="sts-pprod"){if(d.v!=="yes"&&d.v!=="no")return;E.prep.prod=E.prep.prod===d.v?"":d.v;if(E.prep.prod!=="yes")E.prep.place=false;save();}
+ else if(a==="sts-pplace"){if(E.prep.prod!=="yes")return;E.prep.place=!E.prep.place;save();}
+ else return;
+ render();
+}
+function stsInput(t){
+ var E=S.sts,k=String(t.dataset.sts);
+ if(k==="f:d"){var v=String(t.value||"");UI.stsf=UI.stsf||{};if(v===""||parseYmd(v)!=null)UI.stsf.d=v;return;}
+ if(k==="f:note"){UI.stsf=UI.stsf||{};UI.stsf.note=String(t.value||"").slice(0,300);return;}
+ if(k.indexOf("n:")===0){var p=k.slice(2);if(!STSVSPATH.test(p))return;if(/^res\./.test(p)&&!E.cm)return;var o=stsGet(p);if(o&&o.s==="value"){var c=w4Clean("n",t.value);o.v=c;if(c!==t.value)t.value=c;if(/^res\./.test(p))E.res.at=today();save();}return;}
+ if(E.cm&&/^(pr|wh|tk|dm|sch)\./.test(k))return;
+ var tx=STSTXT.filter(function(x){return x[0].test(k);})[0];
+ if(tx){stsSetPath(k,String(t.value).slice(0,tx[1]));save();return;}
+ if(/^sch\.[0-2]$/.test(k)){var dv=String(t.value||"");if(dv===""||parseYmd(dv)!=null){stsSetPath(k,dv);save();render();}return;}
+ var m=/^pb\.([0-2])\.d$/.exec(k);if(m){if(stsLogDate(+m[1],String(t.value||""))){save();render();}return;}
+}
+
+/* --- the experiment adapter, for Show-to-Sell (outer wrappers: Show first, then Email, then Etsy, then Partnership) --- */
+EXPKEY.show="show";EXPOPEN.show=true;
+var _rvExp6=rvExp;rvExp=function(){return stsActive()?"show":_rvExp6();};
+var _xaName6=xaName;xaName=function(){return stsActive()?"Show-to-Sell":_xaName6();};
+var _xaTotal6=xaTotal;xaTotal=function(){return stsActive()?STSTOTAL:_xaTotal6();};
+var _xaW46=xaW4;xaW4=function(){return stsActive()?"#/show/w4/2":_xaW46();};
+var _xaW4S6=xaW4Step;xaW4Step=function(){return stsActive()?2:_xaW4S6();};
+var _sprHasWork6=sprHasWork;sprHasWork=function(){return stsActive()?stsHasWork():_sprHasWork6();};
+var _rvSnap6=rvSnap;rvSnap=function(k){return stsActive()?stsSnap(k):_rvSnap6(k);};
+var _tabOf6=tabOf;tabOf=function(r){r=r||"#/";if(/^#\/show(\/|$)/.test(r))return stsActive()?"sprint":"exp";return _tabOf6(r);};
+var _rWeeks6=rWeeks;rWeeks=function(){return stsActive()?stsWeeks():_rWeeks6();};
+var _rTrack6=rTrack;
+rTrack=function(){
+ if(!stsActive())return _rTrack6();
+ return '<div class="rweeks">'+stsWeeks().map(function(w){var inner='<small>Week '+w.n+'</small><b>'+esc(w.title)+'</b>'+rBars(w)+'<em>'+esc(w.status)+'</em>';return w.open?'<a class="rwk '+w.state+'" href="#/show/w'+w.n+'">'+inner+'</a>':'<div class="rwk later">'+inner+'</div>';}).join("")+'</div>';
+};
+var _rNext6=rNext;
+rNext=function(){
+ if(!(stsActive()&&(SPR.loaded?rvPhase():"during")==="during"))return _rNext6();
+ var wk=stsCurWeek(),W=stsWeeks()[wk-1],first=W.first;
+ if(!first)return {k:"Your next step",t:"Open your results",d:"You have finished every step. Your results, your evidence reading and your Day 30 review are in one place.",link:"#/results",b:"Open my results"};
+ var s=W.L[first-1];
+ return {k:"Your next step",t:s.t,d:"You will need: "+s.b+" Everything saves as you go.",m:s.m,link:stsWeekBase(wk)+first,b:"Continue Week "+wk+", step "+first,w:wk,n:first};
+};
+var _rHomeList6=rHomeList;
+rHomeList=function(nx){
+ var ph=SPR.loaded?rvPhase():"during";
+ if(!stsActive()||ph!=="during")return _rHomeList6(nx);
+ var W=stsWeeks()[stsCurWeek()-1];
+ return '<div class="card"><h2>Week '+W.n+': '+esc(W.title)+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,stsWeekBase(W.n)+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+};
+var _rSoFar6=rSoFar;
+rSoFar=function(){
+ if(!stsActive())return _rSoFar6();
+ var E=S.sts,h='<div class="card"><h2>Your sprint so far</h2>';
+ if(!stsStepCount()&&!E.cm)return h+'<p class="mute">Your numbers appear here once you begin. What you did, what came back and what sold are always kept apart.</p></div>';
+ h+='<div class="tiles"><div class="tile"><b>'+stsStepCount()+'</b><span>Steps done</span></div><div class="tile"><b>'+stsOut().length+' of 3</b><span>Demos published</span></div><div class="tile"><b aria-hidden="true">'+(E.cm?"&#10003;":"&ndash;")+'</b><span>Plan committed<span class="sr">: '+(E.cm?"yes":"not yet")+'</span></span></div></div>';
+ return h+'<p><a class="link" href="#/results">Open your results</a></p></div>';
+};
+var _home6=home;home=function(){return stsActive()?stsMySprint():_home6();};
+var _resultsPage6=resultsPage;resultsPage=function(){return stsActive()?stsResultsPage():_resultsPage6();};
+var _reviewPage6=reviewPage;
+reviewPage=function(){
+ if(!stsActive())return _reviewPage6();
+ var tail=_reviewPage6(),i=tail.indexOf('<div class="card"><h2>4. Complete your review</h2>');
+ return stsReviewHead()+(i>-1?tail.slice(i):"");
+};
+var _etBlockP6=etBlockP;etBlockP=function(){return stsActive()?/^#\/(step\/[1-7]|w[234]\/[1-6])$/.test(route||""):_etBlockP6();};
+var _etBlockHtml6=etBlockHtml;etBlockHtml=function(){return stsActive()?_etBlockHtml6().replace("This is your Etsy sprint","This is your Show-to-Sell sprint"):_etBlockHtml6();};
 
 /* ---------- H1: navigation shell (14 Nov 2026). Home, My Sprint, Experiments, Results, Community (when switched on), Profile. ---------- */
 var NAVI={
@@ -4296,6 +4907,8 @@ document.addEventListener("click",function(e){
  if(a.indexOf("pue-")===0){puEAction(a,d);return;}
  if(a.indexOf("pum-")===0){pumAction(a,d);return;}
  if(a.indexOf("em-")===0){emAction(a,d);return;}
+ if(a.indexOf("pus-")===0){pusAction(a,d);return;}
+ if(a.indexOf("sts-")===0){stsAction(a,d);return;}
  if(a.indexOf("et-")===0){etAction(a,d,t);return;}
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
@@ -4341,6 +4954,8 @@ document.addEventListener("input",function(e){
  else if(t.dataset.pue){puEInput(t);}
  else if(t.dataset.pum){pumInput(t);}
  else if(t.dataset.em){emInput(t);}
+ else if(t.dataset.pus){pusInput(t);}
+ else if(t.dataset.sts){stsInput(t);}
  else if(t.dataset.sk){S.sketch[t.dataset.sk]=S.sketch[t.dataset.sk]||{};S.sketch[t.dataset.sk].note=t.value;save();}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="signin"&&e.target.dataset&&e.target.dataset.auth){e.preventDefault();if(e.target.dataset.auth==="email")sendCode();else if(e.target.dataset.auth==="code")verifyCode();else if(e.target.dataset.auth==="pw")pwLogin();}});
@@ -4791,7 +5406,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,emActive:emActive,emPrepReady:emPrepReady,emPrep:emPrep,emRoute:emRoute,emWeeks:emWeeks,emWeekDone:emWeekDone,emCurWeek:emCurWeek,emStepCount:emStepCount,emHasWork:emHasWork,emStart:emStart,emFresh:emFresh,emArchive:emArchive,emPastFix:emPastFix,emRec:emRec,emMySprint:emMySprint,emResultsPage:emResultsPage,emReviewHead:emReviewHead,emPastLate:emPastLate,pumAction:pumAction,pumInput:pumInput,emPastSummary:emPastSummary,emAction:emAction,emInput:emInput,emfix:emfix,emVerdict:emVerdict,emSnap:emSnap,emListCheck:emListCheck,emSchCheck:emSchCheck,emDraftCheck:emDraftCheck,emCompose:emCompose,emReady:emReady,emCommit:emCommit,emSent:emSent,emWin:emWin,emConfs:emConfs,emRecip:emRecip,emCaveats:emCaveats,emRouteInner:emRouteInner,emHome:emHome,em1s1:em1s1,em1s2:em1s2,em1s3:em1s3,em1s4:em1s4,em1s5:em1s5,em2s1:em2s1,em2s2:em2s2,em2s3:em2s3,em2s4:em2s4,em2s5:em2s5,em3s1:em3s1,em3s2:em3s2,em3s3:em3s3,em3s4:em3s4,em4s1:em4s1,em4s2:em4s2,em4s3:em4s3,em4s4:em4s4,emLogDate:emLogDate,emAddConf:emAddConf,xaNameOf:xaNameOf,pastSummary:pastSummary,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,stsActive:stsActive,stsPrepReady:stsPrepReady,stsPrep:stsPrep,stsRoute:stsRoute,stsWeeks:stsWeeks,stsWeekDone:stsWeekDone,stsCurWeek:stsCurWeek,stsStepCount:stsStepCount,stsHasWork:stsHasWork,stsStart:stsStart,stsFresh:stsFresh,stsArchive:stsArchive,stsPastFix:stsPastFix,stsRec:stsRec,stsMySprint:stsMySprint,stsResultsPage:stsResultsPage,stsReviewHead:stsReviewHead,stsPastLate:stsPastLate,pusAction:pusAction,pusInput:pusInput,stsPastSummary:stsPastSummary,stsAction:stsAction,stsInput:stsInput,stsfix:stsfix,stsVerdict:stsVerdict,stsSnap:stsSnap,stsSchCheck:stsSchCheck,stsDemoCheck:stsDemoCheck,stsReady:stsReady,stsCommit:stsCommit,stsOut:stsOut,stsWin:stsWin,stsConfs:stsConfs,stsNums:stsNums,stsSum:stsSum,stsFmtSum:stsFmtSum,stsCompare:stsCompare,stsCaveats:stsCaveats,stsRouteInner:stsRouteInner,stsHome:stsHome,stsWhere:stsWhere,sts1s1:sts1s1,sts1s2:sts1s2,sts1s3:sts1s3,sts1s4:sts1s4,sts1s5:sts1s5,sts2s1:sts2s1,sts2s2:sts2s2,sts2s3:sts2s3,sts2s4:sts2s4,sts2s5:sts2s5,sts3s1:sts3s1,sts3s2:sts3s2,sts3s3:sts3s3,sts3s4:sts3s4,sts4s1:sts4s1,sts4s2:sts4s2,sts4s3:sts4s3,sts4s4:sts4s4,stsLogDate:stsLogDate,stsAddConf:stsAddConf,stsExposure:stsExposure,STSCFG:STSCFG,emActive:emActive,emPrepReady:emPrepReady,emPrep:emPrep,emRoute:emRoute,emWeeks:emWeeks,emWeekDone:emWeekDone,emCurWeek:emCurWeek,emStepCount:emStepCount,emHasWork:emHasWork,emStart:emStart,emFresh:emFresh,emArchive:emArchive,emPastFix:emPastFix,emRec:emRec,emMySprint:emMySprint,emResultsPage:emResultsPage,emReviewHead:emReviewHead,emPastLate:emPastLate,pumAction:pumAction,pumInput:pumInput,emPastSummary:emPastSummary,emAction:emAction,emInput:emInput,emfix:emfix,emVerdict:emVerdict,emSnap:emSnap,emListCheck:emListCheck,emSchCheck:emSchCheck,emDraftCheck:emDraftCheck,emCompose:emCompose,emReady:emReady,emCommit:emCommit,emSent:emSent,emWin:emWin,emConfs:emConfs,emRecip:emRecip,emCaveats:emCaveats,emRouteInner:emRouteInner,emHome:emHome,em1s1:em1s1,em1s2:em1s2,em1s3:em1s3,em1s4:em1s4,em1s5:em1s5,em2s1:em2s1,em2s2:em2s2,em2s3:em2s3,em2s4:em2s4,em2s5:em2s5,em3s1:em3s1,em3s2:em3s2,em3s3:em3s3,em3s4:em3s4,em4s1:em4s1,em4s2:em4s2,em4s3:em4s3,em4s4:em4s4,emLogDate:emLogDate,emAddConf:emAddConf,xaNameOf:xaNameOf,pastSummary:pastSummary,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
