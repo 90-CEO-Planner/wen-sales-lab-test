@@ -58,8 +58,8 @@ async function signOutAll(){
 function clone(o){return JSON.parse(JSON.stringify(o));}
 function keysOf(o){var m={};Object.keys(o).forEach(function(k){m[k]=JSON.stringify(o[k]);});return m;}
 function changedKeys(){var out=[];if(!S)return out;Object.keys(S).forEach(function(k){if(SYNC.bk[k]!==JSON.stringify(S[k]))out.push(k);});return out;}
-function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF(),past:[],chk:CHKDEF(),et:ETDEF(),em:EMDEF(),sts:STSDEF(),fyb:FYBDEF()};}
-function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return fybfix(stsfix(emfix(etfix(d5fix(rvfix(w4fix(w3fix(w2fix(o)))))))));}
+function blank(){return {week:1,steps:{},plan:"own",focus:{product:"",format:"",price:"",currency:"GBP",freq:"",where:"",url:"",problem:"",outcome:"",inc:[],incd:{disc:"",comm:""}},cdraft:{name:"",link:""},cmsg:"",base:{orders:{s:"",v:""},revenue:{s:"",v:""},partner:{s:"",v:""},hours:"",comfort:0,confidence:0},buyer:{who:"",buys:[],places:[]},types:[],cands:[],sketch:{},decision:"",remind:{weekly:true,steps:false},fitIndex:0,newType:"",nextId:1,refl:"",w2:{steps:{},quiz1:[],quiz1done:false,hardest:[],pre:[],q4:{},practiceDone:false,practice:[],stuck:[],dec:"",comfort2:"",openedAt:"",cur:0,feel:[],diff:[]},out:{},w3:{steps:{},quiz:{},dismiss:{},pre:[],learn:[],feel:[],ready:[],unclear:[],chg:[],dec:""},col:clone(W3DEF),w4:W4DEF(),rv:RVDEF(),past:[],chk:CHKDEF(),et:ETDEF(),em:EMDEF(),sts:STSDEF(),fyb:FYBDEF(),lv:LVDEF()};}
+function normalise(st){var b=blank(),o=Object.assign({},b,st||{});["focus","cdraft","base","buyer","remind"].forEach(function(k){o[k]=Object.assign({},b[k],(st||{})[k]||{});});o.focus.incd=Object.assign({},b.focus.incd,o.focus.incd||{});return lvfix(fybfix(stsfix(emfix(etfix(d5fix(rvfix(w4fix(w3fix(w2fix(o))))))))));}
 
 /* ---------- local mirror: survives a closed tab or a dropped connection ---------- */
 function mirrorKey(){return ME?"wsl_mirror_"+ME.id:null;}
@@ -887,7 +887,7 @@ function render(){
   var m=(route||"#/").match(/^#\/step\/(\d)/),m2=(route||"#/").match(/^#\/w2\/([1-6])$/),m3=(route||"#/").match(/^#\/w3\/([1-6])$/),m4=(route||"#/").match(/^#\/w4\/([1-6])$/);
   if(route==="#/admin"&&ME&&ME.admin){html=adminHtml();if(!ADMIN.members&&!ADMIN.busy)adminLoad();}
   else if(/^#\/community/.test(route)&&FLAGS.community===true)html=communityHtml();
-  else if(etBlockP())html=etBlockHtml();else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(/^#\/etsy(\/w[1-4])?(\/[1-6])?$/.test(route))html=etRoute();else if(/^#\/email(\/w[1-4])?(\/[1-5])?$/.test(route))html=emRoute();else if(/^#\/show(\/w[1-4])?(\/[1-5])?$/.test(route))html=stsRoute();else if(/^#\/find(\/w[1-4])?(\/[1-5])?$/.test(route))html=fybRoute();else if(route==="#/profile")html=profilePage();else if(route==="#/help")html=helpPage();else html=homeHub();
+  else if(etBlockP())html=etBlockHtml();else if(m2&&week1Done())html=[0,w2s1,w2s2,w2s3,w2s4,w2s5,w2s6][+m2[1]]();else if(m3&&week2Done())html=[0,w3s1,w3s2,w3s3,w3s4,w3s5,w3s6][+m3[1]]();else if(m4&&week3Done())html=[0,w4s1,w4s2,w4s3,w4s4,w4s5,w4s6][+m4[1]]();else if(m&&+m[1]>=1&&+m[1]<=7)html=[0,step1,step2,step3,step4,step5,step6,step7][+m[1]]();else if(route==="#/sprint")html=home();else if(route==="#/experiments")html=experimentsPage();else if(route==="#/results")html=resultsPage();else if(route==="#/review")html=reviewPage();else if(/^#\/etsy(\/w[1-4])?(\/[1-6])?$/.test(route))html=etRoute();else if(/^#\/email(\/w[1-4])?(\/[1-5])?$/.test(route))html=emRoute();else if(/^#\/show(\/w[1-4])?(\/[1-5])?$/.test(route))html=stsRoute();else if(/^#\/find(\/w[1-4])?(\/[1-5])?$/.test(route))html=fybRoute();else if(/^#\/live(\/w[1-4])?(\/[1-6])?$/.test(route))html=lvRoute();else if(route==="#/profile")html=profilePage();else if(route==="#/help")html=helpPage();else html=homeHub();
   html=rHead(html);
  }
  var keep=snapFields();document.getElementById("app").innerHTML=html;restoreFields(keep);try{rEnhance();}catch(e){}try{shellNav();}catch(e){}try{comPhotoFill();}catch(e){}
@@ -2199,7 +2199,7 @@ function rvPastHtml(){
   h+=pastSummary(p);(p.upd||[]).forEach(function(u){h+=rvUpdRow(u,p.exp);});
   if(open){
    h+='<div class="note info">The update window for this earlier sprint is open until '+esc(dayLab(pastEndDay(p)))+'. Results you add here belong to this sprint only. They do not change your current sprint or your Day 30 position.</div>';
-   if(p.exp==="etsy"){h+=etPastLate(p,i);}else if(p.exp==="email"){h+=emPastLate(p,i);}else if(p.exp==="show"){h+=stsPastLate(p,i);}else if(p.exp==="find"){h+=fybPastLate(p,i);}else if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
+   if(p.exp==="etsy"){h+=etPastLate(p,i);}else if(p.exp==="email"){h+=emPastLate(p,i);}else if(p.exp==="show"){h+=stsPastLate(p,i);}else if(p.exp==="find"){h+=fybPastLate(p,i);}else if(p.exp==="live"){h+=lvPastLate(p,i);}else if(UI.pu&&UI.pu.i===i){var d=puDraft();h+=['clicks','orders','value','enq','hours'].map(function(k){return puRow(k,k==="value");}).join("")+'<p class="row"><button type="button" class="btn" data-a="pu-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pu-cancel">Cancel</button></p>';}
    else h+='<p><button type="button" class="btn ghost" data-a="pu-open" data-i="'+i+'">Add a late result to this sprint</button></p>';
   } else if(today()>pastEndDay(p))h+='<p class="mute">The update window for this sprint closed on '+esc(dayLab(pastEndDay(p)))+'.</p>';
   rows.push(h+'</div>');
@@ -3011,8 +3011,8 @@ function etRouteInner(){
    back at the functions that were already there. Wrappers capture the earlier definition and fall through to it
    unless the sprint in progress is an Etsy one. */
 var EXPKEY={partnership:"part",etsy:"etsy"};
-function xaNameOf(e){return e==="etsy"?"Etsy Sales Bottleneck":(e==="email"?"Email-to-Sale":(e==="show"?"Show-to-Sell":(e==="find"?"Find Your Buyers":"Partnership-to-Sales")));}
-function pastSummary(p){return p.exp==="etsy"?etPastSummary(p):(p.exp==="email"?emPastSummary(p):(p.exp==="show"?stsPastSummary(p):(p.exp==="find"?fybPastSummary(p):"")));}
+function xaNameOf(e){return e==="etsy"?"Etsy Sales Bottleneck":(e==="email"?"Email-to-Sale":(e==="show"?"Show-to-Sell":(e==="find"?"Find Your Buyers":(e==="live"?"LIVE Sales":"Partnership-to-Sales"))));}
+function pastSummary(p){return p.exp==="etsy"?etPastSummary(p):(p.exp==="email"?emPastSummary(p):(p.exp==="show"?stsPastSummary(p):(p.exp==="find"?fybPastSummary(p):(p.exp==="live"?lvPastSummary(p):""))));}
 EXPOPEN.etsy=true;
 var ETWKT=["Diagnose","Change one thing","Hold and watch","Read the result"];
 var ETTOTAL=24;
@@ -3085,7 +3085,7 @@ function etRec(v){
  return {t:t,b:b,first:f,extra:x,basis:bs,assume:as,provisional:rvPhase()==="during"||r==="E2"};
 }
 function rvUpdRow(u,exp){
- if(exp==="etsy"||exp==="email"||exp==="show"||exp==="find")return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">'+(exp==="etsy"?"Etsy":(exp==="show"?"Show-to-Sell":(exp==="find"?"Find Your Buyers":"Email")))+' evidence reading updated</span></span><span class="tag">'+esc(u.label)+'</span></div>';
+ if(exp==="etsy"||exp==="email"||exp==="show"||exp==="find"||exp==="live")return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">'+(exp==="etsy"?"Etsy":(exp==="show"?"Show-to-Sell":(exp==="find"?"Find Your Buyers":(exp==="live"?"LIVE Sales":"Email"))))+' evidence reading updated</span></span><span class="tag">'+esc(u.label)+'</span></div>';
  return '<div class="crow"><span><strong>'+esc(dayLab(u.at))+'</strong> <span class="tag">post-sprint update</span><br><span class="mute">Orders '+esc(w4Val(u.res.orders))+', clicks '+esc(w4Val(u.res.clicks))+'</span></span><span class="tag">'+esc(u.label)+'</span></div>';
 }
 /* ===== ETSY E4 LOGIC END ===== */
@@ -3099,8 +3099,9 @@ sprArchive=function(prev){
  else if(prev&&prev.experiment==="email"){emArchive(prev);etResetP();}
  else if(prev&&prev.experiment==="show"){stsArchive(prev);etResetP();}
  else if(prev&&prev.experiment==="find"){fybArchive(prev);etResetP();}
+ else if(prev&&prev.experiment==="live"){lvArchive(prev);etResetP();}
  else{_sprArchive(prev);}
- S.et=etFresh(S.et.prep);S.em=emFresh(S.em.prep);S.sts=stsFresh(S.sts.prep);S.fyb=fybFresh(S.fyb.prep);
+ S.et=etFresh(S.et.prep);S.em=emFresh(S.em.prep);S.sts=stsFresh(S.sts.prep);S.fyb=fybFresh(S.fyb.prep);S.lv=lvFresh(S.lv.prep);
 };
 var _d5fix=d5fix;
 d5fix=function(o){
@@ -3110,6 +3111,7 @@ d5fix=function(o){
   else if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="email"){out.push(emPastFix(x));}
   else if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="show"){out.push(stsPastFix(x));}
   else if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="find"){out.push(fybPastFix(x));}
+  else if(x&&typeof x==="object"&&!Array.isArray(x)&&x.exp==="live"){out.push(lvPastFix(x));}
   else{var t=_d5fix({past:[x]});if(t.past.length)out.push(t.past[0]);}
  });
  var r=_d5fix(o);r.past=out.slice(-10);return r;
@@ -3175,41 +3177,43 @@ experimentsPage=function(){
   if(!open)return c+'<p class="rxm"><strong>Coming soon.</strong> Not open yet, so it cannot be started.</p></div></li>';
   if(!SPR.loaded)return c+'<p class="rxm">We could not check your sprint just now. Please refresh the page.</p></div></li>';
   if(ph==="during"){c+=cx===x[0]?'<p class="rxm"><strong>Your current experiment.</strong> '+esc(rvClock())+'. Find it under <a href="#/sprint">My Sprint</a>. You can start your next sprint after Day 30.</p>':'<p class="rxm">You already have a sprint running. You can start this one after Day 30.</p>';return c+'</div></li>';}
-  var key=x[0]==="etsy"?"etsy":(x[0]==="email"?"email":(x[0]==="show"?"show":(x[0]==="find"?"find":"partnership"))),label=ph==="notstarted"?"Start my 30-day sprint":"Start another sprint";
+  var key=x[0]==="etsy"?"etsy":(x[0]==="email"?"email":(x[0]==="show"?"show":(x[0]==="find"?"find":(x[0]==="live"?"live":"partnership")))),label=ph==="notstarted"?"Start my 30-day sprint":"Start another sprint";
   if(key==="etsy"&&!etPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a live Etsy listing that you can measure. Your 30 days do not start until you have one and press start yourself.</p><p><a class="btn ghost" href="#/etsy">Prepare for the Etsy experiment</a></p></div></li>';
   if(key==="email"&&!emPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a list of people who agreed to hear from you, and a tool to send from. Your 30 days do not start until you are ready and press start yourself.</p><p><a class="btn ghost" href="#/email">Prepare for Email-to-Sale</a></p></div></li>';
   if(key==="show"&&!stsPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a product people can buy that you can show in use, and somewhere of your own to publish. Your 30 days do not start until you are ready and press start yourself.</p><p><a class="btn ghost" href="#/show">Prepare for Show-to-Sell</a></p></div></li>';
   if(key==="find"&&!fybPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs a clear idea of who your buyer is, and being happy to take part in conversations as yourself. Your 30 days do not start until you are ready and press start yourself.</p><p><a class="btn ghost" href="#/find">Prepare for Find Your Buyers</a></p></div></li>';
+  if(key==="live"&&!lvPrepReady())return c+'<p class="rxm"><strong>Prepare first.</strong> This experiment needs you to be able to go live today on TikTok or YouTube, and to be happy to be seen or heard. Your 30 days do not start until you are ready and press start yourself.</p><p><a class="btn ghost" href="#/live">Prepare for LIVE Sales</a></p></div></li>';
   c+=(ph==="notstarted"?'<p class="rxm">Ready when you are. Your 30 days begin only when you press the button.</p>':'<p class="rxm">Your last sprint is complete. You can choose when to start another, and it will not start by itself.</p>')+sprConfirmX(key,label);
   return c+'</div></li>';
  }
  var open="",rest="";EXPX.forEach(function(x,i){if(EXPOPEN[x[0]])open+=card(x,i);else rest+=card(x,i);});
  var first=ph==="notstarted"&&!(S.chk&&S.chk.done);if(first)h+='<div class="rchk">'+chkCard()+'</div>';h+='<ul class="rxgrid">'+open+'</ul>';
- h+='<div class="note warn"><strong>Temporary test limitation.</strong> In this test build Partnership-to-Sales, the Etsy Sales Bottleneck, Email-to-Sale, Show-to-Sell and Find Your Buyers can be started. LIVE Sales will become available when it is built. You will always be able to choose any experiment that is open.</div>';
+ h+='<div class="note info"><strong>All six experiments are open.</strong> You can choose any of them, one at a time. Nothing starts until you press start yourself.</div>';
  if(!first)h+='<div class="rchk">'+chkCard()+'</div>';
  return h+'<ul class="rxgrid">'+rest+'</ul>';
 };
 var _sprAction=sprAction;
 sprAction=function(a,d,t){
- if(a==="spr-askx"){if(d.x!=="etsy"&&d.x!=="partnership"&&d.x!=="email"&&d.x!=="show"&&d.x!=="find")return;UI.sprConf=d.x;UI.sprErr="";render();}
- else if(a==="spr-gox"){UI.sprX=d.x==="etsy"?"etsy":(d.x==="email"?"email":(d.x==="show"?"show":(d.x==="find"?"find":"partnership")));sprGo();}
+ if(a==="spr-askx"){if(d.x!=="etsy"&&d.x!=="partnership"&&d.x!=="email"&&d.x!=="show"&&d.x!=="find"&&d.x!=="live")return;UI.sprConf=d.x;UI.sprErr="";render();}
+ else if(a==="spr-gox"){UI.sprX=d.x==="etsy"?"etsy":(d.x==="email"?"email":(d.x==="show"?"show":(d.x==="find"?"find":(d.x==="live"?"live":"partnership"))));sprGo();}
  else if(a==="spr-go"){UI.sprX="partnership";sprGo();}
  else _sprAction(a,d,t);
 };
 sprGo=async function(){
  if(UI.sprBusy)return;
- var key=UI.sprX==="etsy"?"etsy":(UI.sprX==="email"?"email":(UI.sprX==="show"?"show":(UI.sprX==="find"?"find":"partnership")));
+ var key=UI.sprX==="etsy"?"etsy":(UI.sprX==="email"?"email":(UI.sprX==="show"?"show":(UI.sprX==="find"?"find":(UI.sprX==="live"?"live":"partnership"))));
  if(key==="etsy"&&!etPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Etsy preparation checklist first.";render();return;}
  if(key==="email"&&!emPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Email-to-Sale preparation checklist first.";render();return;}
  if(key==="show"&&!stsPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Show-to-Sell preparation checklist first.";render();return;}
  if(key==="find"&&!fybPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the Find Your Buyers preparation checklist first.";render();return;}
+ if(key==="live"&&!lvPrepReady()){UI.sprConf=false;UI.sprErr="Please finish the LIVE Sales preparation checklist first.";render();return;}
  UI.sprBusy=true;UI.sprErr="";render();
  var prev=rvCur(),ph=rvPhase();
  var r=await sb.rpc("start_sprint",{p_experiment:key,p_day:today()});
  UI.sprBusy=false;UI.sprConf=false;
  if(r.error){UI.sprErr=sprMsg(r.error.message);render();return;}
  if(prev&&(ph==="window"||ph==="closed"))sprArchive(prev);
- if(key==="etsy")etStart();if(key==="email")emStart();if(key==="show")stsStart();if(key==="find")fybStart();
+ if(key==="etsy")etStart();if(key==="email")emStart();if(key==="show")stsStart();if(key==="find")fybStart();if(key==="live")lvStart();
  await sprLoad();
  save();toast("Day 1 begins today. Good luck.");render();
 };
@@ -3230,7 +3234,7 @@ function etPrep(){
  else if(ready){
   h+='<div class="card"><h2>Ready when you are</h2><p>Your listing is live and you can see its numbers.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("etsy",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
  }else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both of these are needed: your listing is live, and you can see its Stats. Tick them above when they are true.</div>';
- h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It does not need a listing. It borrows other people\'s audiences to bring your product to new buyers.</span></p><p class="mute">Email-to-Sale, Show-to-Sell and Find Your Buyers are open now too. LIVE Sales is coming soon, and is not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It does not need a listing. It borrows other people\'s audiences to bring your product to new buyers.</span></p><p class="mute">Email-to-Sale, Show-to-Sell, Find Your Buyers and LIVE Sales are open now too.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
  return h;
 }
 function et4Input(t){if(String(t.dataset.et)==="p:listing"){S.et.prep.listing=String(t.value||"").slice(0,120);save();}}
@@ -3414,7 +3418,7 @@ var EMS=(function(){
 })();
 function emDef(n){
  if(n.t==="o"){var o={};Object.keys(n.f).forEach(function(k){o[k]=emDef(n.f[k]);});return o;}
- if(n.t==="a"){var a=[];if(n.n===3){for(var i=0;i<3;i++)a.push(emDef(n.i));}return a;}
+ if(n.t==="a"){var a=[];if(n.n===3||n.fx){for(var i=0;i<n.n;i++)a.push(emDef(n.i));}return a;}
  if(n.t==="m")return {};if(n.t==="s"||n.t==="d")return "";if(n.t==="b")return false;if(n.t==="e")return "";if(n.t==="v")return {s:"",v:""};if(n.t==="n")return 1;if(n.t==="c")return null;return null;
 }
 function emClean(n,x,dflt){
@@ -3428,7 +3432,7 @@ function emClean(n,x,dflt){
  if(n.t==="o"){var o=(x&&typeof x==="object"&&!Array.isArray(x))?x:{},r={};Object.keys(n.f).forEach(function(k){r[k]=emClean(n.f[k],o[k],dflt&&dflt[k]!==undefined?dflt[k]:emDef(n.f[k]));});return r;}
  if(n.t==="m"){var m={};if(x&&typeof x==="object"&&!Array.isArray(x))Object.keys(x).forEach(function(k){if(n.k.test(k)&&x[k]===true)m[k]=true;});return m;}
  if(n.t==="a"){var a=[];if(Array.isArray(x)){x.slice(0,n.n).forEach(function(y,i){a.push(emClean(n.i,y,emDef(n.i)));});}
-  if(n.n===3){while(a.length<3)a.push(emDef(n.i));}return a;}
+  if(n.n===3||n.fx){while(a.length<n.n)a.push(emDef(n.i));}return a;}
  return dflt;
 }
 function EMDEF(){return emDef(EMS);}
@@ -3749,7 +3753,7 @@ function emPrep(){
  else if(ph==="during")h+='<div class="note info">You already have a sprint running. You can start Email-to-Sale after Day 30, if you wish.</div>';
  else if(ready)h+='<div class="card"><h2>Ready when you are</h2><p>You have a list and a tool. You will check the list properly in Week 1.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("email",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
  else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both are needed: a list of people who agreed to hear from you, and a tool to send from.</div>';
- h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It does not need a list. It borrows other people\'s audiences.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p><strong>Show-to-Sell</strong> <span class="tag">open now</span><br><span class="mute">For products that are easy to show in use.</span></p><p><strong>Find Your Buyers</strong> <span class="tag">open now</span><br><span class="mute">For finding where your buyers already spend time, with no audience of your own needed.</span></p><p class="mute">LIVE Sales is coming soon, and is not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It does not need a list. It borrows other people\'s audiences.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p><strong>Show-to-Sell</strong> <span class="tag">open now</span><br><span class="mute">For products that are easy to show in use.</span></p><p><strong>Find Your Buyers</strong> <span class="tag">open now</span><br><span class="mute">For finding where your buyers already spend time, with no audience of your own needed.</span></p><p><strong>LIVE Sales</strong> <span class="tag">open now</span><br><span class="mute">For selling live on TikTok or YouTube, for people with LIVE access who are happy on camera.</span></p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
  return h;
 }
 function emMySprint(){
@@ -4354,7 +4358,7 @@ function stsPrep(){
  else if(ph==="during")h+='<div class="note info">You already have a sprint running. You can start Show-to-Sell after Day 30, if you wish.</div>';
  else if(ready)h+='<div class="card"><h2>Ready when you are</h2><p>You have a product to show and a place to show it. You will choose the details in Week 1.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("show",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
  else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both are needed: a product people can buy that you can show in use, and somewhere of your own to publish.</div>';
- h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It borrows other people\'s audiences, so you do not need your own.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p><strong>Email-to-Sale</strong> <span class="tag">open now</span><br><span class="mute">For anyone with a list of people who agreed to hear from them.</span></p><p><strong>Find Your Buyers</strong> <span class="tag">open now</span><br><span class="mute">For finding where your buyers already spend time, with no audience of your own needed.</span></p><p class="mute">LIVE Sales is coming soon, and is not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">It borrows other people\'s audiences, so you do not need your own.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p><strong>Email-to-Sale</strong> <span class="tag">open now</span><br><span class="mute">For anyone with a list of people who agreed to hear from them.</span></p><p><strong>Find Your Buyers</strong> <span class="tag">open now</span><br><span class="mute">For finding where your buyers already spend time, with no audience of your own needed.</span></p><p><strong>LIVE Sales</strong> <span class="tag">open now</span><br><span class="mute">For selling live on TikTok or YouTube, for people with LIVE access who are happy on camera.</span></p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
  return h;
 }
 function stsMySprint(){
@@ -5003,7 +5007,7 @@ function fybPrep(){
  else if(ph==="during")h+='<div class="note info">You already have a sprint running. You can start Find Your Buyers after Day 30, if you wish.</div>';
  else if(ready)h+='<div class="card"><h2>Ready when you are</h2><p>You know who you are looking for. You will find and choose the places in Week 1.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("find",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
  else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both are needed: a clear idea of who your buyer is, and being happy to take part as yourself.</div>';
- h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">Other people who reach your buyer introduce your product.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p><strong>Email-to-Sale</strong> <span class="tag">open now</span><br><span class="mute">For anyone with a list of people who agreed to hear from them.</span></p><p><strong>Show-to-Sell</strong> <span class="tag">open now</span><br><span class="mute">For products that are easy to show in use.</span></p><p class="mute">LIVE Sales is coming soon, and is not open yet.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span><br><span class="mute">Other people who reach your buyer introduce your product.</span></p><p><strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span><br><span class="mute">For sellers with a live Etsy listing.</span></p><p><strong>Email-to-Sale</strong> <span class="tag">open now</span><br><span class="mute">For anyone with a list of people who agreed to hear from them.</span></p><p><strong>Show-to-Sell</strong> <span class="tag">open now</span><br><span class="mute">For products that are easy to show in use.</span></p><p><strong>LIVE Sales</strong> <span class="tag">open now</span><br><span class="mute">For selling live on TikTok or YouTube, for people with LIVE access who are happy on camera.</span></p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
  return h;
 }
 function fybMySprint(){
@@ -5204,6 +5208,627 @@ reviewPage=function(){
 var _etBlockP7=etBlockP;etBlockP=function(){return fybActive()?/^#\/(step\/[1-7]|w[234]\/[1-6])$/.test(route||""):_etBlockP7();};
 var _etBlockHtml7=etBlockHtml;etBlockHtml=function(){return fybActive()?_etBlockHtml7().replace("This is your Etsy sprint","This is your Find Your Buyers sprint"):_etBlockHtml7();};
 
+/* ---------- LIVE Sales: run two to four live sessions, change one thing, and see what the numbers describe. ----------
+   Agreed design (Stage 3 Build Plan): eligibility check, topic from buyer problems, a run sheet, rehearsal and a tested buyer path in Week 1;
+   two structured sessions in Week 2; two more in Week 3 changing one deliberate variable (topic, opener or call-to-action timing);
+   Week 4 compares viewers, engagement, clicks, enquiries, orders, revenue and hours. Primary measure: clicks and enquiries per session,
+   with orders beside them. Plan for sessions with only a few viewers. Never promise reach. The app never goes live, posts or messages
+   for the member. Built on the shared sprint through the same experiment adapter as the other experiments. */
+var LVSTEPS=[
+ [{n:1,t:"How selling live works, with only a few viewers",m:20,b:"Nothing. A short lesson and a quick check."},
+  {n:2,t:"Your product and where you start",m:25,b:"Your shop or payment tool, for the last 30 days."},
+  {n:3,t:"Check you can go live",m:20,b:"Your LIVE settings, and the platform's own current rules."},
+  {n:4,t:"Choose a topic and write your run sheet",m:45,b:"What your buyers ask about, and your offer."},
+  {n:5,t:"Rehearse, test the buyer's path, plan and commit",m:45,b:"Your run sheet, and a link or code you can track."},
+  {n:6,t:"Week 1 review",m:15,b:"Whatever you have done so far."}],
+ [{n:1,t:"Running your first two sessions",m:15,b:"Nothing. A short read."},
+  {n:2,t:"Session 1 log",m:20,b:"The day it went out, how long it ran, and what you can see."},
+  {n:3,t:"Session 2 log",m:20,b:"The same, for your second session."},
+  {n:4,t:"Week 2 review",m:15,b:"Whatever you have done so far."}],
+ [{n:1,t:"Change one thing, then go live again",m:15,b:"Nothing. A short read."},
+  {n:2,t:"Session 3 log",m:20,b:"The day it went out, how long it ran, and what you can see."},
+  {n:3,t:"Session 4 log",m:20,b:"The same, for your fourth session."},
+  {n:4,t:"What else could explain the numbers?",m:20,b:"Anything you remember changing or happening."},
+  {n:5,t:"Week 3 review",m:15,b:"Whatever you have done so far."}],
+ [{n:1,t:"How to read a few small live sessions",m:25,b:"Nothing. A short lesson."},
+  {n:2,t:"Record your numbers for each session",m:40,b:"The platform's live summary, your link or code, and your orders."},
+  {n:3,t:"Your evidence verdict",m:20,b:"The numbers from step 2."},
+  {n:4,t:"Decide what is next",m:25,b:"Your verdict."}]
+];
+var LVWKT=["Prepare","First two sessions","Change one thing","Read the result"];
+var LVWKD=["Check you can go live, choose a topic, write your run sheet, and test the buyer's path.","Go live twice, as planned, and log what you can see.","Change one thing, go live twice more, and note anything else that could matter.","Record your numbers for each session, read the result, and decide what is next."];
+var LVTOTAL=19;
+/* Provisional testing settings, kept in one place so they can be changed after review against real results. They are not validated
+   benchmarks and not guarantees. minSessions is the least needed to describe a result; confSessions and confViewers are where a reading
+   becomes steadier. Neither is strong evidence by itself. A session only counts if it ran for at least minMins. */
+var LVCFG={minSessions:2,confSessions:4,minMins:10,confViewers:30,minClicks:5,smallOrders:3,watchDays:3,unevenViews:2,unevenMins:2,maxSessions:4};
+var LVK=["peak","eng","clicks","enq","orders","rev"];
+var LVKL={peak:"Most people watching at once",eng:"Comments and questions",clicks:"Clicks on your link",enq:"People who asked about your product",orders:"Orders from your link or code",rev:"Revenue from those orders"};
+var LVPLAT=[["tiktok","TikTok LIVE"],["youtube","YouTube Live"]];
+var LVYN=[["yes","Yes"],["no","No"],["unsure","Not sure"]];
+var LVCK=[["acc","I can start a LIVE on my own account today."],["rules","I have read the platform's current rules for going live and for selling, and I meet them."],["buy","People can buy from me through a link or code that the platform allows."],["cam","I am happy to be seen or heard live, or to share my screen."]];
+var LVTRK=[["link","A link that only LIVE sessions use"],["code","A code that only LIVE sessions use"],["ask","I will ask each buyer if they came from a live session"],["none","I cannot track it yet"]];
+var LVTRKL={link:"A link",code:"A code",ask:"Asking each buyer",none:"Not yet"};
+var LVVAR=[["topic","The topic"],["opener","The opener, the first two minutes"],["cta","When I invite people to buy"]];
+var LVVARL={topic:"the topic",opener:"the opener",cta:"when you invite people to buy"};
+var LVRS=[["open","The opener: who you are, what you will show, and why to stay",300],["show","The demonstration: what you will show, step by step",400],["invite","Your invitation to buy, and where the link or code is",300],["ask","Answers to the three questions you expect",400],["close","The close: a last invitation, with any real deadline",300]];
+var LVTICKS=[["claims","What I say is true and I can show it. No promises, income claims or health claims."],["rules","I have read the platform's current rules for going live and selling, and I will follow them."],["urgent","Any deadline, limit or price I mention is real."],["people","I will not show or read out other people's names, photos or private details without permission, and I will moderate comments."],["path","I have tested the path a buyer takes, and my link or code works."],["proof","I understand a few sessions with few viewers is a small test and not proof."]];
+var LVCONF=[["price","I changed the price"],["promo","I ran a sale or another promotion"],["ads","I paid to promote a session, or posted about it elsewhere"],["shared","Someone else shared, hosted or recommended a session"],["platform","The stream dropped, or the platform restricted my account"],["stock","The product was out of stock, or the page was not working"],["season","A major seasonal or holiday period"],["ext","A mention or press that sent unusual traffic"],["other","Something else"]];
+var LVNEXT=[["repeat","Run the same format again, to see if it happens again"],["vary","Change a different one thing and run again"],["page","Work on my page, price or offer first"],["show","Try Show-to-Sell, which needs no LIVE access"],["other","Take what I learned to a different experiment"],["unsure","I am not sure yet"]];
+var LVS=(function(){
+ var s=function(n){return {t:"s",n:n};},v={t:"v"},b={t:"b"},d={t:"d"},e=function(a){return {t:"e",v:a};},yn=e(["","yes","no","unsure"]);
+ return {t:"o",f:{
+  prep:{t:"o",f:{acc:e(["","yes","no"]),cam:b}},
+  steps:{t:"m",k:/^[1-6]$/,i:b},steps2:{t:"m",k:/^[1-4]$/,i:b},st3:{t:"m",k:/^[1-5]$/,i:b},st4:{t:"m",k:/^[1-4]$/,i:b},
+  dec:e(["","next"]),dec2:e(["","next"]),dec3:e(["","next"]),dec4:e(["","done"]),
+  pr:{t:"o",f:{product:s(120),buyer:s(200),problem:s(200)}},
+  bl:{t:"o",f:{enq30:v,orders30:v,rev30:v}},
+  el:{t:"o",f:{plat:e(["","tiktok","youtube"]),acc:yn,rules:yn,buy:yn,cam:yn}},
+  tp:{t:"o",f:{topic:s(120),why:s(200)}},
+  rs:{t:"o",f:{open:s(300),show:s(400),invite:s(300),ask:s(400),close:s(300)}},
+  vr:{t:"o",f:{k:e(["","topic","opener","cta"]),what:s(200)}},
+  tk:{t:"o",f:{trk:e(["","link","code","ask","none"]),ref:s(200)}},
+  ticks:{t:"m",k:/^(claims|rules|urgent|people|path|proof)$/,i:b},
+  sch:{t:"a",n:4,fx:true,i:d},
+  cm:{t:"c"},
+  hd:{t:"a",n:4,fx:true,i:{t:"o",f:{d:d,m:v}}},
+  cf:{t:"a",n:60,i:{t:"o",f:{id:{t:"n"},d:d,at:d,k:e(LVCONF.map(function(x){return x[0];})),maj:b,note:s(300),wd:d}}},
+  nid:{t:"n"},
+  res:{t:"o",f:{d:{t:"a",n:4,fx:true,i:{t:"o",f:{peak:v,eng:v,clicks:v,enq:v,orders:v,rev:v}}},hrs:v,at:d}},
+  nx:e([""].concat(LVNEXT.map(function(x){return x[0];})))
+ }};
+})();
+function LVDEF(){return emDef(LVS);}
+function lvSchClean(a){var out=["","","",""],prev="";for(var i=0;i<4;i++){var x=Array.isArray(a)?a[i]:"";if(typeof x==="string"&&parseYmd(x)!=null&&(!prev||x>prev)){out[i]=x;prev=x;}else break;}return out;}
+function lvfix(o){
+ var w=(o.lv&&typeof o.lv==="object"&&!Array.isArray(o.lv))?o.lv:{},r=emClean(LVS,w,LVDEF()),isd=function(y){return typeof y==="string"&&parseYmd(y)!=null;},st=function(y,n){return typeof y==="string"?y.slice(0,n):"";};
+ r.sch=lvSchClean(r.sch);
+ var cu=fybUniq(Array.isArray(w.cf)?w.cf.slice(0,60):[],function(x){return isd(x.d)&&isd(x.at)&&LVCONF.some(function(c){return c[0]===x.k;});});
+ r.cf=cu.list.map(function(x){return {id:x.id,d:x.d,at:x.at,k:x.k,maj:x.k==="other"?x.maj===true:true,note:st(x.note,300),wd:isd(x.wd)?x.wd:""};});
+ r.nid=fybNext(w.nid,cu.max);
+ var c=w.cm;r.cm=null;
+ if(c&&typeof c==="object"&&!Array.isArray(c)&&isd(c.at)&&Array.isArray(c.sch)){
+  var sc=lvSchClean(c.sch.slice(0,4)),n=sc.filter(function(x){return !!x;}).length;
+  if(n>=2&&(LVPLAT.some(function(x){return x[0]===c.plat;}))){
+   var vk=LVS.f.vr.f.k.v.indexOf(c.vk)>-1?c.vk:"";
+   r.cm={at:c.at,sch:sc.slice(0,n),plat:c.plat,topic:st(c.topic,120),what:st(c.what,200),trk:LVS.f.tk.f.trk.v.indexOf(c.trk)>-1?c.trk:"",ref:st(c.ref,200),vk:n>=3?vk:"",vw:n>=3?st(c.vw,200):""};
+  }
+ }
+ o.lv=r;return o;
+}
+/* ===== LIVE LOGIC START: pure rules, checked by dev/live_e8_tests.js ===== */
+function lvN(o){var s=vstate(o);return s==="pos"?+o.v:(s==="zero"?0:null);}
+function lvFmt(o,money){var s=vstate(o),c=money?sym(S.focus.currency):"";return s==="pos"?c+String(+o.v):(s==="zero"?c+"0 (confirmed)":"not seen");}
+function lvActive(){var c=rvCur();return !!c&&c.experiment==="live";}
+function lvPrepReady(){var p=S.lv.prep;return p.acc==="yes"&&p.cam===true;}
+function lvStepsOf(i){return LVSTEPS[i];}
+function lvDOf(i){var E=S.lv;return [E.steps,E.steps2,E.st3,E.st4][i]||{};}
+function lvWeekDone(i){var E=S.lv,L=lvStepsOf(i),D=lvDOf(i);return L.every(function(s){return D[s.n];})||[E.dec==="next",E.dec2==="next",E.dec3==="next",E.dec4==="done"][i];}
+function lvCurWeek(){for(var i=0;i<4;i++){if(!lvWeekDone(i))return i+1;}return 4;}
+function lvWeekBase(w){return w===1?"#/live/":"#/live/w"+w+"/";}
+function lvStepCount(){var n=0;for(var i=0;i<4;i++)n+=rCount(lvStepsOf(i),lvDOf(i));return n;}
+function lvWeeks(){
+ var cur=lvCurWeek(),out=[];
+ for(var i=0;i<4;i++){
+  var L=lvStepsOf(i),D=lvDOf(i),n=rCount(L,D),tot=L.length,st=(i+1<cur)?"done":(i+1===cur?"now":"later"),first=0;
+  if(st==="now"){for(var j=0;j<tot;j++){if(!D[L[j].n]){first=L[j].n;break;}}}
+  out.push({n:i+1,title:LVWKT[i],L:L,D:D,done:n,total:tot,state:st,open:i===0||lvWeekDone(i-1),first:first,status:st==="later"?"Opens when you finish Week "+i:(st==="done"&&n===tot?"Done":n+" of "+tot+" steps done")});
+ }
+ return out;
+}
+function lvPlatName(k){var p=LVPLAT.filter(function(x){return x[0]===k;})[0];return p?p[1]:"";}
+function lvList(a){return a.length===1?String(a[0]):(a.slice(0,-1).join(", ")+" and "+a[a.length-1]);}
+/* the member's own answers to the access and rules questions. This never checks the account. */
+function lvElig(){
+ var e=S.lv.el,vals=LVCK.map(function(x){return e[x[0]];});
+ if(!e.plat||vals.some(function(v){return v==="";}))return {k:"open",t:"Answer all of them",b:"Choose the platform, then give every question an honest yes, no or not sure."};
+ if(vals.every(function(v){return v==="yes";}))return {k:"ready",t:"You answered yes to all of them",b:"This is based only on what you told us. The Sales Lab does not check your account, and the platform's rules change, so please check its own current page on the day you go live."};
+ if(vals.some(function(v){return v==="no";}))return {k:"no",t:"Not yet",b:"At least one answer is no, so planning sessions now would not help. Show-to-Sell teaches the same skill of showing your product, and needs no LIVE access. You are free to choose it, and you can come back when you can go live."};
+ return {k:"unsure",t:"Find out before you plan",b:"At least one answer is not sure. Please check the platform's own pages first, because who can go live, and what you may sell, changes. This is general guidance, not legal advice."};
+}
+function lvDays(a,b){var x=parseYmd(a),y=parseYmd(b);if(x==null||y==null)return 0;return Math.round((y-x)/86400000);}
+function lvPlanN(sch){var n=0;for(var i=0;i<4;i++){if(sch&&sch[i])n++;else break;}return n;}
+function lvSchCheck(sch,at){
+ var r={ok:false,why:"",t:"",b:""},tod=at||today(),n=lvPlanN(sch);
+ if(!Array.isArray(sch)||n<LVCFG.minSessions||sch.slice(0,n).some(function(x){return parseYmd(x)==null;})){r.why="missing";r.t="Choose at least two session days";r.b="Sessions one and two are needed. Three and four are optional, and need the days before them.";return r;}
+ if(sch[0]<tod){r.why="past";r.t="The first session day has passed";r.b="Choose today or a day ahead, so the plan is made before you go live.";return r;}
+ for(var i=1;i<n;i++){if(!(sch[i-1]<sch[i])){r.why="order";r.t="The days must be in order";r.b="Each session on a later day than the one before.";return r;}}
+ var last=sch[n-1],w={from:sch[0],last:last,n:n,to:addDays(last,LVCFG.watchDays),readOn:addDays(last,LVCFG.watchDays+1)};r.w=w;
+ if(rvCur()){
+  if(sch[0]<rvStart()){r.why="beforestart";r.t="That is before your sprint began";r.b="Your sprint began on "+dayLab(rvStart())+".";return r;}
+  if(w.to>rvEnd()){r.why="toolate";r.t="That runs past the end of your update window";r.b="Your sessions and the "+LVCFG.watchDays+" days of watching afterwards would end on "+dayLab(w.to)+", after your update window closes on "+dayLab(rvEnd())+". Choose earlier days, or plan it for your next sprint.";return r;}
+  if(w.to>rvDay30())r.prov=true;
+ }
+ r.ok=true;return r;
+}
+function lvSheetCheck(rs){
+ var issues=[],txt=LVRS.map(function(x){return rs[x[0]]||"";}).join(" ").trim(),words=txt?txt.split(/\s+/).length:0;
+ LVRS.forEach(function(x){if(!String(rs[x[0]]||"").trim())issues.push("Write the part about "+x[1].split(":")[0].toLowerCase()+".");});
+ if(rs.invite&&!/(link|code|bio|basket|pinned|shop|below|checkout)/i.test(rs.invite))issues.push("Say where people can buy: where the link or code is.");
+ if(/(guarantee|get rich|earn \$|earn £|100% (safe|sure)|cures?\b|miracle|risk[- ]free|never fails|instant results|make \$|make £)/i.test(txt))issues.push("Avoid promises you cannot keep, such as guarantees, cures or income claims.");
+ if(/(only \d+ (left|spots|places)|last chance|selling out|about to sell out|gone forever|today only|never again)/i.test(txt))issues.push("Only say that something is limited, or ends today, if it is true.");
+ if(words>0&&words<40)issues.push("It is very short. A few more lines make it easier to stay on track live.");
+ return {words:words,issues:issues,ok:issues.length===0};
+}
+function lvReady(){
+ var E=S.lv,m=[];
+ if(E.cm)return {ok:false,done:true,miss:[]};
+ if(!E.pr.product.trim())m.push("The one product you will sell (Week 1, step 2)");
+ if(lvElig().k!=="ready")m.push("Your go-live check answered yes to everything (Week 1, step 3)");
+ if(!E.tp.topic.trim())m.push("A topic (Week 1, step 4)");
+ LVRS.forEach(function(x){if(!String(E.rs[x[0]]).trim())m.push("Run sheet: "+x[1].split(":")[0].toLowerCase()+" (Week 1, step 4)");});
+ if(!E.tk.trk)m.push("How you will count orders (step 5)");
+ if(LVTICKS.some(function(x){return E.ticks[x[0]]!==true;}))m.push("All six checks ticked (step 5)");
+ var sc=lvSchCheck(E.sch);if(!sc.ok)m.push("Valid session days (step 5): "+sc.t);
+ else if(sc.w.n>=3&&(!E.vr.k||!E.vr.what.trim()))m.push("The one thing you will change from session 3, and what you will do differently (step 5)");
+ return {ok:m.length===0,done:false,miss:m,sc:sc};
+}
+function lvCommit(){
+ var E=S.lv,r=lvReady();if(!r.ok)return false;var n=lvPlanN(E.sch);
+ E.cm={at:today(),sch:E.sch.slice(0,n),plat:E.el.plat,topic:E.tp.topic.trim().slice(0,120),what:E.pr.product.trim().slice(0,200),trk:E.tk.trk,ref:E.tk.ref,vk:n>=3?E.vr.k:"",vw:n>=3?E.vr.what.trim().slice(0,200):""};
+ return true;
+}
+function lvPlanCount(){var E=S.lv;return E.cm?E.cm.sch.length:lvPlanN(E.sch);}
+/* a session counts once it was held on a day, and ran for at least the minimum (unknown minutes get the benefit of the doubt) */
+function lvHeld(i){var E=S.lv;return !!(E.cm&&i<E.cm.sch.length&&E.hd[i].d);}
+function lvCounted(i){if(!lvHeld(i))return false;var m=lvN(S.lv.hd[i].m);return m===null||m>=LVCFG.minMins;}
+function lvCountedIdx(asOf){var out=[];for(var i=0;i<4;i++){if(!lvCounted(i))continue;if(asOf&&S.lv.hd[i].at&&S.lv.hd[i].at>asOf)continue;out.push(i);}return out;}
+function lvHeldN(){var n=0;for(var i=0;i<4;i++)if(lvHeld(i))n++;return n;}
+function lvWin(){
+ var E=S.lv;if(!E.cm)return null;var ds=[];for(var i=0;i<4;i++)if(lvHeld(i))ds.push(E.hd[i].d);ds.sort();
+ var pl=E.cm.sch[E.cm.sch.length-1],last=ds.length&&ds[ds.length-1]>pl?ds[ds.length-1]:pl;
+ return {from:E.cm.sch[0],last:last,to:addDays(last,LVCFG.watchDays),readOn:addDays(last,LVCFG.watchDays+1),planned:E.cm.sch.length,held:ds.length};
+}
+function lvConfKind(k){return LVCONF.filter(function(x){return x[0]===k;})[0]||null;}
+function lvConfMajor(c){return c.k==="other"?c.maj===true:!!lvConfKind(c.k);}
+function lvConfs(asOf){
+ var E=S.lv,w=lvWin(),r={major:[],minor:[],outside:[]};
+ E.cf.forEach(function(c){
+  if(c.wd&&(!asOf||c.wd<=asOf))return;if(asOf&&c.at>asOf)return;
+  var lo=E.cm?addDays(E.cm.sch[0],-7):"";
+  if(!w||c.d<lo||c.d>w.to){r.outside.push(c);return;}
+  (lvConfMajor(c)?r.major:r.minor).push(c);
+ });
+ return r;
+}
+function lvNums(asOf){
+ var E=S.lv,known=!(asOf&&(!E.res.at||E.res.at>asOf));
+ return [0,1,2,3].map(function(i){var o={};LVK.forEach(function(k){var x=E.res.d[i][k];o[k]=known?{s:x.s,v:x.v}:{s:"",v:""};});return o;});
+}
+function lvSum(nm,k,idx){var n=0,c=0;(idx||[0,1,2,3]).forEach(function(i){var y=lvN(nm[i][k]);if(y!==null){n+=y;c++;}});return {n:Math.round(n*100)/100,k:c,of:(idx||[0,1,2,3]).length};}
+function lvFmtSum(s,money){var c=money?sym(S.focus.currency):"";if(s.of===0||s.k===0)return "not seen";if(s.k===s.of)return s.n===0?c+"0 (confirmed)":c+String(s.n);return c+String(s.n)+" from "+s.k+" of "+s.of+" sessions";}
+function lvSessName(i){var E=S.lv,d=E.hd[i].d;return "Session "+(i+1)+(d?" ("+dayLab(d)+")":"");}
+function lvSessLine(i,nm){
+ var x=nm[i],mins=lvN(S.lv.hd[i].m),p=lvN(x.peak),e=lvN(x.eng),c=lvN(x.clicks),q=lvN(x.enq),o=lvN(x.orders),pl=function(n,w){return n===null?"not seen":n+" "+w+(n===1?"":"s");};
+ return lvSessName(i)+": "+(mins===null?"length not recorded":mins+" minutes")+", "+(p===null?"viewers not seen":p+" at most watching at once")+", "+(e===null?"comments or questions not seen":e+" "+(e===1?"comment or question":"comments or questions"))+", "+pl(c,"click")+", "+(q===null?"enquiries not seen":q+" enquir"+(q===1?"y":"ies"))+", "+pl(o,"order")+".";
+}
+/* clicks and enquiries per session are the primary measure; orders sit beside them. Two before and two after one deliberate change, as counts. */
+function lvCompare(nm,idx){
+ var E=S.lv,cm=E.cm,lines=idx.map(function(i){return lvSessLine(i,nm);}),pair=null;
+ var A=idx.filter(function(i){return i<2;}),B=idx.filter(function(i){return i>=2;});
+ if(cm&&cm.vk&&A.length&&B.length){
+  var f=function(L,k){var s=lvSum(nm,k,L);return s.k===s.of?s.n:null;};
+  var o=[f(A,"clicks"),f(A,"enq"),f(A,"orders"),f(B,"clicks"),f(B,"enq"),f(B,"orders")];
+  var q=function(n,w,pw){return n+" "+(n===1?w:(pw||w+"s"));},part=function(k){return q(o[k],"click")+", "+q(o[k+1],"enquiry","enquiries")+", "+q(o[k+2],"order");};
+  if(o.every(function(x){return x!==null;}))pair="Before the change ("+q(A.length,"session")+"): "+part(0)+". After changing "+LVVARL[cm.vk]+" ("+q(B.length,"session")+"): "+part(3)+".";
+ }
+ return {lines:lines,pair:pair,line:lines.join(" ")};
+}
+function lvCaveats(nm,od,idx,cmp){
+ var E=S.lv,lines=[],conf="fair",peaks=idx.map(function(i){return lvN(nm[i].peak);}),known=peaks.filter(function(x){return x!==null;}),tot=known.reduce(function(a,b){return a+b;},0);
+ if(idx.length<LVCFG.confSessions){conf="limited";lines.push("You held "+idx.length+" session"+(idx.length===1?"":"s")+". Below "+LVCFG.confSessions+", a few people either way can change the picture, so this is too limited to support a confident conclusion. Treat it as a hint.");}
+ if(known.length<idx.length){if(conf==="fair")conf="lower";lines.push("The number watching was not recorded for every session, so how many people could have responded is not known.");}
+ else if(tot<LVCFG.confViewers){conf="limited";lines.push("At most "+tot+" people were watching across your sessions, added together. That is normal when you are starting, and it means a few people either way change everything. Treat it as a hint.");}
+ if(od>0&&od<LVCFG.smallOrders){if(conf==="fair")conf="lower";lines.push("Orders are a very small count ("+od+" in total). One or two orders are well within chance.");}
+ var uneven=false,mins=idx.map(function(i){return lvN(E.hd[i].m);}).filter(function(x){return x!==null&&x>0;});
+ if(known.length>1){var pk=known.filter(function(x){return x>0;});if(pk.length&&(known.indexOf(0)>-1||Math.max.apply(null,pk)>=LVCFG.unevenViews*Math.min.apply(null,pk)))uneven=true;}
+ if(mins.length>1&&Math.max.apply(null,mins)>=LVCFG.unevenMins*Math.min.apply(null,mins))uneven=true;
+ if(idx.length>1){if(uneven){if(conf==="fair")conf="lower";lines.push("Your sessions differed a lot in how long they ran or how many people watched, so they did not have the same chance to sell. Their numbers are not like for like, and equal orders would not mean sessions did equally well.");}
+  else lines.push("Your sessions were on different days and at different times, so they never had exactly the same audience or the same chance to sell.");}
+ if(cmp.pair)lines.push("You changed one thing from session 3. Setting the sessions before and after side by side describes what happened. It does not show that the change made the difference, because the audience was different too.");
+ if(E.cm&&E.cm.trk==="ask"){if(conf==="fair")conf="lower";lines.push("You counted orders by asking buyers whether they came from a live session. Memory is not exact, so treat the split between sessions as a rough guide.");}
+ return {conf:conf,lines:lines,uneven:uneven};
+}
+function lvVerdict(asOf){
+ var E=S.lv,cm=E.cm,small="A few live sessions is a small test. It shows what happened, not what will always happen. Reach is never guaranteed.";
+ var fin=function(v,c,cmp){v.conf=c;v.cmp=cmp||null;v.strength=c==="fair"?"There is enough here to describe what happened, and it is a fair first reading for a small test. It is still not strong evidence.":((c==="limited"||c==="lower")?"There is enough here to describe what happened. There is not enough to draw a firm conclusion.":(v.rule==="L4"?"There is not yet enough here to describe a result.":""));return v;};
+ if(!cm)return fin(vmk("Insufficient evidence","info","L1",["No plan is committed yet, so there is nothing to read."],["This says nothing about your product or your sessions, because nothing has been tested."],["Finish Week 1 and commit your plan."]),"none");
+ var w=lvWin(),t=asOf||today(),idx=lvCountedIdx(asOf);
+ if(t<w.readOn)return fin(vmk("Insufficient evidence","info","L2",[w.held<w.planned&&t<=w.last?"You have held "+w.held+" of "+w.planned+" planned sessions so far.":"Your sessions are done, and people can still respond until "+dayLab(w.to)+"."],["A result read before people have had time to respond would be a guess."],[w.held<w.planned&&t<=w.last?"Go live as planned and log each session.":"Wait until "+dayLab(w.readOn)+", then record your numbers."]),"none");
+ if(!idx.length)return fin(vmk("Insufficient evidence","info","L2",["No session that ran for at least "+LVCFG.minMins+" minutes is logged, so there is nothing to read."],["This says nothing about your product or live selling, because nothing was tried."],["If you did go live, log it. If not, that is fine. You can plan it again in your next sprint."]),"none");
+ var nm=lvNums(asOf),od=lvSum(nm,"orders",idx),en=lvSum(nm,"enq",idx),ck=lvSum(nm,"clicks",idx),cmp=lvCompare(nm,idx);
+ if(od.k<od.of||en.k<en.of||ck.k<ck.of||cm.trk==="none"){
+  var why=[];if(ck.k<ck.of)why.push("Clicks are not recorded for every session.");if(en.k<en.of)why.push("The number of people who asked about your product is not recorded for every session.");if(od.k<od.of)why.push("Orders are not recorded for every session.");if(cm.trk==="none")why.push("You said you could not track whether an order came from a live session.");
+  return fin(vmk("Mixed or unclear","warn","L3",why,["Without these the sessions cannot be read. A number you could not see is kept as unknown, and is never read as zero.","If an order cannot be traced to a live session, we cannot say whether live selling brought it."],["Record what you can see for each session. For next time, use a link or a code that only live sessions use."]),"unclear",cmp);
+ }
+ var nums="Sessions held: "+idx.length+". Clicks: "+ck.n+". People who asked about your product: "+en.n+". Orders: "+od.n+".";
+ if(idx.length<LVCFG.minSessions)return fin(vmk("Insufficient evidence","info","L4",[nums,"Fewer than "+LVCFG.minSessions+" sessions ran for at least "+LVCFG.minMins+" minutes."],["That is too few sessions to describe a result.","The settings used are provisional starting points that will be reviewed against real results: "+LVCFG.minSessions+" sessions is the least needed to describe a result, and about "+LVCFG.confSessions+" is where a reading becomes steadier. Neither is strong evidence by itself."],["Hold at least one more session of at least "+LVCFG.minMins+" minutes before deciding anything."]),"none",cmp);
+ var cf=lvConfs(asOf),cav=lvCaveats(nm,od.n,idx,cmp),extra=[cmp.pair||""].filter(function(x){return !!x;});
+ if(cf.major.length)return fin(vmk("Mixed or unclear","warn","L5",[nums,"You logged "+cf.major.length+" major thing"+(cf.major.length===1?"":"s")+" in this period that could also explain the numbers: "+cf.major.map(function(c){return (lvConfKind(c.k)||["","?"])[1].toLowerCase();}).join("; ")+"."].concat(extra),["Because something else changed or happened, the numbers cannot be put down to your live sessions alone. Even with orders, this would not be called promising.",small].concat(cav.lines),["Write down what happened and when. For a cleaner answer, run sessions again with nothing else changing."]),"unclear",cmp);
+ if(od.n>0)return fin(vmk("Promising","ok","L6",[nums].concat(cmp.lines,extra),["What you can see is orders after your sessions. That is not the same as proof that live selling caused them. Some of these people may have bought anyway.",small,"This is encouraging. It is not proof.","The counts for each session describe what happened in this test. They do not show that one session, or one change, is better than another."].concat(cav.lines),["Run the same format again, and see whether it happens again."]),cav.conf,cmp);
+ if(en.n>0||ck.n>=LVCFG.minClicks)return fin(vmk("Traffic but no sales","warn","L7",[nums].concat(extra,[en.n>0?"People asked about your product, and you confirmed no orders.":"People clicked through, and you confirmed no orders."]),["This shows your sessions brought interest. It does not show why nobody bought.",small].concat(cav.lines),["Look at what happened after: how you answered, the page, the price and the offer. Change one of those."]),cav.conf,cmp);
+ if(idx.length<LVCFG.confSessions||cav.conf==="limited")return fin(vmk("Insufficient evidence","info","L8",[nums,"With this few sessions and viewers, no clicks, enquiries or orders are within what chance could produce."],["This does not mean live selling or your product did not work. There was too little to tell, so the evidence is limited.",small].concat(cav.lines),["Run one or two more sessions before deciding anything."]),"limited",cmp);
+ return fin(vmk("Approach needs reviewing","warn","L8",[nums,"You went live steadily, and nobody clicked, asked or ordered."],["This does not mean the idea is wrong. A few sessions is one try.",small].concat(cav.lines),["Try changing one thing next: the topic, the opener, or when you invite people to buy."]),cav.conf,cmp);
+}
+function lvSnap(kind){
+ var asOf=null,late=false,prov=false;
+ if(kind==="day30"&&rvCur()){if(rvPhase()==="during")prov=true;else asOf=rvDay30();}
+ if(asOf){var w=lvWin();if(w&&w.to>asOf)prov=true;if(S.lv.res.at&&S.lv.res.at>asOf)late=true;}
+ var v=lvVerdict(asOf||null);
+ return {at:today(),label:v.label,rule:v.rule,ctr:{msgs:0,resp:0,opp:0},res:{},kind:kind==="day30"?"day30":"update",asOf:asOf||"",late:late,prov:prov||(v.rule==="L2"&&!!S.lv.cm&&(asOf||today())<lvWin().readOn)};
+}
+function lvHasRes(){return S.lv.res.d.some(function(x){return LVK.some(function(k){return !!x[k].s;});})||!!S.lv.res.hrs.s;}
+function lvHasWork(){var E=S.lv;return !!E.cm||E.hd.some(function(x){return !!x.d;})||E.cf.length>0||lvHasRes();}
+function lvFresh(prep){var e=LVDEF();if(prep)e.prep=prep;return e;}
+function lvStart(){var prep=S.lv.prep;S.lv=lvFresh(prep);var pn=String(S.focus.product||"").trim();if(pn)S.lv.pr.product=pn.slice(0,120);var bw=String((S.buyer&&S.buyer.who)||"").trim();if(bw)S.lv.pr.buyer=bw.slice(0,200);}
+function lvRec(v){
+ var l=v.label,r=v.rule,t,b,f,x="",bs,as;
+ if(l==="Promising"){t="Run the same format again";b="Orders came after your sessions. Going live again in the same way shows whether it happens again.";f="Plan two more sessions in the same format, with the same link or code.";bs="Orders were recorded after your sessions, with no major confounder logged.";as="We are assuming your live sessions, not something else, led to those orders. Your numbers cannot prove that.";}
+ else if(l==="Traffic but no sales"){t="Improve what people find after the session";b="Your sessions brought clicks or questions, so they did their job. The next place to look is what happened next.";f="Choose one of how you answer questions, your page, the price or how the offer is described, and change only that.";bs="People clicked or asked, and no orders were confirmed.";as="We are assuming what people found next, not the sessions themselves, is the weak point. Your numbers cannot confirm that.";}
+ else if(l==="Approach needs reviewing"){t="Change one thing, then go live again";b="You went live steadily and nobody clicked, asked or ordered. That is one try, not the end of the idea.";f="Change one thing: the topic, the opener, or when you invite people to buy.";x="If going live feels like the wrong fit, Show-to-Sell is open now and needs no LIVE access. You are free to choose it, or any other experiment that is open.";bs="No clicks, enquiries or orders, with at least "+LVCFG.confSessions+" sessions and enough viewers.";as="We are assuming your buyers watch live at the times you chose. They may not.";}
+ else if(l==="Mixed or unclear"){t=r==="L3"?"Fill the gaps, then read it again":"Go live again with steady conditions";b="Something else changed, or a number or an order could not be traced, so the result cannot be read cleanly.";f=r==="L3"?"Record the missing numbers, and use a link or code only live sessions use next time.":"Write down what else happened, then plan sessions again with nothing else changing.";bs=r==="L3"?"Some key numbers or the tracking were missing.":"Something else could explain the numbers.";as="We are assuming nothing else needed to be considered. If something did, please log it.";}
+ else{t=(r==="L4"||r==="L8")?"Hold a few more sessions first":"Wait for your sessions to finish";b=(r==="L4"||r==="L8")?"There were too few sessions or viewers to read a result. That says nothing about live selling or your product, only that the numbers are small.":"Your result cannot be read yet.";f=(r==="L1")?"Finish Week 1 and commit your plan.":(r==="L2"?"Go live as planned, log each session, and come back after the watching period.":"Hold one or two more sessions in the same format.");x=(r==="L4"||r==="L8")?"Show-to-Sell and Find Your Buyers are open now and can work with a small or no audience. You are free to choose either, or any other experiment that is open.":"";bs=(r==="L4"||r==="L8")?"Sessions or viewers were below the provisional settings, or the evidence is limited.":"There is not enough yet to read.";as="We are assuming more sessions will give a steadier picture.";}
+ return {t:t,b:b,first:f,extra:x,basis:bs,assume:as,provisional:rvPhase()==="during"||(r==="L2"&&!!S.lv.cm)};
+}
+/* ===== LIVE LOGIC END ===== */
+
+/* --- screens --- */
+function lvShell(wk,n,body){
+ var st=lvStepsOf(wk-1),s=st[n-1],dn=lvDOf(wk-1)[n],base="#/live/w"+wk;
+ var h='<a class="back" href="'+base+'">&larr; LIVE Sales, Week '+wk+'</a><h1>Week '+wk+' &middot; Step '+n+' of '+st.length+'</h1><p><strong>'+esc(s.t)+'</strong> <span class="tag">about '+s.m+' min</span></p><p class="mute">You will need: '+esc(s.b)+' Everything saves automatically.</p>'+body;
+ h+='<div class="card row" style="justify-content:space-between"><button type="button" class="btn'+(dn?" ghost":"")+'" data-a="lv-done" data-w="'+wk+'" data-n="'+n+'">'+(dn?"Marked done (tap to undo)":"Mark this step done")+'</button>'+(n<st.length?'<a class="btn ghost" href="#/live/w'+wk+'/'+(n+1)+'">Next step &rarr;</a>':'')+'</div>';
+ return h;
+}
+function lvNumRow(path,lab,o,money){
+ var opts=[["value","A number"],["zero","Zero, I checked"],["unknown","I can't see this"]];
+ return '<div class="q"><strong>'+esc(lab+(money?" ("+sym(S.focus.currency).trim()+")":""))+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="lv-vs" data-p="'+path+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="9" data-lv="n:'+path+'" value="'+esc(o.v)+'" aria-label="'+esc(lab)+'" style="max-width:160px">':'')+'</div>';
+}
+function lvGet(path){var p=String(path).split("."),o=S.lv;for(var i=0;i<p.length;i++){if(o==null)return null;o=o[/^\d$/.test(p[i])?+p[i]:p[i]];}return o;}
+var LVVSPATH=/^(bl\.(enq30|orders30|rev30)|res\.hrs|res\.d\.[0-3]\.(peak|eng|clicks|enq|orders|rev)|hd\.[0-3]\.m)$/;
+function lvChips(a,list,cur,extra,dis){return list.map(function(x){return '<button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(cur===x[0])+'" data-a="'+a+'" data-v="'+x[0]+'"'+(extra||'')+(dis?' disabled':'')+'>'+esc(x[1])+'</button>';}).join("");}
+function lvHome(wk){
+ wk=wk||1;var st=lvStepsOf(wk-1),d=rCount(st,lvDOf(wk-1)),dn=lvDOf(wk-1),base=lvWeekBase(wk);
+ var h='<a class="back" href="#/sprint">&larr; My Sprint</a><h1>LIVE Sales</h1><p class="mute">Week '+wk+' of 4: '+esc(LVWKT[wk-1])+'. '+esc(LVWKD[wk-1])+'</p><div class="card"><strong>'+d+' of '+st.length+' steps done</strong><div class="bar" aria-hidden="true"><i style="width:'+Math.round(d/st.length*100)+'%"></i></div></div>';
+ h+='<div class="card"><h2>The steps</h2>'+st.map(function(s){var x=dn[s.n];return '<a class="step'+(x?' done':'')+'" href="'+base+s.n+'"><span class="n">'+(x?"&#10003;":s.n)+'</span><span class="t"><span class="tt">'+esc(s.t)+'</span><br><span class="mute">'+s.m+' min</span></span><span class="mute">'+(x?"Done":"Open")+'</span></a>';}).join("")+'</div>';
+ return h;
+}
+var LVQUIZ=[["a","Only two people are watching your first live. What is the best thing to do?",[["a1","End the stream, it is not worth it"],["a2","Run your run sheet as planned, and talk to the people there"],["a3","Beg more people to join"]],"a2","Plan for a few viewers. A small, real conversation teaches you what to change, and the numbers count however few there are."],["b","Someone watching asks if your product is guaranteed to work. What do you say?",[["b1","Yes, it always works"],["b2","Only say what is true, and show what you can"],["b3","Say it is selling out"]],"b2","Promises you cannot keep, and pressure that is not real, break platform rules and lose trust."]];
+function lv1s1(){
+ return lvShell(1,1,LC("lv1s1.lesson")+'<div class="card"><h2>Quick check</h2>'+LVQUIZ.map(function(q){return '<div class="q"><strong>'+esc(q[1])+'</strong><div class="row" style="flex-direction:column;align-items:stretch">'+q[2].map(function(o){return '<button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(UI.lvq&&UI.lvq[q[0]]===o[0])+'" data-a="lv-q" data-q="'+q[0]+'" data-v="'+o[0]+'">'+esc(o[1])+'</button>';}).join("")+'</div>'+(UI.lvq&&UI.lvq[q[0]]?'<div class="note '+(UI.lvq[q[0]]===q[3]?"ok":"info")+'" aria-live="polite">'+(UI.lvq[q[0]]===q[3]?"Good. ":"Have another look. ")+esc(q[4])+'</div>':'')+'</div>';}).join("")+'</div>');
+}
+function lv1s2(){
+ var E=S.lv,ro=E.cm?' readonly':'',h=LC("lv1s2.lesson")+'<div class="card"><h2>Your product and your buyer</h2><label for="lvp">The one product you will sell live</label><input id="lvp" type="text" maxlength="120" data-lv="pr.product" value="'+esc(E.pr.product)+'"'+ro+'>'+(String(S.focus.product||"").trim()&&E.pr.product===String(S.focus.product).trim().slice(0,120)?'<p class="mute">Pre-filled from your product details. Please check it.</p>':'')+'<label for="lvb">Who is your buyer?</label><input id="lvb" type="text" maxlength="200" data-lv="pr.buyer" value="'+esc(E.pr.buyer)+'"><label for="lvq">What are they trying to sort out, in their own words?</label><input id="lvq" type="text" maxlength="200" data-lv="pr.problem" value="'+esc(E.pr.problem)+'"></div>';
+ h+='<div class="card"><h2>Where you start (the last 30 days)</h2><p class="mute">If you cannot see a number, say so, and it is kept as unknown. It is never read as zero.</p>'+lvNumRow("bl.enq30","People who asked about this product",E.bl.enq30)+lvNumRow("bl.orders30","Orders for this product",E.bl.orders30)+lvNumRow("bl.rev30","Revenue from this product",E.bl.rev30,true)+'</div>';
+ return lvShell(1,2,h);
+}
+function lv1s3(){
+ var E=S.lv,lk=!!E.cm,r=lvElig(),h=LC("lv1s3.lesson")+'<div class="card"><h2>Where will you go live?</h2><div class="row">'+LVPLAT.map(function(p){return '<button type="button" class="chip" aria-pressed="'+(E.el.plat===p[0])+'" data-a="lv-plat" data-v="'+p[0]+'"'+(lk?' disabled':'')+'>'+esc(p[1])+'</button>';}).join("")+'</div><p class="mute">One platform keeps your sessions comparable.</p></div><div class="card"><h2>Four honest questions</h2>';
+ LVCK.forEach(function(x){h+='<div class="q"><strong>'+esc(x[1])+'</strong><div class="row">'+LVYN.map(function(o){return '<button type="button" class="chip sm" aria-pressed="'+(E.el[x[0]]===o[0])+'" data-a="lv-el" data-k="'+x[0]+'" data-v="'+o[0]+'"'+(lk?' disabled':'')+'>'+o[1]+'</button>';}).join("")+'</div></div>';});
+ h+='<div class="note '+(r.k==="ready"?"ok":(r.k==="open"?"info":"warn"))+'"><strong>'+esc(r.t)+'.</strong> '+esc(r.b)+'</div><p class="mute">Who can go live, and what you may sell, changes. Check the platform\'s own current pages. The Sales Lab never goes live, posts or messages for you.</p></div>';
+ return lvShell(1,3,h);
+}
+function lv1s4(){
+ var E=S.lv,lk=!!E.cm,ro=lk?' readonly':'',h=LC("lv1s4.lesson")+'<div class="card"><h2>Your topic</h2><label for="lvt">One problem your buyer has, that you can help with live</label><input id="lvt" type="text" maxlength="120" data-lv="tp.topic" value="'+esc(E.tp.topic)+'"'+ro+' placeholder="For example: how to plan a month when income changes"><label for="lvw">Why it matters to them (optional)</label><input id="lvw" type="text" maxlength="200" data-lv="tp.why" value="'+esc(E.tp.why)+'"'+ro+'></div>';
+ h+='<div class="card"><h2>Your run sheet</h2><p class="mute">Short notes you can glance at while live, not a script to read.</p>'+LVRS.map(function(x){return '<label for="lvr'+x[0]+'">'+esc(x[1])+'</label><textarea id="lvr'+x[0]+'" maxlength="'+x[2]+'" style="min-height:80px" data-lv="rs.'+x[0]+'"'+ro+'>'+esc(E.rs[x[0]])+'</textarea>';}).join("");
+ var c=lvSheetCheck(E.rs);
+ h+=(c.issues.length&&(c.words>0)?'<div class="note info"><strong>Worth another look:</strong><ul>'+c.issues.map(function(y){return '<li>'+esc(y)+'</li>';}).join("")+'</ul></div>':(c.ok?'<div class="note ok">That reads as clear and honest.</div>':''))+'<p class="mute">'+c.words+' words. This check only looks for common problems in your words. It is not confirmation that your sessions meet the platform\'s rules.</p></div>';
+ return lvShell(1,4,h);
+}
+function lv1s5(){
+ var E=S.lv,lk=!!E.cm,h=LC("lv1s5.lesson");
+ if(lk)return lvShell(1,5,h+lvPlanLog());
+ h+='<div class="card"><h2>How will you count orders?</h2><div class="row" style="flex-direction:column;align-items:stretch">'+lvChips("lv-trk",LVTRK,E.tk.trk)+'</div>';
+ if(E.tk.trk==="none")h+='<div class="note warn">That is honest, and it means your result will be read as unclear, because an order cannot be traced to a live session. A link or a code takes a few minutes to set up.</div>';
+ else if(E.tk.trk==="ask")h+='<div class="note info">That can work for a small number of orders. Memory is not exact, so your result will be read with a little more care.</div>';
+ else if(E.tk.trk)h+='<label for="lvref">The link or code (optional, only you see this)</label><input id="lvref" type="text" maxlength="200" data-lv="tk.ref" value="'+esc(E.tk.ref)+'">';
+ h+='</div><div class="card"><h2>Six checks</h2><p class="mute">Tick each one when it is true.</p>'+LVTICKS.map(function(t){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(E.ticks[t[0]]===true)+'" data-a="lv-tick" data-k="'+t[0]+'">'+esc(t[1])+'</button></p>';}).join("")+'<p><strong>'+LVTICKS.filter(function(t){return E.ticks[t[0]]===true;}).length+' of 6 ticked.</strong></p></div>';
+ h+='<div class="card"><h2>When will you go live?</h2><p class="mute">Two sessions are enough to start. Sessions three and four are optional, and need the days before them.</p>'+[0,1,2,3].map(function(i){return '<label for="lvD'+i+'">Session '+(i+1)+(i<2?'':' (optional)')+'</label><input id="lvD'+i+'" type="date" data-lv="sch.'+i+'" value="'+esc(E.sch[i])+'" min="'+esc(today())+'" style="max-width:200px">';}).join("");
+ var sc=lvSchCheck(E.sch);
+ if(sc.ok){h+='<div class="crow"><span>Sessions planned</span><strong>'+sc.w.n+'</strong></div><div class="crow"><span>You will be watching until</span><strong>'+esc(dayLab(sc.w.to))+'</strong></div><div class="crow"><span>Read your numbers from</span><strong>'+esc(dayLab(sc.w.readOn))+'</strong></div>';if(sc.prov)h+='<div class="note info">Your watching period runs past Day 30, so your Day 30 position will be provisional, and the rest is recorded as a post-sprint update in your 14 day update window.</div>';}
+ else if(E.sch.some(function(x){return !!x;}))h+='<div class="note '+(sc.why==="missing"?"info":"warn")+'"><strong>'+esc(sc.t)+'.</strong> '+esc(sc.b)+'</div>';
+ if(sc.ok&&sc.w.n>=3)h+='<h3>The one thing you will change from session 3</h3><div class="row">'+LVVAR.map(function(x){return '<button type="button" class="chip" aria-pressed="'+(E.vr.k===x[0])+'" data-a="lv-var" data-v="'+x[0]+'">'+esc(x[1])+'</button>';}).join("")+'</div><label for="lvvw">What will you do differently?</label><input id="lvvw" type="text" maxlength="200" data-lv="vr.what" value="'+esc(E.vr.what)+'"><p class="mute">Change one thing only. That is how you can describe what moved.</p>';
+ h+='</div>';
+ var r=lvReady();
+ h+='<div class="card"><h2>Ready to commit?</h2>';
+ if(r.ok)h+='<div class="note ok"><strong>Everything is in place.</strong></div>';else h+='<div class="note warn"><strong>Not quite yet. Still needed:</strong><ul>'+r.miss.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+ if(UI.lvc&&r.ok)h+='<div class="note info" aria-live="polite"><strong>Commit and lock your plan?</strong> Your platform, topic, run sheet, how you count orders and your days will be locked and dated.</div><div class="row"><button type="button" class="btn" data-a="lv-commit">Yes, commit and lock</button><button type="button" class="btn ghost" data-a="lv-cancel">Not yet</button></div>';
+ else h+='<p><button type="button" class="btn"'+(r.ok?'':' disabled')+' data-a="lv-confirm">Commit my plan</button></p>';
+ return lvShell(1,5,h+'</div>');
+}
+function lvPlanLog(){
+ var c=S.lv.cm;if(!c)return "";
+ return '<div class="card"><h2>Your plan</h2><p class="mute">Committed on '+esc(dayLab(c.at))+'. This record is locked.</p><div class="crow"><span>Product</span><strong>'+esc(c.what)+'</strong></div><div class="crow"><span>Where</span><strong>'+esc(lvPlatName(c.plat))+'</strong></div><div class="crow"><span>Topic</span><strong>'+esc(c.topic)+'</strong></div>'+c.sch.map(function(d,i){return '<div class="crow"><span>Session '+(i+1)+'</span><strong>'+esc(dayLab(d))+'</strong></div>';}).join("")+(c.vk?'<div class="crow"><span>Changed from session 3</span><strong>'+esc(LVVARL[c.vk])+(c.vw?': '+esc(c.vw):'')+'</strong></div>':'')+'<div class="crow"><span>Counting orders</span><strong>'+esc(LVTRKL[c.trk]||"")+'</strong></div></div>';
+}
+function lv1s6(){return lvShell(1,6,LC("lv1s6.lesson")+lvSummary1());}
+function lvSummary1(){
+ var E=S.lv,r=lvElig();
+ return '<div class="card"><h2>Your Week 1 summary</h2><div class="crow"><span>Your product</span><strong>'+esc(E.pr.product||"Not chosen")+'</strong></div><div class="crow"><span>Where</span><strong>'+esc(lvPlatName(E.el.plat)||"Not chosen")+'</strong></div><div class="crow"><span>Go-live check</span><strong>'+esc(r.t)+'</strong></div><div class="crow"><span>Topic</span><strong>'+esc(E.tp.topic||"Not chosen")+'</strong></div><div class="crow"><span>Plan</span><strong>'+(E.cm?'Committed, '+E.cm.sch.length+' sessions':'Not committed yet')+'</strong></div><h3>Your decision</h3><p><button type="button" class="chip" aria-pressed="'+(E.dec==="next")+'" data-a="lv-dec" data-w="1" data-v="next">Ready for Week 2</button></p></div>';
+}
+function lvStatus(){
+ var E=S.lv,w=lvWin();if(!E.cm)return '<div class="note warn"><strong>No plan is committed yet.</strong> Week 1 finishes with committing your plan. <a href="#/live/w1/5">Go to Week 1, step 5</a></div>';
+ return '<div class="card"><h2>Where you are</h2><div class="crow"><span>Sessions held</span><strong>'+w.held+' of '+w.planned+'</strong></div>'+E.cm.sch.map(function(d,i){return '<div class="crow"><span>Session '+(i+1)+' planned for</span><strong>'+esc(dayLab(d))+(E.hd[i].d?' (held '+esc(dayLab(E.hd[i].d))+')':'')+'</strong></div>';}).join("")+'<div class="crow"><span>Watching until</span><strong>'+esc(dayLab(w.to))+'</strong></div><div class="crow"><span>Read your numbers from</span><strong>'+esc(dayLab(w.readOn))+'</strong></div>'+(today()>w.last&&today()<w.readOn?'<div class="note info">Your sessions are done. People can still respond, so please do not read your numbers as a result yet.</div>':'')+(rvCur()&&w.to>rvDay30()?'<div class="note info">Your watching period runs past Day 30, so your Day 30 position will be provisional, and the rest is recorded as a post-sprint update until '+esc(dayLab(rvEnd()))+'.</div>':'')+'</div>';
+}
+function lv2s1(){return lvShell(2,1,LC("lv2s1.lesson")+lvPlanLog()+lvStatus());}
+function lvSessionPage(i,wk,n,key){
+ var E=S.lv,h=LC(key);
+ if(!E.cm)return lvShell(wk,n,h+lvStatus());
+ if(i>=E.cm.sch.length)return lvShell(wk,n,h+'<div class="note info">You planned '+E.cm.sch.length+' sessions, so there is no session '+(i+1)+' to log. You can mark this step done and move on.</div>'+lvStatus());
+ var x=E.hd[i],r=E.res.d[i],p="res.d."+i+".";
+ h+='<div class="card"><h2>Session '+(i+1)+'</h2><p class="mute">Planned for '+esc(dayLab(E.cm.sch[i]))+'. You go live yourself, on your own account. The Sales Lab never goes live for you.</p><label for="lvh'+i+'">The day you went live</label><input id="lvh'+i+'" type="date" data-lv="hd.'+i+'.d" value="'+esc(x.d)+'" min="'+esc(E.cm.at)+'" max="'+esc(today())+'" style="max-width:200px">';
+ if(x.d){h+=lvNumRow("hd."+i+".m","How many minutes it ran",x.m)+(lvN(x.m)!==null&&lvN(x.m)<LVCFG.minMins?'<div class="note info">A session needs to run at least '+LVCFG.minMins+' minutes to count in your result. It stays on your record.</div>':'')+lvNumRow(p+"peak","Most people watching at once",r.peak)+lvNumRow(p+"eng","Comments and questions",r.eng)+'<p class="mute">The platform\'s live summary shows these. Clicks, enquiries and orders come in Week 4, once people have had time to respond.</p>';}
+ return lvShell(wk,n,h+'</div>'+lvStatus());
+}
+function lv2s2(){return lvSessionPage(0,2,2,"lv2s2.lesson");}
+function lv2s3(){return lvSessionPage(1,2,3,"lv2s3.lesson");}
+function lv2s4(){
+ var E=S.lv;return lvShell(2,4,LC("lv2s4.lesson")+'<div class="card"><h2>Your Week 2 summary</h2><div class="crow"><span>Sessions held</span><strong>'+lvHeldN()+' of '+lvPlanCount()+'</strong></div><h3>Your decision</h3><p><button type="button" class="chip" aria-pressed="'+(E.dec2==="next")+'" data-a="lv-dec" data-w="2" data-v="next">Ready for Week 3</button></p></div>');
+}
+function lv3s1(){
+ var c=S.lv.cm;return lvShell(3,1,LC("lv3s1.lesson")+(c&&c.vk?'<div class="card"><h2>The one thing you are changing</h2><p><strong>'+esc(LVVARL[c.vk].charAt(0).toUpperCase()+LVVARL[c.vk].slice(1))+'</strong>'+(c.vw?': '+esc(c.vw):'')+'</p><p class="mute">Change nothing else. Sessions one and two are the "before", and three and four the "after".</p></div>':'')+lvPlanLog()+lvStatus());
+}
+function lv3s2(){return lvSessionPage(2,3,2,"lv3s2.lesson");}
+function lv3s3(){return lvSessionPage(3,3,3,"lv3s3.lesson");}
+function lvConfHtml(){
+ var E=S.lv,h="";if(!E.cf.length)return '<p class="mute">Nothing logged. That is a fine answer if nothing changed.</p>';
+ E.cf.slice().sort(function(a,b){return a.d<b.d?-1:(a.d>b.d?1:a.id-b.id);}).forEach(function(c){var w=lvWin(),inw=w&&E.cm&&c.d>=addDays(E.cm.sch[0],-7)&&c.d<=w.to,mj=lvConfMajor(c),wd=!!c.wd,k=lvConfKind(c.k);h+='<div class="crow" style="display:block'+(wd?';opacity:.6':'')+'"><p><strong>'+esc(dayLab(c.d))+'</strong>: '+esc(k?k[1]:"")+' <span class="tag">'+(mj?"major":"minor")+'</span>'+(inw?'':' <span class="tag">outside your window, not counted</span>')+(wd?' <span class="tag">withdrawn '+esc(dayLab(c.wd))+'</span>':'')+'</p>'+(c.note?'<p style="white-space:pre-wrap">'+esc(c.note)+'</p>':'')+(wd?'':'<p><button type="button" class="chip sm" data-a="lv-fwd" data-id="'+c.id+'">Withdraw this entry</button></p>')+'</div>';});
+ return h;
+}
+function lv3s4(){
+ var E=S.lv,h=LC("lv3s4.lesson");if(!E.cm)return lvShell(3,4,h+lvStatus());
+ var u=UI.lvf||{};
+ h+='<div class="card"><h2>Log something that could also explain your numbers</h2><label for="lvfd">The day it happened</label><input id="lvfd" type="date" data-lv="f:d" value="'+esc(u.d||today())+'" max="'+esc(today())+'" min="'+esc(addDays(E.cm.sch[0],-7))+'" style="max-width:200px">'+LVCONF.map(function(x){return '<p><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(u.k===x[0])+'" data-a="lv-fk" data-v="'+x[0]+'">'+esc(x[1])+'</button></p>';}).join("");
+ if(u.k==="other")h+='<label>Could this change your numbers a lot?</label><div class="row"><button type="button" class="chip" aria-pressed="'+(u.maj===true)+'" data-a="lv-fmaj" data-v="yes">Yes, it could</button><button type="button" class="chip" aria-pressed="'+(u.maj===false)+'" data-a="lv-fmaj" data-v="no">Probably not</button></div>';
+ h+='<label for="lvfn">A note (optional)</label><textarea id="lvfn" maxlength="300" data-lv="f:note" style="min-height:60px">'+esc(u.note||"")+'</textarea><p><button type="button" class="btn ghost" data-a="lv-fadd">Add to my list</button></p></div>';
+ var c=lvConfs();h+='<div class="card"><h2>Your list</h2><p><strong>'+c.major.length+' major, '+c.minor.length+' minor</strong> in this period.</p>'+lvConfHtml()+'</div>';
+ return lvShell(3,4,h);
+}
+function lv3s5(){
+ var E=S.lv;return lvShell(3,5,LC("lv3s5.lesson")+'<div class="card"><h2>Your Week 3 summary</h2><div class="crow"><span>Sessions held</span><strong>'+lvHeldN()+' of '+lvPlanCount()+'</strong></div><div class="crow"><span>Things that could explain the numbers</span><strong>'+(function(){var c=lvConfs();return c.major.length+" major, "+c.minor.length+" minor";})()+'</strong></div><h3>Your decision</h3><p><button type="button" class="chip" aria-pressed="'+(E.dec3==="next")+'" data-a="lv-dec" data-w="3" data-v="next">Ready to read my result in Week 4</button></p></div>');
+}
+function lv4s1(){return lvShell(4,1,LC("lv4s1.lesson")+LC("lv4s1.examples"));}
+function lv4s2(){
+ var E=S.lv,h=LC("lv4s2.lesson");if(!E.cm)return lvShell(4,2,h+lvStatus());
+ h+=rvCur()?rvPostNote():'';
+ h+='<div class="card"><h2>Your numbers, session by session</h2><p class="mute">Count each session from the day it went out to '+esc(dayLab(lvWin().to))+'. Use the link or code only live sessions use. If you cannot see a number, say so. It is kept as unknown and never read as zero.</p>';
+ var any=false;E.cm.sch.forEach(function(d,i){if(!lvHeld(i))return;any=true;var p="res.d."+i+".",x=E.res.d[i];h+='<h3>'+esc(lvSessName(i))+'</h3>'+LVK.map(function(k){return lvNumRow(p+k,LVKL[k],x[k],k==="rev");}).join("");});
+ if(!any)h+='<p class="mute">No session is logged as held yet. Log each one in Week 2 and Week 3, and it appears here.</p>';
+ h+=lvNumRow("res.hrs","Hours you spent on LIVE Sales in total, including preparing",E.res.hrs);
+ if(E.res.at)h+='<p class="mute">Last saved '+esc(dayLab(E.res.at))+(rvCur()&&E.res.at>rvDay30()?' <span class="tag">post-sprint update</span>':'')+'.</p>';
+ return lvShell(4,2,h+'</div>');
+}
+function lvSessRows(nm,idx){
+ return idx.map(function(i){var x=nm[i];return '<div class="crow" style="display:block"><p style="margin:0"><strong>'+esc(lvSessName(i))+'</strong></p><p class="mute" style="margin:2px 0 8px">Watching at once '+esc(lvFmt(x.peak))+'. Comments and questions '+esc(lvFmt(x.eng))+'. Clicks '+esc(lvFmt(x.clicks))+'. Asked about your product '+esc(lvFmt(x.enq))+'. Orders '+esc(lvFmt(x.orders))+'. Revenue '+esc(lvFmt(x.rev,true))+'.</p></div>';}).join("");
+}
+function lv4s3(){
+ var E=S.lv,h=LC("lv4s3.lesson");if(!E.cm)return lvShell(4,3,h+lvStatus());
+ var v=lvVerdict(),cl={limited:"Limited. Too limited to support a confident conclusion.",lower:"Lower than usual. See the notes below.",fair:"Fair for a small test.",unclear:"Unclear.",none:""}[v.conf||"none"],idx=lvCountedIdx(),nm=lvNums();
+ h+='<div class="card"><h2>Your evidence verdict</h2><div class="note '+v.cls+'"><strong>'+esc(v.label)+'</strong> <span class="tag">rule '+esc(v.rule)+'</span></div>'+(cl?'<p><strong>How much confidence?</strong> <span class="tag">'+esc(cl)+'</span></p>':'')+(v.strength?'<p>'+esc(v.strength)+'</p>':'')+'<h3>What the numbers show</h3><ul>'+v.why.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><h3>What they cannot show</h3><ul>'+v.limits.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul><h3>A reasonable next step</h3><ul>'+v.next.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></div>';
+ h+='<div class="card"><h2>Session by session</h2>'+lvSessRows(nm,idx)+(v.cmp&&v.cmp.pair?'<p>'+esc(v.cmp.pair)+'</p>':'')+'<p class="mute">Counts, not percentages. Clicks and enquiries are the main measure, with orders beside them. These counts describe what happened. They do not show that one session, or one change, is better than another.</p></div>';
+ h+='<div class="card"><h2>What was considered</h2><div class="crow"><span>Major things logged</span><strong>'+lvConfs().major.length+'</strong></div><div class="crow"><span>Time spent</span><strong>'+esc(lvFmt(E.res.hrs))+(lvN(E.res.hrs)!==null?' hours':'')+'</strong></div><div class="crow"><span>Provisional settings used</span><strong>At least '+LVCFG.minSessions+' sessions of '+LVCFG.minMins+' minutes or more to describe a result, about '+LVCFG.confSessions+' sessions and '+LVCFG.confViewers+' people watching in total for a steadier reading, and '+LVCFG.minClicks+' clicks or one enquiry before "Traffic but no sales"</strong></div><p class="mute">These are provisional testing assumptions, not proof of reliability and not a validated benchmark. Having enough to describe a result is not the same as strong evidence. Time spent is shown beside the result and never changes it.</p></div>';
+ return lvShell(4,3,h);
+}
+function lv4s4(){
+ var E=S.lv,v=lvVerdict(),h=LC("lv4s4.lesson")+'<div class="card"><h2>Your verdict was: '+esc(v.label)+'</h2><h3>What would you like to do?</h3>'+LVNEXT.map(function(x){return '<p><button type="button" class="chip" aria-pressed="'+(E.nx===x[0])+'" data-a="lv-nx" data-v="'+x[0]+'">'+x[1]+'</button></p>';}).join("")+'<h3>Anything else?</h3><p><button type="button" class="chip" aria-pressed="'+(E.dec4==="done")+'" data-a="lv-dec" data-w="4" data-v="done">I am done with this experiment for now</button></p></div>';
+ return lvShell(4,4,h);
+}
+var LVROUTE=/^#\/live(?:\/(w[1-4]))?(?:\/([1-6]))?$/;
+function lvRouteInner(){
+ var m=LVROUTE.exec(route)||[],n=+(m[2]||0),wk=m[1]?+m[1].slice(1):(n?1:0);
+ if(!wk)return lvHome(1);
+ if(!n||n>LVSTEPS[wk-1].length)return lvHome(wk);
+ var F=[null,[0,lv1s1,lv1s2,lv1s3,lv1s4,lv1s5,lv1s6],[0,lv2s1,lv2s2,lv2s3,lv2s4],[0,lv3s1,lv3s2,lv3s3,lv3s4,lv3s5],[0,lv4s1,lv4s2,lv4s3,lv4s4]];
+ return F[wk][n]?F[wk][n]():lvHome(wk);
+}
+function lvRoute(){
+ var m=LVROUTE.exec(route)||[],wk=m[1]||"",n=+(m[2]||0);
+ if(!lvActive())return lvPrep();
+ if(!wk&&!n)return lvMySprint();
+ var w=wk?+wk.slice(1):1;
+ if(w>1&&!lvWeekDone(w-2))return '<a class="back" href="#/sprint">&larr; My Sprint</a><h1>Week '+w+' is not open yet</h1><div class="note info">Week '+w+' opens when you finish Week '+(w-1)+'. <a href="#/live/w'+(w-1)+'">Go to Week '+(w-1)+'</a></div>';
+ return lvRouteInner();
+}
+function lvPrep(){
+ var P=S.lv.prep,ph=SPR.loaded?rvPhase():"",ready=lvPrepReady();
+ var h='<a class="back" href="#/experiments">&larr; Experiments</a><h1>Prepare for LIVE Sales</h1><p class="mute">Get ready first. Nothing on this page starts your 30 days, and nothing here counts as completed experiment activity.</p>';
+ h+='<div class="card"><h2>What the experiment is</h2><p>Over four weeks you check you can go live, choose a topic from your buyer\'s problems, and write a short run sheet. You go live two to four times on your own account, changing one thing for the last two. You count clicks, questions, orders and your own time, and read the result honestly.</p><p>Expect only a few viewers at first. That is normal, and it still teaches you. Reach is never guaranteed. The Sales Lab never goes live, posts or messages for you.</p></div>';
+ h+='<div class="card"><h2>The four weeks, in plain words</h2><ol>'+LVWKT.map(function(t,i){return '<li><strong>Week '+(i+1)+': '+esc(t)+'.</strong> '+esc(LVWKD[i])+'</li>';}).join("")+'</ol><p class="mute">About 3 to 5 hours a week. You can read ahead, and you can go at your own pace inside each week.</p></div>';
+ h+='<div class="card"><h2>What you need before it can start</h2><p><strong>Can you go live today on TikTok or YouTube, on your own account?</strong></p><div class="row"><button type="button" class="chip" aria-pressed="'+(P.acc==="yes")+'" data-a="lv-pacc" data-v="yes">Yes</button><button type="button" class="chip" aria-pressed="'+(P.acc==="no")+'" data-a="lv-pacc" data-v="no">Not yet</button></div><p style="margin-top:12px"><button type="button" class="chip" style="text-align:left;border-radius:10px" aria-pressed="'+(P.cam===true)+'" data-a="lv-pcam">I am happy to be seen or heard live, or to share my screen.</button></p>';
+ if(P.acc==="no")h+='<div class="note info"><strong>That is fine.</strong> Who can go live depends on the platform, and its rules change. <a href="#/show">Show-to-Sell</a> teaches the same skill of showing your product, and needs no LIVE access. Your 30 days will not start until you are ready, and you choose when to begin.</div>';
+ h+='<p class="mute">The sprint starts only when you press the start button yourself. The Sales Lab does not check your account, so please look at the platform\'s own pages for its current requirements.</p></div>';
+ if(!SPR.loaded)h+='<div class="note warn" role="status">We could not check your sprint just now. Please refresh the page.</div>';
+ else if(lvActive())h+='<div class="note ok">You are already on this experiment. <a href="#/sprint">Open My Sprint</a>.</div>';
+ else if(ph==="during")h+='<div class="note info">You already have a sprint running. You can start LIVE Sales after Day 30, if you wish.</div>';
+ else if(ready)h+='<div class="card"><h2>Ready when you are</h2><p>You can go live and you are happy to. You will check the details in Week 1.</p>'+(UI.sprErr?'<div class="note warn" role="alert">'+esc(UI.sprErr)+'</div>':'')+sprConfirmX("live",ph==="notstarted"?"Start my 30-day sprint":"Start another sprint")+'</div>';
+ else h+='<div class="note info"><strong>Not ready to start yet.</strong> Both are needed: being able to go live today, and being happy to be seen or heard.</div>';
+ h+='<div class="card"><h2>Another experiment may suit you better right now</h2><p>You are always free to choose a different experiment.</p><p><strong>Show-to-Sell</strong> <span class="tag">open now</span><br><span class="mute">The same skill, with short demos you publish, and no LIVE access needed.</span></p><p><strong>Find Your Buyers</strong> <span class="tag">open now</span><br><span class="mute">For finding where your buyers already spend time, with no audience of your own needed.</span></p><p><strong>Email-to-Sale</strong> <span class="tag">open now</span><br><span class="mute">For anyone with a list of people who agreed to hear from them.</span></p><p><strong>Partnership-to-Sales</strong> <span class="tag">open now</span> and <strong>Etsy Sales Bottleneck</strong> <span class="tag">open now</span> are open too.</p><p><a class="btn ghost" href="#/experiments">See the experiments, and the sales check</a></p></div>';
+ return h;
+}
+function lvMySprint(){
+ var wk=lvCurWeek(),W=lvWeeks()[wk-1];
+ var h='<h1>My Sprint</h1><p class="mute">LIVE Sales &middot; Week '+wk+' of 4</p>'+sprintBar(true);
+ h+='<div class="tabs rwpick">'+lvWeeks().map(function(w){var g=rSvg("-50 -50 100 100",rWeekG(w.n,w.open,"#fff"));return w.open?'<a class="chip rwb" aria-pressed="'+(w.n===wk)+'" href="#/live/w'+w.n+'">'+g+'<b>'+esc(w.title)+'</b>Week '+w.n+(w.state==="done"?' &#10003;':'')+'</a>':'<button type="button" class="chip rwb" disabled title="Opens when you finish Week '+(w.n-1)+'">'+g+'<b>'+esc(w.title)+'</b>Week '+w.n+'</button>';}).join("")+'</div>';
+ h+='<p class="mute"><strong>This week:</strong> '+esc(LVWKD[wk-1])+'</p>'+(wk===1?'<p class="mute">Week 2 opens when you finish Week 1 (choose "Ready for Week 2" in the last step).</p>':'');
+ var pn=String(S.focus.product||"").trim();if(pn)h+='<div class="note ok"><strong>Your product:</strong> '+esc(pn)+'</div>';
+ h+='<div class="card"><h2>Week '+W.n+': '+esc(W.title)+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,lvWeekBase(W.n)+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+ return h+'<p class="mute"><a href="#/experiments">See all six experiments, and the sales check</a></p>';
+}
+function lvResultsPage(){
+ var E=S.lv,v=lvVerdict(),ph=rvPhase(),started=lvStepCount()>0||!!E.cm,idx=lvCountedIdx(),nm=lvNums(),h='<div class="phd"><h1>Results</h1><p class="mute">Your numbers, what they show, and what you learned. Counts, not percentages, while samples are small.</p>';
+ if(started)h+='<div class="rtally"><div><h3>You did</h3><p><b>'+lvStepCount()+'</b>Steps done</p><p><b>'+lvHeldN()+' of '+lvPlanCount()+'</b>Sessions held</p><p><b>'+esc(lvFmt(E.res.hrs))+'</b>Hours spent</p></div><div><h3>Came back</h3><p><b>'+esc(lvFmtSum(lvSum(nm,"peak",idx)))+'</b>Most watching at once, added up</p><p><b>'+esc(lvFmtSum(lvSum(nm,"clicks",idx)))+'</b>Clicks on your link</p><p><b>'+esc(lvFmtSum(lvSum(nm,"enq",idx)))+'</b>People who asked about your product</p></div><div><h3>Sold</h3><p><b>'+esc(lvFmtSum(lvSum(nm,"orders",idx)))+'</b>Orders from your link or code</p><p><b>'+esc(lvFmtSum(lvSum(nm,"rev",idx),true))+'</b>Revenue from those orders</p></div></div>';
+ h+='</div><!--/phd--><div class="rcols"><div>';
+ h+='<div class="card"><h2>Where you started</h2><p class="mute">The last 30 days before your sprint, from Week 1, step 2. "I can\'t see this" stays unknown and is never turned into zero.</p><div class="tiles"><div class="tile"><b style="font-size:20px">'+esc(lvFmt(E.bl.enq30))+'</b>People who asked</div><div class="tile"><b style="font-size:20px">'+esc(lvFmt(E.bl.orders30))+'</b>Orders for this product</div><div class="tile"><b style="font-size:20px">'+esc(lvFmt(E.bl.rev30,true))+'</b>Revenue</div></div></div>';
+ h+='<div class="card"><h2>Your sprint so far</h2><p class="mute">'+esc(rvClock())+'</p>';
+ if(E.cm){var w=lvWin();h+='<p>Going live on '+esc(lvPlatName(E.cm.plat))+' about <strong>'+esc(E.cm.topic)+'</strong>, '+lvHeldN()+' of '+E.cm.sch.length+' sessions held.</p><p class="mute">Watching until '+esc(dayLab(w.to))+'. Read your numbers from '+esc(dayLab(w.readOn))+'.</p>'+(idx.length?'<h3>Session by session</h3>'+lvSessRows(nm,idx):'');}
+ else h+='<p class="mute">No plan is committed yet. You commit it in <a href="#/live/w1/5">Week 1, step 5</a>.</p>';
+ h+='</div>';
+ if(started)h+='<section class="rpnl gold rread"><small>What the evidence suggests</small><h2>'+(ph==="during"&&v.rule!=="L2"?"Provisional reading: ":"")+esc(v.label)+'</h2><p>'+esc(v.why[0]||"")+'</p>'+(v.strength?'<p>'+esc(v.strength)+'</p>':'')+'<p class="mute">A reading, not a verdict. Orders you can see after live sessions are not proof that live selling caused them. <span class="tag">rule '+v.rule+'</span>'+(v.conf&&v.conf!=="none"?' <span class="tag">confidence: '+esc(v.conf)+'</span>':'')+'</p></section>';
+ h+='</div><div class="rside"><div class="card"><h2>Day 30 review</h2>'+(S.rv.done?'<p>Saved on '+esc(dayLab(S.rv.at))+': '+esc(S.rv.snap?S.rv.snap.label:"")+'.</p>':'<p class="mute">'+(started?"Look back at your sprint, see what the evidence suggests, and choose what to focus on next. You can open it at any time.":"Available once your sprint has started.")+'</p>')+'<p><a class="btn'+(S.rv.done?' ghost':'')+'" href="#/review">Open my Day 30 review</a></p></div>';
+ var c=lvConfs(),learn=[];if(E.tp.topic.trim()&&E.cm)learn.push("Your topic: "+E.tp.topic.trim());if(E.cm&&E.cm.vk)learn.push("The one thing you changed: "+LVVARL[E.cm.vk]);
+ if(E.cf.length)learn.push("Things that could also explain your numbers: "+c.major.length+" major, "+c.minor.length+" minor");
+ if(E.nx){var nx=LVNEXT.filter(function(x){return x[0]===E.nx;})[0];if(nx)learn.push("What you decided next: "+nx[1]);}
+ h+='<div class="card"><h2>What you have learned</h2>'+(learn.length?learn.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join(""):'<p class="mute">Your own notes and choices from Weeks 2 to 4 appear here as you go.</p>')+'</div><div class="card"><h2>Past sprints</h2>'+rvPastHtml()+'</div>';
+ return h+'</div></div>';
+}
+function lvReviewHead(){
+ var E=S.lv,v=lvVerdict(),rec=lvRec(v),ph=rvPhase(),prov=ph==="during"||rec.provisional,idx=lvCountedIdx(),nm=lvNums();
+ var h='<a class="back" href="#/results">&larr; Results</a><h1>Your Day 30 review</h1><p class="mute">LIVE Sales. A look at where you started, what you did, what the evidence suggests, and what to focus on next.</p>'+sprintBar(true);
+ h+='<div class="card"><h2>1. Where you started, and where you are now</h2><p class="mute">Your starting numbers are the 30 days before your sprint. Your session numbers cover these sessions only. We show them side by side and we do not label the difference as better or worse, because the two are not like for like.</p><div class="crow" style="display:block"><p style="margin:0"><strong>People who asked about this product</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(lvFmt(E.bl.enq30))+'. From your sessions: '+esc(lvFmtSum(lvSum(nm,"enq",idx)))+'.</p></div><div class="crow" style="display:block"><p style="margin:0"><strong>Orders for this product</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(lvFmt(E.bl.orders30))+'. From your sessions: '+esc(lvFmtSum(lvSum(nm,"orders",idx)))+'.</p></div><div class="crow" style="display:block"><p style="margin:0"><strong>Revenue from this product</strong></p><p class="mute" style="margin:2px 0 8px">Before: '+esc(lvFmt(E.bl.rev30,true))+'. From your sessions: '+esc(lvFmtSum(lvSum(nm,"rev",idx),true))+'.</p></div></div>';
+ h+='<div class="card"><h2>2. What you did</h2><p>Steps completed: '+LVWKT.map(function(t,i){return "Week "+(i+1)+" "+rCount(lvStepsOf(i),lvDOf(i))+" of "+lvStepsOf(i).length;}).join(", ")+'.</p><p>Sessions held: '+lvHeldN()+' of '+lvPlanCount()+'. Time spent: '+esc(lvFmt(E.res.hrs))+(lvN(E.res.hrs)!==null?' hours':'')+'.</p><div class="note info">You do not need to have finished every step. Anything unfinished stays saved and you can come back to it.</div></div>';
+ h+='<div class="card"><h2>3. What the evidence suggests</h2><div class="note '+v.cls+'"><strong>'+(prov?"Provisional reading: ":"")+esc(v.label)+'</strong> <span class="tag">rule '+v.rule+'</span>'+(v.conf&&v.conf!=="none"?' <span class="tag">confidence: '+esc(v.conf)+'</span>':'')+'</div><h3>What the numbers show</h3>'+v.why.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("")+(E.cm?lvSessRows(nm,idx):'')+'<h3>What remains uncertain</h3>'+v.limits.map(function(x){return '<p style="margin:4px 0">'+esc(x)+'</p>';}).join("")+(v.strength?'<p style="margin:4px 0">'+esc(v.strength)+'</p>':'')+'<p style="margin:4px 0">This is a reading, not a verdict. The thresholds behind it are provisional starting points, not guarantees.</p><h3>What to focus on next</h3><div class="note info"><strong>'+esc(rec.t)+'</strong><br>'+esc(rec.b)+'</div><p><strong>First small action:</strong> '+esc(rec.first)+'</p>'+(rec.extra?'<p>'+esc(rec.extra)+'</p>':'')+'<p class="mute"><strong>Evidence:</strong> '+esc(rec.basis)+'</p><p class="mute"><strong>Assumption:</strong> '+esc(rec.assume)+'</p></div>';
+ return h;
+}
+function lvWith(x,fn){var keep=S.lv;S.lv=x;try{return fn();}finally{S.lv=keep;}}
+function lvPastSummary(p){
+ if(p.exp!=="live"||!p.lvx)return "";
+ return lvWith(p.lvx,function(){var x=S.lv;if(!x.cm)return '<p class="mute" style="margin:2px 0 6px">No plan was committed in this sprint.</p>';var nm=lvNums(),idx=lvCountedIdx();return '<p class="mute" style="margin:2px 0 6px">Live sessions: '+esc(x.cm.what)+', '+lvHeldN()+' of '+x.cm.sch.length+' held. Asked about your product '+esc(lvFmtSum(lvSum(nm,"enq",idx)))+', orders '+esc(lvFmtSum(lvSum(nm,"orders",idx)))+'.</p>';});
+}
+function lvPastFix(x){
+ var okd=function(y){return (typeof y==="string"&&(y===""||parseYmd(y)!=null))?y:"";},st=function(y,n){return typeof y==="string"?y.slice(0,n):"";},nm=function(y){return (typeof y==="number"&&isFinite(y)&&y>=0&&y<100000)?Math.floor(y):0;};
+ var rvt=rvfix({rv:{snap:x.snap,upd:x.upd,done:!!x.snap}}).rv;
+ return {exp:"live",sid:nm(x.sid),auto:x.auto===true,start:okd(x.start),archivedAt:okd(x.archivedAt),label:st(x.label,40),rule:st(x.rule,4),review:x.review===true,snap:rvt.snap,upd:rvt.upd,lvx:lvfix({lv:x.lvx}).lv};
+}
+function lvArchive(prev){
+ var snap=S.rv.snap,auto=false;if(!snap){snap=lvSnap("day30");auto=true;}
+ var e={exp:"live",sid:prev.id,start:prev.start_day,archivedAt:today(),label:snap.label,rule:snap.rule,review:!!S.rv.done,auto:auto,snap:snap,upd:S.rv.upd.slice(0,20),lvx:clone(S.lv)};
+ S.past=(S.past||[]);if(S.past.length>=10)S.past.shift();S.past.push(e);
+}
+function pulDraft(){if(!UI.pul)UI.pul={i:-1,d:[0,1,2,3].map(function(){var o={};LVK.forEach(function(k){o[k]={s:"",v:""};});return o;}),hrs:{s:"",v:""}};return UI.pul;}
+function lvPastLate(p,i){
+ if(!(p.lvx&&p.lvx.cm))return "";
+ if(!(UI.pul&&UI.pul.i===i))return '<p><button type="button" class="btn ghost" data-a="pul-open" data-i="'+i+'">Add late numbers to this sprint</button></p>';
+ var u=pulDraft(),opts=[["value","A number"],["zero","Zero, I checked"],["unknown","I can\'t see this"]],h='<p class="mute">Add what you can now see for this earlier sprint. They belong to this sprint only, and do not change your current sprint or the Day 30 position. Leave anything you do not want to change.</p>';
+ var row=function(path,lab,o,key){return '<div class="q"><strong>'+esc(lab)+'</strong><div class="row">'+opts.map(function(x){return '<button type="button" class="chip sm" aria-pressed="'+(o.s===x[0])+'" data-a="pul-vs" data-n="'+path+'" data-k="'+key+'" data-v="'+x[0]+'">'+x[1]+'</button>';}).join("")+'</div>'+(o.s==="value"?'<input type="text" inputmode="decimal" maxlength="9" data-pul="'+path+'.'+key+'" value="'+esc(o.v)+'" aria-label="'+esc(lab)+'" style="max-width:160px">':'')+'</div>';};
+ p.lvx.cm.sch.forEach(function(d,n){if(!p.lvx.hd[n].d)return;h+='<h3>Session '+(n+1)+' ('+esc(dayLab(p.lvx.hd[n].d))+')</h3>';LVK.forEach(function(k){h+=row(String(n),LVKL[k]+(k==="rev"?" ("+sym(S.focus.currency).trim()+")":""),u.d[n][k],k);});});
+ h+=row("h","Hours spent in total",u.hrs,"hrs");
+ return h+'<p class="row"><button type="button" class="btn" data-a="pul-save">Save as a post-sprint update</button><button type="button" class="btn ghost" data-a="pul-cancel">Cancel</button></p>';
+}
+function pulOk(p){return !!(p&&p.exp==="live"&&p.lvx&&p.lvx.cm&&pastWinOpen(p));}
+function pulAction(a,d){
+ var u=UI.pul||null;
+ if(a==="pul-open"){var i=+d.i,p=(S.past||[])[i];if(!pulOk(p))return;UI.pul=null;u=pulDraft();u.i=i;}
+ else if(a==="pul-cancel"){UI.pul=null;}
+ else if(a==="pul-vs"){u=pulDraft();var n=String(d.n),o;if(n==="h"&&d.k==="hrs")o=u.hrs;else if(/^[0-3]$/.test(n)&&LVK.indexOf(d.k)>-1)o=u.d[+n][d.k];else return;if(!ETVS[d.v]||d.v==="")return;o.s=o.s===d.v?"":d.v;if(o.s!=="value")o.v="";}
+ else if(a==="pul-save"){
+  if(!u)return;var p2=(S.past||[])[u.i];if(!pulOk(p2))return;
+  var any=false,np=p2.lvx.cm.sch.length;u.d.forEach(function(x,n2){if(n2>=np||!p2.lvx.hd[n2].d)return;LVK.forEach(function(k){var o2=x[k];if(o2.s){any=true;p2.lvx.res.d[n2][k]={s:o2.s,v:o2.s==="value"?w4Clean(k,o2.v):""};}});});
+  if(u.hrs.s){any=true;p2.lvx.res.hrs={s:u.hrs.s,v:u.hrs.s==="value"?w4Clean("hrs",u.hrs.v):""};}
+  if(!any)return;p2.lvx.res.at=today();
+  var v=lvWith(p2.lvx,function(){return lvVerdict();});
+  var e={at:today(),label:v.label,rule:v.rule,ctr:{msgs:0,resp:0,opp:0},res:{},kind:"update",asOf:"",late:false,prov:false};
+  p2.upd=p2.upd||[];if(p2.upd.length&&p2.upd[p2.upd.length-1].at===e.at)p2.upd[p2.upd.length-1]=e;else if(p2.upd.length<RVMAX)p2.upd.push(e);else return;
+  UI.pul=null;save();
+ }
+ else return;
+ render();
+}
+function pulInput(t){var u=pulDraft(),m=/^(?:([0-3])|(h))\.(peak|eng|clicks|enq|orders|rev|hrs)$/.exec(String(t.dataset.pul));if(!m)return;var o=m[2]?(m[3]==="hrs"?u.hrs:null):(m[3]!=="hrs"?u.d[+m[1]][m[3]]:null);if(o&&o.s==="value"){var c=w4Clean(m[3],t.value);o.v=c;if(c!==t.value)t.value=c;}}
+
+/* --- actions and input --- */
+function lvSetPath(path,val){
+ var p=String(path).split("."),o=S.lv;for(var i=0;i<p.length-1;i++){o=o[/^\d$/.test(p[i])?+p[i]:p[i]];if(o==null)return false;}
+ o[/^\d$/.test(p[p.length-1])?+p[p.length-1]:p[p.length-1]]=val;return true;
+}
+var LVTXT=[[/^pr\.product$/,120],[/^pr\.buyer$/,200],[/^pr\.problem$/,200],[/^tp\.topic$/,120],[/^tp\.why$/,200],[/^rs\.open$/,300],[/^rs\.show$/,400],[/^rs\.invite$/,300],[/^rs\.ask$/,400],[/^rs\.close$/,300],[/^tk\.ref$/,200],[/^vr\.what$/,200]];
+var LVLOCKED=/^(pr\.product|tp\.|rs\.|tk\.|vr\.|sch\.)/;
+function lvAddConf(){
+ var E=S.lv,u=UI.lvf||{};if(!E.cm||E.cf.length>=60)return false;
+ var d=u.d||today();if(parseYmd(d)==null||d>today()||d<addDays(E.cm.sch[0],-7))return false;
+ if(!lvConfKind(u.k))return false;if(u.k==="other"&&u.maj!==true&&u.maj!==false)return false;
+ E.cf.push({id:E.nid++,d:d,at:today(),k:u.k,maj:u.k==="other"?u.maj===true:true,note:String(u.note||"").trim().slice(0,300),wd:""});UI.lvf=null;return true;
+}
+function lvLogDate(i,v){
+ var E=S.lv;if(!E.cm||!(i>=0&&i<E.cm.sch.length))return false;
+ if(v===""){E.hd[i]={d:"",m:{s:"",v:""}};E.res.d[i]=emDef(LVS.f.res.f.d.i);return true;}
+ if(parseYmd(v)==null||v>today()||v<E.cm.at)return false;
+ if(rvCur()&&v<rvStart())return false;
+ E.hd[i].d=v;return true;
+}
+function lvAction(a,d){
+ var E=S.lv,has=function(L,v){return L.some(function(x){return x[0]===v;});};
+ if(a==="lv-done"){var st=[E.steps,E.steps2,E.st3,E.st4][(+d.w)-1];if(!st||!/^[1-6]$/.test(String(d.n))||+d.n>LVSTEPS[(+d.w)-1].length)return;st[d.n]=!st[d.n];save();}
+ else if(a==="lv-dec"){var w=+d.w;if(w===1&&d.v==="next")E.dec=E.dec===d.v?"":d.v;else if(w===2&&d.v==="next")E.dec2=E.dec2===d.v?"":d.v;else if(w===3&&d.v==="next")E.dec3=E.dec3===d.v?"":d.v;else if(w===4&&d.v==="done")E.dec4=E.dec4===d.v?"":d.v;else return;save();}
+ else if(a==="lv-q"){UI.lvq=UI.lvq||{};UI.lvq[d.q]=d.v;}
+ else if(a==="lv-plat"){if(E.cm||!has(LVPLAT,d.v))return;E.el.plat=E.el.plat===d.v?"":d.v;save();}
+ else if(a==="lv-el"){if(E.cm||!has(LVCK,d.k)||!has(LVYN,d.v))return;E.el[d.k]=E.el[d.k]===d.v?"":d.v;save();}
+ else if(a==="lv-trk"){if(E.cm||["link","code","ask","none"].indexOf(d.v)<0)return;E.tk.trk=E.tk.trk===d.v?"":d.v;save();}
+ else if(a==="lv-var"){if(E.cm||!has(LVVAR,d.v))return;E.vr.k=E.vr.k===d.v?"":d.v;save();}
+ else if(a==="lv-tick"){if(E.cm||!has(LVTICKS,d.k))return;if(E.ticks[d.k])delete E.ticks[d.k];else E.ticks[d.k]=true;save();}
+ else if(a==="lv-vs"){if(!LVVSPATH.test(String(d.p))||!ETVS[d.v]||d.v==="")return;var mm=/^(?:res\.d|hd)\.([0-3])\./.exec(d.p);if(/^(res|hd)\./.test(d.p)&&!E.cm)return;if(mm&&(+mm[1]>=E.cm.sch.length||!E.hd[+mm[1]].d))return;var o=lvGet(d.p);if(!o)return;o.s=o.s===d.v?"":d.v;if(o.s!=="value")o.v="";if(/^res\./.test(d.p))E.res.at=today();save();}
+ else if(a==="lv-confirm"){if(!lvReady().ok)return;UI.lvc=true;}
+ else if(a==="lv-cancel"){UI.lvc=false;}
+ else if(a==="lv-commit"){if(!UI.lvc)return;UI.lvc=false;if(!lvCommit())return;save();}
+ else if(a==="lv-fk"){if(!lvConfKind(d.v))return;UI.lvf=UI.lvf||{};UI.lvf.k=UI.lvf.k===d.v?"":d.v;if(UI.lvf.k!=="other")delete UI.lvf.maj;}
+ else if(a==="lv-fmaj"){UI.lvf=UI.lvf||{};if(UI.lvf.k!=="other"||(d.v!=="yes"&&d.v!=="no"))return;UI.lvf.maj=d.v==="yes";}
+ else if(a==="lv-fadd"){if(!lvAddConf())return;save();}
+ else if(a==="lv-fwd"){var c=E.cf.filter(function(x){return x.id===+d.id;})[0];if(!c||c.wd)return;c.wd=today();save();}
+ else if(a==="lv-nx"){if(!has(LVNEXT,d.v))return;E.nx=E.nx===d.v?"":d.v;save();}
+ else if(a==="lv-pacc"){if(d.v!=="yes"&&d.v!=="no")return;E.prep.acc=E.prep.acc===d.v?"":d.v;if(E.prep.acc!=="yes")E.prep.cam=false;save();}
+ else if(a==="lv-pcam"){if(E.prep.acc!=="yes")return;E.prep.cam=!E.prep.cam;save();}
+ else return;
+ render();
+}
+function lvInput(t){
+ var E=S.lv,k=String(t.dataset.lv),val=String(t.value==null?"":t.value);
+ if(k==="f:d"){UI.lvf=UI.lvf||{};if(val===""||parseYmd(val)!=null)UI.lvf.d=val;return;}
+ if(k==="f:note"){UI.lvf=UI.lvf||{};UI.lvf.note=val.slice(0,300);return;}
+ if(k.indexOf("n:")===0){var p=k.slice(2);if(!LVVSPATH.test(p))return;var mm=/^(?:res\.d|hd)\.([0-3])\./.exec(p);if(/^(res|hd)\./.test(p)&&!E.cm)return;if(mm&&(+mm[1]>=E.cm.sch.length||!E.hd[+mm[1]].d))return;var o=lvGet(p);if(o&&o.s==="value"){var c=w4Clean("n",val);o.v=c;if(c!==t.value)t.value=c;if(/^res\./.test(p))E.res.at=today();save();}return;}
+ if(E.cm&&LVLOCKED.test(k))return;
+ var tx=LVTXT.filter(function(x){return x[0].test(k);})[0];
+ if(tx){lvSetPath(k,val.slice(0,tx[1]));save();return;}
+ if(/^sch\.[0-3]$/.test(k)){if(val===""||parseYmd(val)!=null){var arr=E.sch.slice();arr[+k.slice(4)]=val;E.sch=lvSchClean(arr);save();render();}return;}
+ var m=/^hd\.([0-3])\.d$/.exec(k);if(m){if(lvLogDate(+m[1],val)){save();render();}return;}
+}
+
+/* --- the experiment adapter, for LIVE Sales (outer wrappers: Live first, then Find, Show, Email, Etsy and Partnership) --- */
+EXPKEY.live="live";EXPOPEN.live=true;
+var _rvExp8=rvExp;rvExp=function(){return lvActive()?"live":_rvExp8();};
+var _xaName8=xaName;xaName=function(){return lvActive()?"LIVE Sales":_xaName8();};
+var _xaTotal8=xaTotal;xaTotal=function(){return lvActive()?LVTOTAL:_xaTotal8();};
+var _xaW48=xaW4;xaW4=function(){return lvActive()?"#/live/w4/2":_xaW48();};
+var _xaW4S8=xaW4Step;xaW4Step=function(){return lvActive()?2:_xaW4S8();};
+var _sprHasWork8=sprHasWork;sprHasWork=function(){return lvActive()?lvHasWork():_sprHasWork8();};
+var _rvSnap8=rvSnap;rvSnap=function(k){return lvActive()?lvSnap(k):_rvSnap8(k);};
+var _tabOf8=tabOf;tabOf=function(r){r=r||"#/";if(/^#\/live(\/|$)/.test(r))return lvActive()?"sprint":"exp";return _tabOf8(r);};
+var _rWeeks8=rWeeks;rWeeks=function(){return lvActive()?lvWeeks():_rWeeks8();};
+var _rTrack8=rTrack;
+rTrack=function(){
+ if(!lvActive())return _rTrack8();
+ return '<div class="rweeks">'+lvWeeks().map(function(w){var inner='<small>Week '+w.n+'</small><b>'+esc(w.title)+'</b>'+rBars(w)+'<em>'+esc(w.status)+'</em>';return w.open?'<a class="rwk '+w.state+'" href="#/live/w'+w.n+'">'+inner+'</a>':'<div class="rwk later">'+inner+'</div>';}).join("")+'</div>';
+};
+var _rNext8=rNext;
+rNext=function(){
+ if(!(lvActive()&&(SPR.loaded?rvPhase():"during")==="during"))return _rNext8();
+ var wk=lvCurWeek(),W=lvWeeks()[wk-1],first=W.first;
+ if(!first)return {k:"Your next step",t:"Open your results",d:"You have finished every step. Your results, your evidence reading and your Day 30 review are in one place.",link:"#/results",b:"Open my results"};
+ var s=W.L[first-1];
+ return {k:"Your next step",t:s.t,d:"You will need: "+s.b+" Everything saves as you go.",m:s.m,link:lvWeekBase(wk)+first,b:"Continue Week "+wk+", step "+first,w:wk,n:first};
+};
+var _rHomeList8=rHomeList;
+rHomeList=function(nx){
+ var ph=SPR.loaded?rvPhase():"during";
+ if(!lvActive()||ph!=="during")return _rHomeList8(nx);
+ var W=lvWeeks()[lvCurWeek()-1];
+ return '<div class="card"><h2>Week '+W.n+': '+esc(W.title)+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,lvWeekBase(W.n)+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+};
+var _rSoFar8=rSoFar;
+rSoFar=function(){
+ if(!lvActive())return _rSoFar8();
+ var E=S.lv,h='<div class="card"><h2>Your sprint so far</h2>';
+ if(!lvStepCount()&&!E.cm)return h+'<p class="mute">Your numbers appear here once you begin. What you did, what came back and what sold are always kept apart.</p></div>';
+ h+='<div class="tiles"><div class="tile"><b>'+lvStepCount()+'</b><span>Steps done</span></div><div class="tile"><b>'+lvHeldN()+' of '+lvPlanCount()+'</b><span>Sessions held</span></div><div class="tile"><b aria-hidden="true">'+(E.cm?"&#10003;":"&ndash;")+'</b><span>Plan committed<span class="sr">: '+(E.cm?"yes":"not yet")+'</span></span></div></div>';
+ return h+'<p><a class="link" href="#/results">Open your results</a></p></div>';
+};
+var _home8=home;home=function(){return lvActive()?lvMySprint():_home8();};
+var _resultsPage8=resultsPage;resultsPage=function(){return lvActive()?lvResultsPage():_resultsPage8();};
+var _reviewPage8=reviewPage;
+reviewPage=function(){
+ if(!lvActive())return _reviewPage8();
+ var tail=_reviewPage8(),i=tail.indexOf('<div class="card"><h2>4. Complete your review</h2>');
+ return lvReviewHead()+(i>-1?tail.slice(i):"");
+};
+var _etBlockP8=etBlockP;etBlockP=function(){return lvActive()?/^#\/(step\/[1-7]|w[234]\/[1-6])$/.test(route||""):_etBlockP8();};
+var _etBlockHtml8=etBlockHtml;etBlockHtml=function(){return lvActive()?_etBlockHtml8().replace("This is your Etsy sprint","This is your LIVE Sales sprint"):_etBlockHtml8();};
+
 /* ---------- H2: Home and Help brought into line with the approved hybrid design (15 Nov 2026). ----------
    The hybrid prototype (wen-sales-lab-design/full/h) is the agreed reference. This adds what Home and the navigation were missing:
    the coaching panel names the next session and its date (also required by the Master Build Blueprint: "next coaching date"),
@@ -5244,7 +5869,7 @@ function homeComPanel(){
 function homeLatelyItems(){
  var L=[],t=today(),add=function(d,txt){if(typeof d==="string"&&parseYmd(d.slice(0,10))!=null&&d.slice(0,10)<=t)L.push([d.slice(0,10),txt]);};
  try{
-  var c=rvCur();if(c&&c.start_day)add(c.start_day,"Started your 30-day sprint: "+xaNameOf(c.experiment==="etsy"||c.experiment==="email"||c.experiment==="show"||c.experiment==="find"?c.experiment:"partnership"));
+  var c=rvCur();if(c&&c.start_day)add(c.start_day,"Started your 30-day sprint: "+xaNameOf(c.experiment==="etsy"||c.experiment==="email"||c.experiment==="show"||c.experiment==="find"||c.experiment==="live"?c.experiment:"partnership"));
   if(S.rv&&S.rv.done&&S.rv.at)add(S.rv.at,"Saved your Day 30 review");
   (S.rv&&S.rv.upd||[]).forEach(function(u){add(u.at,"Added a post-sprint update");});
   (S.past||[]).forEach(function(p){add(p.archivedAt,"Your "+xaNameOf(p.exp)+" sprint moved to Past sprints");});
@@ -5253,6 +5878,7 @@ function homeLatelyItems(){
   if(S.et&&S.et.cm){add(S.et.cm.at,"Committed your Etsy change");add(S.et.res&&S.et.res.aAt,"Recorded your Etsy numbers");}
   if(S.em&&S.em.cm){add(S.em.cm.at,"Committed your three emails");(S.em.sd||[]).forEach(function(x,i){add(x.d,"Sent email "+(i+1));});add(S.em.res&&S.em.res.at,"Recorded your email numbers");}
   if(S.sts&&S.sts.cm){add(S.sts.cm.at,"Committed your three demos");(S.sts.pb||[]).forEach(function(x,i){add(x.d,"Published demo "+(i+1));});add(S.sts.res&&S.sts.res.at,"Recorded your demo numbers");}
+  if(S.lv&&S.lv.cm){add(S.lv.cm.at,"Committed your plan to go live");(S.lv.hd||[]).forEach(function(x,i){add(x.d,"Went live: session "+(i+1));});add(S.lv.res&&S.lv.res.at,"Recorded your live session numbers");}
   if(S.fyb&&S.fyb.cm){add(S.fyb.cm.at,"Committed your plan to find your buyers");var seen={};(S.fyb.lg||[]).forEach(function(x){if(x.wd)return;var pl=fybPlanPlace(x.p),k=x.d+"|"+x.p;if(seen[k])return;seen[k]=1;add(x.d,"Took part in "+(pl?pl.name:"one of your places"));});add(S.fyb.res&&S.fyb.res.at,"Recorded your numbers");}
  }catch(e){}
  L.sort(function(a,b){return a[0]<b[0]?1:(a[0]>b[0]?-1:0);});
@@ -5653,6 +6279,8 @@ document.addEventListener("click",function(e){
  if(a.indexOf("sts-")===0){stsAction(a,d);return;}
  if(a.indexOf("puf-")===0){pufAction(a,d);return;}
  if(a.indexOf("fyb-")===0){fybAction(a,d);return;}
+ if(a.indexOf("pul-")===0){pulAction(a,d);return;}
+ if(a.indexOf("lv-")===0){lvAction(a,d);return;}
  if(a.indexOf("et-")===0){etAction(a,d,t);return;}
  if(a==="copyprompt"){var ta=document.getElementById("findprompt"),mg=document.getElementById("copymsg");function ok(){if(mg)mg.textContent="Copied. Now paste it into your AI tool.";}function manual(){if(ta){ta.focus();ta.select();}if(mg)mg.textContent="Select all and copy it by hand (it is selected for you).";}try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(ok,manual);}else{manual();}}catch(x){manual();}return;}
  if(a==="showversions"){showVersions();return;}
@@ -5702,6 +6330,8 @@ document.addEventListener("input",function(e){
  else if(t.dataset.sts){stsInput(t);}
  else if(t.dataset.puf){pufInput(t);}
  else if(t.dataset.fyb){fybInput(t);}
+ else if(t.dataset.pul){pulInput(t);}
+ else if(t.dataset.lv){lvInput(t);}
  else if(t.dataset.sk){S.sketch[t.dataset.sk]=S.sketch[t.dataset.sk]||{};S.sketch[t.dataset.sk].note=t.value;save();}
 });
 document.addEventListener("keydown",function(e){if(e.key==="Enter"&&PHASE==="signin"&&e.target.dataset&&e.target.dataset.auth){e.preventDefault();if(e.target.dataset.auth==="email")sendCode();else if(e.target.dataset.auth==="code")verifyCode();else if(e.target.dataset.auth==="pw")pwLogin();}});
@@ -6152,7 +6782,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,fybActive:fybActive,fybPrepReady:fybPrepReady,fybPrep:fybPrep,fybRoute:fybRoute,fybWeeks:fybWeeks,fybWeekDone:fybWeekDone,fybCurWeek:fybCurWeek,fybStepCount:fybStepCount,fybHasWork:fybHasWork,fybStart:fybStart,fybFresh:fybFresh,fybArchive:fybArchive,fybPastFix:fybPastFix,fybRec:fybRec,fybMySprint:fybMySprint,fybResultsPage:fybResultsPage,fybReviewHead:fybReviewHead,fybPastLate:fybPastLate,pufAction:pufAction,pufInput:pufInput,fybPastSummary:fybPastSummary,fybAction:fybAction,fybInput:fybInput,fybfix:fybfix,fybVerdict:fybVerdict,fybSnap:fybSnap,fybPerCheck:fybPerCheck,fybDraftCheck:fybDraftCheck,fybReady:fybReady,fybCommit:fybCommit,fybLog:fybLog,fybCounts:fybCounts,fybWin:fybWin,fybConfs:fybConfs,fybNums:fybNums,fybSum:fybSum,fybFmtSum:fybFmtSum,fybCompare:fybCompare,fybCaveats:fybCaveats,fybRouteInner:fybRouteInner,fybHome:fybHome,fybPicked:fybPicked,fybPlan:fybPlan,fyb1s1:fyb1s1,fyb1s2:fyb1s2,fyb1s3:fyb1s3,fyb1s4:fyb1s4,fyb1s5:fyb1s5,fyb2s1:fyb2s1,fyb2s2:fyb2s2,fyb2s3:fyb2s3,fyb2s4:fyb2s4,fyb2s5:fyb2s5,fyb3s1:fyb3s1,fyb3s2:fyb3s2,fyb3s3:fyb3s3,fyb3s4:fyb3s4,fyb4s1:fyb4s1,fyb4s2:fyb4s2,fyb4s3:fyb4s3,fyb4s4:fyb4s4,fybAddPlace:fybAddPlace,fybAddLog:fybAddLog,fybAddConf:fybAddConf,FYBCFG:FYBCFG,homeCoachPanel:homeCoachPanel,homeComPanel:homeComPanel,homeLately:homeLately,homeLatelyItems:homeLatelyItems,homeWhen:homeWhen,helpPage:helpPage,comHomePeek:comHomePeek,HOMEC:HOMEC,stsActive:stsActive,stsPrepReady:stsPrepReady,stsPrep:stsPrep,stsRoute:stsRoute,stsWeeks:stsWeeks,stsWeekDone:stsWeekDone,stsCurWeek:stsCurWeek,stsStepCount:stsStepCount,stsHasWork:stsHasWork,stsStart:stsStart,stsFresh:stsFresh,stsArchive:stsArchive,stsPastFix:stsPastFix,stsRec:stsRec,stsMySprint:stsMySprint,stsResultsPage:stsResultsPage,stsReviewHead:stsReviewHead,stsPastLate:stsPastLate,pusAction:pusAction,pusInput:pusInput,stsPastSummary:stsPastSummary,stsAction:stsAction,stsInput:stsInput,stsfix:stsfix,stsVerdict:stsVerdict,stsSnap:stsSnap,stsSchCheck:stsSchCheck,stsDemoCheck:stsDemoCheck,stsReady:stsReady,stsCommit:stsCommit,stsOut:stsOut,stsWin:stsWin,stsConfs:stsConfs,stsNums:stsNums,stsSum:stsSum,stsFmtSum:stsFmtSum,stsCompare:stsCompare,stsCaveats:stsCaveats,stsRouteInner:stsRouteInner,stsHome:stsHome,stsWhere:stsWhere,sts1s1:sts1s1,sts1s2:sts1s2,sts1s3:sts1s3,sts1s4:sts1s4,sts1s5:sts1s5,sts2s1:sts2s1,sts2s2:sts2s2,sts2s3:sts2s3,sts2s4:sts2s4,sts2s5:sts2s5,sts3s1:sts3s1,sts3s2:sts3s2,sts3s3:sts3s3,sts3s4:sts3s4,sts4s1:sts4s1,sts4s2:sts4s2,sts4s3:sts4s3,sts4s4:sts4s4,stsLogDate:stsLogDate,stsAddConf:stsAddConf,stsExposure:stsExposure,STSCFG:STSCFG,emActive:emActive,emPrepReady:emPrepReady,emPrep:emPrep,emRoute:emRoute,emWeeks:emWeeks,emWeekDone:emWeekDone,emCurWeek:emCurWeek,emStepCount:emStepCount,emHasWork:emHasWork,emStart:emStart,emFresh:emFresh,emArchive:emArchive,emPastFix:emPastFix,emRec:emRec,emMySprint:emMySprint,emResultsPage:emResultsPage,emReviewHead:emReviewHead,emPastLate:emPastLate,pumAction:pumAction,pumInput:pumInput,emPastSummary:emPastSummary,emAction:emAction,emInput:emInput,emfix:emfix,emVerdict:emVerdict,emSnap:emSnap,emListCheck:emListCheck,emSchCheck:emSchCheck,emDraftCheck:emDraftCheck,emCompose:emCompose,emReady:emReady,emCommit:emCommit,emSent:emSent,emWin:emWin,emConfs:emConfs,emRecip:emRecip,emCaveats:emCaveats,emRouteInner:emRouteInner,emHome:emHome,em1s1:em1s1,em1s2:em1s2,em1s3:em1s3,em1s4:em1s4,em1s5:em1s5,em2s1:em2s1,em2s2:em2s2,em2s3:em2s3,em2s4:em2s4,em2s5:em2s5,em3s1:em3s1,em3s2:em3s2,em3s3:em3s3,em3s4:em3s4,em4s1:em4s1,em4s2:em4s2,em4s3:em4s3,em4s4:em4s4,emLogDate:emLogDate,emAddConf:emAddConf,xaNameOf:xaNameOf,pastSummary:pastSummary,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,lvActive:lvActive,lvPrepReady:lvPrepReady,lvPrep:lvPrep,lvRoute:lvRoute,lvWeeks:lvWeeks,lvWeekDone:lvWeekDone,lvCurWeek:lvCurWeek,lvStepCount:lvStepCount,lvHasWork:lvHasWork,lvStart:lvStart,lvFresh:lvFresh,lvArchive:lvArchive,lvPastFix:lvPastFix,lvRec:lvRec,lvMySprint:lvMySprint,lvResultsPage:lvResultsPage,lvReviewHead:lvReviewHead,lvPastLate:lvPastLate,pulAction:pulAction,pulInput:pulInput,lvPastSummary:lvPastSummary,lvAction:lvAction,lvInput:lvInput,lvfix:lvfix,lvVerdict:lvVerdict,lvSnap:lvSnap,lvSchCheck:lvSchCheck,lvSchClean:lvSchClean,lvSheetCheck:lvSheetCheck,lvReady:lvReady,lvCommit:lvCommit,lvHeld:lvHeld,lvCounted:lvCounted,lvCountedIdx:lvCountedIdx,lvHeldN:lvHeldN,lvWin:lvWin,lvConfs:lvConfs,lvNums:lvNums,lvSum:lvSum,lvFmtSum:lvFmtSum,lvCompare:lvCompare,lvCaveats:lvCaveats,lvElig:lvElig,lvPlanCount:lvPlanCount,lvRouteInner:lvRouteInner,lvHome:lvHome,lv1s1:lv1s1,lv1s2:lv1s2,lv1s3:lv1s3,lv1s4:lv1s4,lv1s5:lv1s5,lv1s6:lv1s6,lv2s1:lv2s1,lv2s2:lv2s2,lv2s3:lv2s3,lv2s4:lv2s4,lv3s1:lv3s1,lv3s2:lv3s2,lv3s3:lv3s3,lv3s4:lv3s4,lv3s5:lv3s5,lv4s1:lv4s1,lv4s2:lv4s2,lv4s3:lv4s3,lv4s4:lv4s4,lvLogDate:lvLogDate,lvAddConf:lvAddConf,LVCFG:LVCFG,fybActive:fybActive,fybPrepReady:fybPrepReady,fybPrep:fybPrep,fybRoute:fybRoute,fybWeeks:fybWeeks,fybWeekDone:fybWeekDone,fybCurWeek:fybCurWeek,fybStepCount:fybStepCount,fybHasWork:fybHasWork,fybStart:fybStart,fybFresh:fybFresh,fybArchive:fybArchive,fybPastFix:fybPastFix,fybRec:fybRec,fybMySprint:fybMySprint,fybResultsPage:fybResultsPage,fybReviewHead:fybReviewHead,fybPastLate:fybPastLate,pufAction:pufAction,pufInput:pufInput,fybPastSummary:fybPastSummary,fybAction:fybAction,fybInput:fybInput,fybfix:fybfix,fybVerdict:fybVerdict,fybSnap:fybSnap,fybPerCheck:fybPerCheck,fybDraftCheck:fybDraftCheck,fybReady:fybReady,fybCommit:fybCommit,fybLog:fybLog,fybCounts:fybCounts,fybWin:fybWin,fybConfs:fybConfs,fybNums:fybNums,fybSum:fybSum,fybFmtSum:fybFmtSum,fybCompare:fybCompare,fybCaveats:fybCaveats,fybRouteInner:fybRouteInner,fybHome:fybHome,fybPicked:fybPicked,fybPlan:fybPlan,fyb1s1:fyb1s1,fyb1s2:fyb1s2,fyb1s3:fyb1s3,fyb1s4:fyb1s4,fyb1s5:fyb1s5,fyb2s1:fyb2s1,fyb2s2:fyb2s2,fyb2s3:fyb2s3,fyb2s4:fyb2s4,fyb2s5:fyb2s5,fyb3s1:fyb3s1,fyb3s2:fyb3s2,fyb3s3:fyb3s3,fyb3s4:fyb3s4,fyb4s1:fyb4s1,fyb4s2:fyb4s2,fyb4s3:fyb4s3,fyb4s4:fyb4s4,fybAddPlace:fybAddPlace,fybAddLog:fybAddLog,fybAddConf:fybAddConf,FYBCFG:FYBCFG,homeCoachPanel:homeCoachPanel,homeComPanel:homeComPanel,homeLately:homeLately,homeLatelyItems:homeLatelyItems,homeWhen:homeWhen,helpPage:helpPage,comHomePeek:comHomePeek,HOMEC:HOMEC,stsActive:stsActive,stsPrepReady:stsPrepReady,stsPrep:stsPrep,stsRoute:stsRoute,stsWeeks:stsWeeks,stsWeekDone:stsWeekDone,stsCurWeek:stsCurWeek,stsStepCount:stsStepCount,stsHasWork:stsHasWork,stsStart:stsStart,stsFresh:stsFresh,stsArchive:stsArchive,stsPastFix:stsPastFix,stsRec:stsRec,stsMySprint:stsMySprint,stsResultsPage:stsResultsPage,stsReviewHead:stsReviewHead,stsPastLate:stsPastLate,pusAction:pusAction,pusInput:pusInput,stsPastSummary:stsPastSummary,stsAction:stsAction,stsInput:stsInput,stsfix:stsfix,stsVerdict:stsVerdict,stsSnap:stsSnap,stsSchCheck:stsSchCheck,stsDemoCheck:stsDemoCheck,stsReady:stsReady,stsCommit:stsCommit,stsOut:stsOut,stsWin:stsWin,stsConfs:stsConfs,stsNums:stsNums,stsSum:stsSum,stsFmtSum:stsFmtSum,stsCompare:stsCompare,stsCaveats:stsCaveats,stsRouteInner:stsRouteInner,stsHome:stsHome,stsWhere:stsWhere,sts1s1:sts1s1,sts1s2:sts1s2,sts1s3:sts1s3,sts1s4:sts1s4,sts1s5:sts1s5,sts2s1:sts2s1,sts2s2:sts2s2,sts2s3:sts2s3,sts2s4:sts2s4,sts2s5:sts2s5,sts3s1:sts3s1,sts3s2:sts3s2,sts3s3:sts3s3,sts3s4:sts3s4,sts4s1:sts4s1,sts4s2:sts4s2,sts4s3:sts4s3,sts4s4:sts4s4,stsLogDate:stsLogDate,stsAddConf:stsAddConf,stsExposure:stsExposure,STSCFG:STSCFG,emActive:emActive,emPrepReady:emPrepReady,emPrep:emPrep,emRoute:emRoute,emWeeks:emWeeks,emWeekDone:emWeekDone,emCurWeek:emCurWeek,emStepCount:emStepCount,emHasWork:emHasWork,emStart:emStart,emFresh:emFresh,emArchive:emArchive,emPastFix:emPastFix,emRec:emRec,emMySprint:emMySprint,emResultsPage:emResultsPage,emReviewHead:emReviewHead,emPastLate:emPastLate,pumAction:pumAction,pumInput:pumInput,emPastSummary:emPastSummary,emAction:emAction,emInput:emInput,emfix:emfix,emVerdict:emVerdict,emSnap:emSnap,emListCheck:emListCheck,emSchCheck:emSchCheck,emDraftCheck:emDraftCheck,emCompose:emCompose,emReady:emReady,emCommit:emCommit,emSent:emSent,emWin:emWin,emConfs:emConfs,emRecip:emRecip,emCaveats:emCaveats,emRouteInner:emRouteInner,emHome:emHome,em1s1:em1s1,em1s2:em1s2,em1s3:em1s3,em1s4:em1s4,em1s5:em1s5,em2s1:em2s1,em2s2:em2s2,em2s3:em2s3,em2s4:em2s4,em2s5:em2s5,em3s1:em3s1,em3s2:em3s2,em3s3:em3s3,em3s4:em3s4,em4s1:em4s1,em4s2:em4s2,em4s3:em4s3,em4s4:em4s4,emLogDate:emLogDate,emAddConf:emAddConf,xaNameOf:xaNameOf,pastSummary:pastSummary,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
