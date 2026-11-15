@@ -300,7 +300,6 @@ function step3(){
  if(n>=3&&Object.keys(types).length===1)h+='<div class="note info">All your candidates are one type. Two ideas: look at the places your buyer follows or subscribes to, and think of someone you already know.</div>';
  return shell(3,h+'</div>');
 }
-function fitAssessmentText(c){if(!complete(c)){var answered=Q.filter(function(q){return c.fit&&c.fit[q[0]]!=null;}).length;return answered?"Assessment in progress ("+answered+" of "+Q.length+" questions answered)":"Not assessed";}return "Score "+scoreOf(c)+" of 7";}
 function step4(){
  var h=LC("w1s4.lesson");
  if(!S.cands.length)return shell(4,h+'<div class="note info">You haven\'t added any candidates yet. Add some in step 3,.</div>');
@@ -311,7 +310,7 @@ function step4(){
  Q.forEach(function(q,i){h+='<div class="q"><strong>'+(i+1)+'. '+q[1]+'.</strong> '+q[2]+'<div class="row">'+q[3].map(function(o){return '<button type="button" class="chip" aria-pressed="'+(c.fit[q[0]]===o[1])+'" data-a="fit" data-id="'+c.id+'" data-q="'+q[0]+'" data-v="'+o[1]+'">'+o[0]+'</button>';}).join("")+'</div></div>';});
  if(c.fit.q1===0)h+='<div class="note bad"><strong>Not a fit:</strong> they don\'t reach your buyer. This one can stay in your list but can\'t go on your shortlist.</div>';
  if(c.fit.q2===0){h+='<div class="note warn"><strong>Overlap.</strong> Overlapping offers can still work, for example if their product is a different price point, format or stage. They may be less keen to promote you, so it helps to have a reason. What makes this worth it? (optional)</div>'+cChips(c,"overlapWhy",OVERLAP);}
- h+='<div class="note '+lab.c+'" aria-live="polite" style="margin-top:14px"><span class="score">'+fitAssessmentText(c)+'</span> &middot; '+lab.t+(lab.t==="Weak fit"?". We would suggest skipping this one, but it is your call.":(lab.t==="In progress"?". Answer all six to see the label.":"."))+'</div>';
+ h+='<div class="note '+lab.c+'" aria-live="polite" style="margin-top:14px"><span class="score">Score '+scoreOf(c)+' of 7</span> &middot; '+lab.t+(lab.t==="Weak fit"?". We would suggest skipping this one, but it is your call.":(lab.t==="In progress"?". Answer all six to see the label.":"."))+'</div>';
  h+='<div class="row" style="margin-top:12px"><button type="button" class="chip" aria-pressed="'+(!!c.parked)+'" data-a="park" data-id="'+c.id+'">Not sure yet, park this one</button></div>';
  h+='<div class="row" style="margin-top:14px;justify-content:space-between"><button type="button" class="btn ghost" data-a="fitnav" data-d="-1">&larr; Previous</button><button type="button" class="btn" data-a="fitnav" data-d="1">Next candidate &rarr;</button></div></div>';
  return shell(4,h);
@@ -352,8 +351,8 @@ function step6(){
 function step7(){
  var sl=shortlisted().sort(byScore),b=S.base;
  function nv(o){return o.s==="value"?o.v:(o.s==="zero"?"0":(o.s==="unknown"?"I don't know":"not set"));}
- var h='<div class="card"><h2>Your Week 1 summary</h2><p><strong>Focus product:</strong> '+esc(S.focus.product?productLine():"not set")+(S.focus.where?" Sold on: "+esc(S.focus.where)+".":"")+'</p><p><strong>Where you started:</strong> orders '+esc(nv(b.orders))+', revenue '+esc(nv(b.revenue))+', partner-sourced sales '+esc(nv(b.partner))+'.</p><p><strong>Candidates:</strong> '+S.cands.length+' found, '+S.cands.filter(complete).length+' scored.</p><p><strong>Shortlist ('+sl.length+'):</strong></p>'+(sl.length?'<p class="mute">Shortlisting records your choice; it does not confirm fit or buyer reach.</p>':'');
- if(sl.length){h+='<ul>'+sl.map(function(c){return '<li>'+esc(c.name)+' &middot; '+fitAssessmentText(c)+((c.reasons||[]).length?" &middot; "+esc(c.reasons.join(", ")):"")+'</li>';}).join("")+'</ul>';}else h+='<p class="mute">Nobody yet.</p>';
+ var h='<div class="card"><h2>Your Week 1 summary</h2><p><strong>Focus product:</strong> '+esc(S.focus.product?productLine():"not set")+(S.focus.where?" Sold on: "+esc(S.focus.where)+".":"")+'</p><p><strong>Where you started:</strong> orders '+esc(nv(b.orders))+', revenue '+esc(nv(b.revenue))+', partner-sourced sales '+esc(nv(b.partner))+'.</p><p><strong>Candidates:</strong> '+S.cands.length+' found, '+S.cands.filter(complete).length+' scored.</p><p><strong>Shortlist ('+sl.length+'):</strong></p>';
+ if(sl.length){h+='<ul>'+sl.map(function(c){return '<li>'+esc(c.name)+' &middot; score '+scoreOf(c)+'/7'+((c.reasons||[]).length?" &middot; "+esc(c.reasons.join(", ")):"")+'</li>';}).join("")+'</ul>';}else h+='<p class="mute">Nobody yet.</p>';
  var ck=check();
  if(ck){var tot=ck.reduce(function(a,r){return a+r[1];},0);h+='<h3>Your Week 1 skill check (automatic)</h3><p class="mute">A learning indicator, not a grade. You\'ll compare it with Week 4.</p>'+ck.map(function(r){return '<div class="crow"><span>'+r[0]+'</span><span class="score">'+r[1]+' of 2</span></div>';}).join("")+'<p><strong>Total '+tot+' of 10</strong></p>';}
  h+='</div><div class="card"><h2>What\'s next?</h2>';
@@ -1830,7 +1829,7 @@ function rvWorked(){
  if(S.w4.ran==="yes")out.push("The collaboration ran.");
  if(vstate(r.orders)==="pos")out.push("You recorded "+r.orders.v+" sale"+(+r.orders.v===1?"":"s")+" linked to this work.");
  if(vstate(r.enq)==="pos")out.push("You had "+r.enq.v+" enquir"+(+r.enq.v===1?"y":"ies")+".");
- if(!out.length){var sl=shortlisted().length;if(sl)out.push("You found and shortlisted "+sl+" partner"+(sl===1?"":"s")+". Shortlisting records your choice; it does not confirm fit or buyer reach.");out.push("You now have a clear first step to take, and evidence to learn from.");}
+ if(!out.length){var sl=shortlisted().length;if(sl)out.push("You found and shortlisted "+sl+" partner"+(sl===1?"":"s")+" who could reach your buyer.");out.push("You now have a clear first step to take, and evidence to learn from.");}
  return out;
 }
 function rvProg(){return [["Week 1",STEPS.filter(function(s){return S.steps[s.n];}).length,7],["Week 2",STEPS2.filter(function(s){return S.w2.steps[s.n];}).length,6],["Week 3",STEPS3.filter(function(s){return S.w3.steps[s.n];}).length,6],["Week 4",STEPS4.filter(function(s){return S.w4.steps[s.n];}).length,6]];}
@@ -6055,13 +6054,12 @@ function rDates(){
 function rCount(L,D){return L.filter(function(s){return D&&D[s.n];}).length;}
 function rWeeks(){
  var L=[STEPS,STEPS2,STEPS3,STEPS4],D=[S.steps,(S.w2||{}).steps,(S.w3||{}).steps,(S.w4||{}).steps];
- var prep=SPR.loaded&&rvPhase()==="notstarted";
  var w1=week1Done(),w2=w1&&week2Done(),w3=w2&&week3Done(),open=[true,w1,w2,w3],cur=w3?4:(w2?3:(w1?2:1)),out=[];
  for(var i=0;i<4;i++){
   var n=rCount(L[i],D[i]),tot=L[i].length,st=(i+1<cur)?"done":(i+1===cur?"now":"later"),first=0;
   if(st==="now"){for(var j=0;j<tot;j++){if(!(D[i]&&D[i][L[i][j].n])){first=L[i][j].n;break;}}}
   out.push({n:i+1,title:RWK[i],L:L[i],D:D[i]||{},done:n,total:tot,state:st,open:open[i],first:first,
-   status:st==="later"?"Opens when you finish Week "+i:(prep?(st==="done"&&n===tot?"Preparation complete":"Preparation: "+n+" of "+tot+" steps done"):(st==="done"&&n===tot?"Done":n+" of "+tot+" steps done"))});
+   status:st==="later"?"Opens when you finish Week "+i:(st==="done"&&n===tot?"Done":n+" of "+tot+" steps done")});
  }
  return out;
 }
@@ -6087,7 +6085,7 @@ function rNext(){
  else if(!week3Done()){w=3;na=w3NextAction();}
  else{w=4;na=w4NextAction();}
  var m=/^Step (\d+): ([\s\S]*)$/.exec(na.t),n=m?+m[1]:0;
- return {k:fresh?"Start here":(ph==="notstarted"?"Continue preparing":"Your next step"),t:m?m[2]:na.t,d:(n&&rGuide(w,n))||(na.wait?"Nothing to do right now. You can look ahead while you wait.":"Pick up where you left off. Everything saves as you go."),m:na.m,link:na.link,b:n?(fresh?"Start":"Continue")+" Week "+w+", step "+n:(na.wait?"Open":"Continue"),w:w,n:n};
+ return {k:fresh?"Start here":"Your next step",t:m?m[2]:na.t,d:(n&&rGuide(w,n))||(na.wait?"Nothing to do right now. You can look ahead while you wait.":"Pick up where you left off. Everything saves as you go."),m:na.m,link:na.link,b:n?(fresh?"Start":"Continue")+" Week "+w+", step "+n:(na.wait?"Open":"Continue"),w:w,n:n};
 }
 function rStepRow(n,t,link,meta,cls){return '<a class="step'+(cls?" "+cls:"")+'" href="'+link+'"><span class="n">'+(cls==="done"?"&#10003;":n)+'</span><span class="t"><span class="tt">'+esc(t)+'</span></span><span class="mute">'+meta+'</span></a>';}
 function rHomeList(nx){
@@ -6095,26 +6093,26 @@ function rHomeList(nx){
  if(nx.link==="#/experiments"&&ph==="notstarted")return '<div class="card"><h2>Before your sprint</h2>'+rStepRow(1,"Take the sales check","#/experiments","5 min","next")+rStepRow(2,"Choose your experiment","#/experiments","5 min")+rStepRow(3,"Start your 30 days when you are ready","#/sprint","")+'<p class="mute">Browsing and preparing do not start your 30 days. You can also go straight to <a href="#/step/1">Week 1, step 1</a>.</p></div>';
  if(ph==="window"||ph==="closed")return '<div class="card"><h2>After your sprint</h2>'+rStepRow(1,S.rv.done?"Day 30 review saved":"Save your Day 30 review","#/review",S.rv.done?"Done":"",S.rv.done?"done":"next")+rStepRow(2,"Add any late results","#/review",ph==="window"?"until "+dayLab(rvEnd()):"Window closed")+rStepRow(3,"Choose your next experiment","#/experiments","5 min",S.rv.done?"next":"")+'</div>';
  var W=rWeeks().filter(function(x){return x.state==="now";})[0],base=W.n===1?"#/step/":"#/w"+W.n+"/";
- return '<div class="card"><h2>'+(SPR.loaded&&rvPhase()==="notstarted"?"Preparation, Week "+W.n+": ":"Week "+W.n+": ")+W.title+'</h2>'+W.L.map(function(s){var dn=W.D[s.n],prep=SPR.loaded&&rvPhase()==="notstarted";return rStepRow(s.n,s.t,base+s.n,dn?(prep?"Prepared":"Done"):s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
+ return '<div class="card"><h2>Week '+W.n+': '+W.title+'</h2>'+W.L.map(function(s){var dn=W.D[s.n];return rStepRow(s.n,s.t,base+s.n,dn?"Done":s.m+" min",dn?"done":(W.first===s.n?"next":""));}).join("")+'</div>';
 }
 function rXRow(){
  var ph=SPR.loaded?rvPhase():"";
  return '<ul class="rxrow">'+EXPX.map(function(x){var open=!!EXPOPEN[x[0]];return '<li class="'+(open?"open":"soon")+'">'+rSvg("-50 -50 100 100",rExpG(x[0],open))+'<b>'+esc(x[1])+'</b><span>'+(open?(ph==="during"&&EXPKEY[rvExp()]===x[0]?"Your current experiment":"Open now"):"Coming soon")+'</span></li>';}).join("")+'</ul><p><a class="link" href="#/experiments">See all six experiments</a></p>';
 }
 function rSoFar(){
- var b=S.base||{},have=b.orders&&b.orders.s&&b.revenue&&b.revenue.s&&b.partner&&b.partner.s,prep=SPR.loaded&&rvPhase()==="notstarted",h='<div class="card"><h2>'+(prep?"Your preparation so far":"Your sprint so far")+'</h2>';
+ var b=S.base||{},have=b.orders&&b.orders.s&&b.revenue&&b.revenue.s&&b.partner&&b.partner.s,h='<div class="card"><h2>Your sprint so far</h2>';
  if(!doneCount()&&!S.cands.length)return h+'<p class="mute">Your numbers appear here once you begin. What you did, what came back and what sold are always kept apart.</p></div>';
  if(week1Done()){var c=w4Ctr();h+='<div class="tiles"><div class="tile"><b>'+c.msgs+'</b><span>Messages sent</span></div><div class="tile"><b>'+c.resp+'</b><span>Responses received</span></div><div class="tile"><b>'+c.opp+'</b><span>Opportunities created</span></div></div>';}
  else h+='<div class="tiles"><div class="tile"><b>'+S.cands.length+'</b><span>Partners found</span></div><div class="tile"><b>'+shortlisted().length+'</b><span>On your shortlist</span></div><div class="tile"><b aria-hidden="true">'+(have?"&#10003;":"&ndash;")+'</b><span>Starting numbers<span class="sr">: '+(have?"recorded":"not recorded yet")+'</span></span></div></div>';
  return h+'<p><a class="link" href="#/results">Open your results</a></p></div>';
 }
 function homeHub(){
- var nx=rNext(),fresh=nx.k==="Start here",ph=SPR.loaded?rvPhase():"",done=rWeeks().reduce(function(a,w){return a+w.done;},0),tt=esc(nx.t),prep=SPR.loaded&&ph==="notstarted";
+ var nx=rNext(),fresh=nx.k==="Start here",ph=SPR.loaded?rvPhase():"",done=rWeeks().reduce(function(a,w){return a+w.done;},0),tt=esc(nx.t);
  var h='<div class="phd rh"><div class="rgrid"><div><p class="hello"><span class="voice">'+(fresh?"Welcome to the Sales Lab.":(ph==="window"||ph==="closed"?"You finished a sprint.":"Good to see you."))+'</span><span class="when">'+esc(rShort())+'</span></p><h1>'+tt+(/[.?!]$/.test(nx.t)?"":".")+'</h1></div>'
   +'<div class="rpanel"><small>'+esc(nx.k)+'</small><p>'+esc(nx.d)+'</p><a class="btn" href="'+nx.link+'">'+esc(nx.b)+'</a>'+(nx.m?'<span class="mins">About '+hm(nx.m)+'</span>':'')+(nx.skip?'<p class="rskip"><a href="#/step/1">Skip for now and start Week 1, step 1</a></p>':'')+'</div></div>'+rDays()+'<p class="rdates">'+esc(rDates())+'</p></div><!--/phd-->';
  if(!SPR.loaded)h+=sprintBar(false);
  h+=pastOpenNote();
- h+='<section class="rtrack"><h2>'+(prep?xaName()+' preparation: '+done+' of '+xaTotal()+' steps completed':(done?done+' of '+xaTotal()+' steps done in '+xaName():xaName()+': '+xaTotal()+' steps across four weeks'))+'</h2>'+rTrack()+'</section>';
+ h+='<section class="rtrack"><h2>'+(done?done+' of '+xaTotal()+' steps done in '+xaName():xaName()+': '+xaTotal()+' steps across four weeks')+'</h2>'+rTrack()+'</section>';
  h+='<div class="rcols"><div>'+rHomeList(nx)+(etActive()?'':(week1Done()?w2Banner():''))+'<div class="card"><h2>Experiments</h2>'+rXRow()+'</div></div><div class="rside">'+rSoFar();
  if(FLAGS.community===true){h+=homeCoachPanel()+homeComPanel();comHomePeek(false);}
  h+=homeLately();
