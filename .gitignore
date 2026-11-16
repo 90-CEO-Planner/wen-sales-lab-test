@@ -1,2 +1,28 @@
-node_modules
+# Local Supabase CLI state — machine specific, never commit
+supabase/.temp/
+
+# OS and editor noise
 .DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Word lock files (the ~$ ones that appear while a document is open)
+~$*
+
+# Environment files — secrets live in the Supabase dashboard, not in the repo
+.env
+.env.*
+
+# --- Never publish the notes -------------------------------------------------
+# Added 28 Aug 2026, after every one of these was found being served to the
+# public at the app's own domain. GitHub Pages serves the whole repo, so
+# anything committed here is world-readable. This folder is a BUILD OUTPUT, not
+# a mirror of the working folder.
+#
+# USER_GUIDE.md is safe to exclude: build_bundle.ps1 reads it at build time and
+# bakes it into bundle.js as CEO_USER_GUIDE. The app never fetches the file.
+*.md
+build_bundle.ps1
+supabase/

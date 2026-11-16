@@ -1,0 +1,45 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//CEO Planner//Calendar refresh test//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:CEO Planner test (marker 1)
+X-WR-TIMEZONE:Europe/London
+X-PUBLISHED-TTL:PT15M
+REFRESH-INTERVAL;VALUE=DURATION:PT15M
+BEGIN:VEVENT
+UID:ceop-test-recurring@app.thewomensentrepreneurialnetwork.com
+DTSTAMP:20261103T120000Z
+DTSTART:20261104T090000
+DTEND:20261104T100000
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR
+SUMMARY:MARKER 1 - CEO Planner - Your Daily 3
+DESCRIPTION:Open your dashboard to see today's three.
+
+https://app.thewomensentrepreneurialnetwork.com/
+URL:https://app.thewomensentrepreneurialnetwork.com/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Your Daily 3
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:ceop-test-oneday@app.thewomensentrepreneurialnetwork.com
+DTSTAMP:20261103T120000Z
+DTSTART:20261104T140000
+DTEND:20261104T150000
+SUMMARY:MARKER 1 - Your three for Wednesday 4 Nov
+DESCRIPTION:1. Message three past enquiries (20 min)
+2. Write the offer page headline (25 min)
+3. Film one reel (15 min)
+
+https://app.thewomensentrepreneurialnetwork.com/
+URL:https://app.thewomensentrepreneurialnetwork.com/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Your three for today
+TRIGGER:-PT10M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
