@@ -1,0 +1,244 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Item 61 named the absence of this: with a fixed top bar, anything the browser
+   scrolls to — an in-page anchor, a validation error, a field reached by Tab —
+   lands underneath the bar and reads as the page having jumped to the wrong
+   place. The extra 1rem stops the target sitting flush against the bar's edge.
+   --header-h is measured by nav.js after every render. */
+html {
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--color-text-main);
+    /* The redesign replaced the teal/pink/yellow mesh with a plain cool grey
+       (21 Sept 2026). The colour now lives in the banners, not the page. */
+    background-color: var(--color-page);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--color-black);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+/* The app's example text in every input, very faint (Jen, 19 Sept 2026). */
+::placeholder {
+    color: var(--color-placeholder);
+    opacity: 1;
+    font-weight: 400;
+}
+
+a {
+    /* Bright teal fails contrast as text on white, so links use the darker one. */
+    color: var(--color-link);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: #006A72;
+}
+
+/* Layout */
+#app-container {
+    max-width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-md);
+    /* EDGE-02, 18 Sept 2026. Cards already wrap an unbreakable paste; text
+       OUTSIDE a card did not. A pasted link as the 90-day focus made the
+       Weekly Plan 1,095px wide on a 360px phone. min-width: 0 lets this flex
+       child shrink below its content; overflow-wrap is inherited by every
+       heading and paragraph on the page. */
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* EDGE-02: the coach's chat bubbles, which sit outside .main-content. A long
+   link in an answer made the message area 599px wide in a 338px panel. */
+#ai-widget-messages {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-layout {
+    max-width: 1200px;
+}
+
+/* Utilities */
+.text-center { text-align: center; }
+.mt-1 { margin-top: var(--spacing-xs); }
+.mt-2 { margin-top: var(--spacing-sm); }
+.mt-4 { margin-top: var(--spacing-md); }
+.mt-6 { margin-top: var(--spacing-lg); }
+.mt-8 { margin-top: var(--spacing-xl); }
+.mb-4 { margin-bottom: var(--spacing-md); }
+.mb-6 { margin-bottom: var(--spacing-lg); }
+.mb-8 { margin-bottom: var(--spacing-xl); }
+
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: var(--spacing-sm); }
+.gap-4 { gap: var(--spacing-md); }
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: var(--color-text-muted);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--spacing-md);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-up {
+    animation: fadeUp 0.4s ease-out forwards;
+}
+
+/* Base card animation (apply fade up everywhere) */
+.card {
+    animation: fadeUp 0.4s ease-out forwards;
+}
+
+/* Responsive Grids
+ *
+ * Every track is minmax(0, ...) rather than a bare fr. A bare `1fr` means
+ * `minmax(auto, 1fr)`, and an `auto` minimum resolves to MIN-CONTENT -- which for
+ * a word with no spaces in it is the width of the whole word. So one long URL,
+ * file name or SKU typed by a user overrides the equal split and drags the other
+ * columns off the side of the screen.
+ *
+ * Found 22 Aug 2026 on the dashboard: a single unbroken string turned
+ * repeat(3, 1fr) into 939px / 258px / 179px at a 1263px viewport, pushing two
+ * cards out of view entirely and making the page scroll sideways. The reporter's
+ * words were "I've lost the boxes on the dashboard" -- they were never lost, they
+ * were off-screen.
+ *
+ * The wrap rule below is the other half: minmax(0, ...) stops the COLUMN
+ * stretching, overflow-wrap stops the TEXT spilling out of the correctly sized
+ * column. Both are needed. */
+.grid-cols-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--spacing-md); }
+.grid-cols-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--spacing-md); }
+.grid-cols-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--spacing-md); }
+.grid-sidebar { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--spacing-lg); }
+.grid-sidebar-right { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--spacing-lg); }
+
+/* Anything a user typed can be unbreakable. Cards wrap it rather than widening. */
+.grid-cols-2 > *, .grid-cols-3 > *, .grid-cols-4 > *,
+.grid-sidebar > *, .grid-sidebar-right > * { min-width: 0; overflow-wrap: anywhere; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-content {
+        padding: var(--spacing-md);
+    }
+    
+    /* minmax(0, 1fr), not a bare 1fr — batch item 51, 6 Sept 2026.
+     *
+     * These overrides used to reset the tracks to `1fr`, which is
+     * `minmax(auto, 1fr)`: exactly the min-content minimum the block above
+     * exists to avoid, re-introduced on the narrow viewport where it does the
+     * most damage. The `min-width: 0` on the children currently clamps it, so
+     * this is hardening rather than a diagnosis — but the file's own comment
+     * says both halves are needed, and one of them was missing here.
+     *
+     * ⚠️ This is NOT the EDGE-02 failure. See FIXED_NEEDS_TESTING.md: item 51
+     * could not be reproduced from this environment and is still open. */
+    .grid-cols-2,
+    .grid-cols-3,
+    .grid-sidebar,
+    .grid-sidebar-right {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* The four KPI cards stay side by side as a 2x2 block. Stacked in one column
+       they pushed everything else on the Revenue page below the fold. The inline
+       font sizes on those cards are sized for a desktop column, hence the
+       overrides — without them the figures wrap inside a half-width card. */
+    .grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--spacing-sm);
+    }
+
+    .grid-cols-4 > .card {
+        padding: 1rem !important;
+    }
+
+    .grid-cols-4 > .card h3 {
+        font-size: 1.15rem !important;
+    }
+
+    /* ⚠️ `:not(.kpi-big)` is the whole point of this rule, found 7 Oct 2026.
+     *
+     * This `!important` predates the redesign's `.kpi-big` class, and on a
+     * phone it was winning against it — so a headline figure written as a bare
+     * `<p class="kpi-big">` rendered at 0.7rem while its neighbours, which
+     * happen to wrap the number in `<span class="kpi-big">` because they also
+     * print a "/ goal" suffix, kept the full 1.5rem. Same class, same card row,
+     * two different sizes, decided by nothing but whether the markup needed a
+     * span. Jen's words: "the main numbers are different sizes".
+     *
+     * It hit Leads, Sales in these 90 days and the CEO weekly score on the
+     * Dashboard, Call close rate on Revenue, and all five figures on Pipeline.
+     * Keep the exclusion if you ever touch this: the labels and captions DO
+     * want shrinking in a half-width card, the headline number never does. */
+    .grid-cols-4 > .card p:not(.kpi-big) {
+        font-size: 0.7rem !important;
+    }
+
+    .flex-mobile-col {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    
+    .flex-mobile-col > * {
+        width: 100% !important;
+    }
+}

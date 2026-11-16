@@ -1,0 +1,108 @@
+:root {
+    /* Brand Colors - Restored Original Palette */
+    --color-primary: #00C2CB; /* Teal */
+    --color-primary-dark: #0099A1;
+    --color-primary-light: #E5F9FA;
+    
+    --color-secondary: #F2C21D; /* Yellow */
+    --color-secondary-dark: #D1A511;
+    --color-secondary-light: #FDF9E8;
+    
+    --color-accent: #F2A0AE; /* Pink/Rose */
+    --color-accent-dark: #D47E8D;
+    --color-accent-light: #FEF5F7;
+
+    /* Background Mesh Gradient Colors - Vibrant Brand Colors */
+    --mesh-1: #00C2CB; /* Vibrant Teal */
+    --mesh-2: #F2A0AE; /* Vibrant Pink */
+    --mesh-3: #FDF9E8; /* Soft light yellow to create breathing room */
+    --mesh-4: #F2C21D; /* Vibrant Yellow */
+    
+    /* The redesign, signed off by Jen 21 Sept 2026 (REDESIGN_HANDOFF.md). Crisp,
+       not glass: a cool grey page, white cards with a hairline border, bright
+       teal banners, soft teal working areas, black buttons. The glass tokens
+       below are kept by name, because the shell and 30-odd rules read them, but
+       they now resolve to solid white and a grey border. */
+    --color-page: #F4F6F8;
+    --color-line: #E4E7EC;          /* card and divider border */
+    --color-line-strong: #D0D5DD;   /* input border */
+    --color-ink: #111827;           /* buttons */
+    --color-ink-hover: #2B3444;
+    --color-navy: #0B2530;          /* text on bright teal */
+    --color-navy-soft: #0E4A4F;     /* secondary text on bright teal */
+    --color-soft-teal: #E0F8F9;     /* main working area: Daily 3, top 3 */
+    --color-soft-teal-line: #A6E9EC;
+    --color-win: #FEF6D8;           /* yellow = wins and logging */
+    --color-win-line: #EFD57E;
+    --color-coach: #9E3A4E;         /* pink coach label text */
+    --color-link: #00808A;
+    --color-placeholder: #B4BAC4;
+
+    /* Neutrals */
+    --color-black: #101828;
+    --color-text-main: #344054;
+    --color-text-muted: #5B6675;
+    --color-border: var(--color-line-strong);
+    --color-bg-main: var(--color-page);
+    /* The pale panel fill used behind inset blocks — progress tracks, spinners,
+       empty states, preview panels. Referenced in 34 places across 11 screens and
+       never actually defined until 18 Aug 2026, so every one of them rendered
+       transparent: the panels were there, just invisible against the page. */
+    --color-bg-light: #F1F5F9;
+    /* Same red as .btn-danger. Also never defined, which left three error
+       messages — including the "Executive AI Coach failed" warning on the Revenue
+       screen — rendering in ordinary body text, so a failure did not look like one. */
+    --color-error: #B42318;
+    
+    /* Glassmorphism Variables */
+    --glass-bg: #FFFFFF;
+    --glass-bg-hover: #FFFFFF;
+    --glass-border: 1px solid var(--color-line);
+    --glass-border-light: 1px solid var(--color-line);
+    --glass-blur: none;
+    --glass-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    --glass-highlight: none;
+    
+    --color-bg-card: var(--glass-bg); 
+    --color-white: #FFFFFF;
+
+    /* Typography */
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.625rem;  /* 10px: buttons and inputs */
+    --radius-lg: 1rem;      /* 16px: cards */
+    --radius-xl: 1.375rem;  /* 22px: banners */
+    --radius-full: 9999px;
+
+    /* Shadows - Premium Soft Shadows */
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+    --shadow-md: var(--glass-shadow);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.18);
+    --shadow-hover: var(--glass-shadow);
+    
+    /* The app shell — batch item 57, the sidebar rework.
+
+       --header-h is a FALLBACK, not the truth. The sidebar and the drawer scrim
+       both start below the top bar, and the bar's real height moves with the
+       business logo and with the font size. nav.js measures the rendered bar
+       after every render and overwrites this on the root element, so the value
+       here only ever applies for the frame before that runs. */
+    --header-h: 57px;
+    --sidebar-w: 232px;
+    --sidebar-w-collapsed: 60px;
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
