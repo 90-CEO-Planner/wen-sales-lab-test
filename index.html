@@ -22,8 +22,9 @@ p{margin:6px 0}.mute{color:var(--mute);font-size:14px}
 .btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
 .chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 12px;font-size:15px;min-height:40px;cursor:pointer}
-.chip[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chip[aria-pressed=true],.chip[aria-checked=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
 .chip.sm{min-height:34px;padding:5px 10px;font-size:14px}
+.clearans{background:none;border:0;padding:6px 4px;margin-top:2px;font:inherit;font-size:14px;min-height:34px;color:var(--link,var(--ink));text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px;cursor:pointer}
 .chip[disabled]{opacity:.5;cursor:not-allowed}
 input[type=text],input[type=number],select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--ink)}
 textarea{min-height:200px;line-height:1.45}
@@ -80,7 +81,7 @@ h1,h2,h3{font-family:Poppins,system-ui,sans-serif}h1{font-weight:700}h2,h3{font-
 .btn{background:#000;color:#F5F2EE;border-radius:12px;font-family:Montserrat,system-ui,sans-serif;font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
 .btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
 .chip{border-color:var(--brown)}
-.chip[aria-pressed=true]{background:#000;color:#F2C21D;border-color:#000}
+.chip[aria-pressed=true],.chip[aria-checked=true]{background:#000;color:#F2C21D;border-color:#000}
 .back,.mute a,a.link,p a,.glance a{color:var(--link)}
 .lesson{background:var(--acc2);border-left-color:#00C2CB}
 .hero{background:#00C2CB;color:#000;border-radius:16px;box-shadow:none}
@@ -144,9 +145,9 @@ p{max-width:68ch}
 .hero .btn:hover{background:#262626}
 .bar{height:8px}.bar i{transition:width .5s var(--ease)}
 .chip{padding:9px 14px;transition:background .15s var(--ease),border-color .15s var(--ease),color .15s var(--ease)}
-.chip:hover:not([disabled]):not([aria-pressed=true]){border-color:#000;background:#FBFAF8}
+.chip:hover:not([disabled]):not([aria-pressed=true]):not([aria-checked=true]){border-color:#000;background:#FBFAF8}
 .chip:active:not([disabled]){transform:scale(.98)}
-.chip[aria-pressed=true]{box-shadow:inset 0 0 0 1px #000}
+.chip[aria-pressed=true],.chip[aria-checked=true]{box-shadow:inset 0 0 0 1px #000}
 .chip.sm{padding:6px 12px}
 label{font-weight:600;font-size:15px;margin:16px 0 6px}
 input[type=text],input[type=number],input[type=email],input[type=password],select,textarea{padding:12px 14px;border-radius:12px;border-width:1.5px;transition:border-color .15s var(--ease),box-shadow .15s var(--ease)}
@@ -247,8 +248,8 @@ a.link{font-weight:600;text-decoration-thickness:2px}
 .btn.ghost[disabled],.btn.ghost[disabled]:hover{background:transparent;color:var(--ink)}
 .chip{font-family:var(--text);font-weight:500;font-size:16px;color:var(--ink);background:transparent;border:1.5px solid var(--ink);border-radius:999px;padding:10px 16px;min-height:44px}
 .chip.sm{min-height:38px;padding:7px 13px;font-size:15px}
-.chip:hover:not([disabled]):not([aria-pressed=true]){border-color:var(--ink);background:rgba(15,42,45,.07)}
-.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);box-shadow:none}
+.chip:hover:not([disabled]):not([aria-pressed=true]):not([aria-checked=true]){border-color:var(--ink);background:rgba(15,42,45,.07)}
+.chip[aria-pressed=true],.chip[aria-checked=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);box-shadow:none}
 label{font-weight:600}
 input[type=text],input[type=number],input[type=email],input[type=password],select,textarea{background:#fff;color:var(--ink);border:1.5px solid var(--ink);border-radius:4px}
 input[type=text]:hover,input[type=number]:hover,input[type=email]:hover,input[type=password]:hover,select:hover,textarea:hover{border-color:var(--ink)}

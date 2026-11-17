@@ -311,15 +311,19 @@ function step4(){
  Q.forEach(function(q,i){h+='<div class="q"><strong>'+(i+1)+'. '+q[1]+'.</strong> '+q[2]+'<div class="row">'+q[3].map(function(o){return '<button type="button" class="chip" aria-pressed="'+(c.fit[q[0]]===o[1])+'" data-a="fit" data-id="'+c.id+'" data-q="'+q[0]+'" data-v="'+o[1]+'">'+o[0]+'</button>';}).join("")+'</div></div>';});
  if(c.fit.q1===0)h+='<div class="note bad"><strong>Not a fit:</strong> they don\'t reach your buyer. This one can stay in your list but can\'t go on your shortlist.</div>';
  if(c.fit.q2===0){h+='<div class="note warn"><strong>Overlap.</strong> Overlapping offers can still work, for example if their product is a different price point, format or stage. They may be less keen to promote you, so it helps to have a reason. What makes this worth it? (optional)</div>'+cChips(c,"overlapWhy",OVERLAP);}
- h+='<div class="note '+lab.c+'" aria-live="polite" style="margin-top:14px"><span class="score">'+fitAssessmentText(c)+'</span> &middot; '+lab.t+(lab.t==="Weak fit"?". We would suggest skipping this one, but it is your call.":(lab.t==="In progress"?". Answer all six to see the label.":"."))+'</div>';
+ h+='<div class="note '+lab.c+'" aria-live="polite" style="margin-top:14px"><span class="score">'+fitAssessmentText(c)+'</span> &middot; '+lab.t+(lab.t==="Weak fit"?". We would suggest skipping this one, but it is your call.":(lab.t==="In progress"?". Answer all six to see the label.":"."))+'</div>'+(c.short&&!complete(c)?'<div class="note info">This candidate is on your shortlist. Finish the six questions and their score will show in step 5.</div>':'');
  h+='<div class="row" style="margin-top:12px"><button type="button" class="chip" aria-pressed="'+(!!c.parked)+'" data-a="park" data-id="'+c.id+'">Not sure yet, park this one</button></div>';
  h+='<div class="row" style="margin-top:14px;justify-content:space-between"><button type="button" class="btn ghost" data-a="fitnav" data-d="-1">&larr; Previous</button><button type="button" class="btn" data-a="fitnav" data-d="1">Next candidate &rarr;</button></div></div>';
  return shell(4,h);
 }
+/* shortlisted candidates whose fit check is not finished (the choice is kept; step 5 lists only scored candidates) */
+function unscoredShort(){return S.cands.filter(function(c){return c.short&&!complete(c);});}
+function unscoredNames(list){return list.map(function(c){return esc(c.name);}).join(", ");}
 function step5(){
  var h=LC("w1s5.lesson");
  var pool=S.cands.filter(function(c){return complete(c)&&!c.parked;}).sort(byScore),sel=shortlisted().length;
- if(!pool.length)return shell(5,h+'<div class="note info">No scored candidates yet. Finish the fit check in step 4 first. Parked candidates don\'t appear here.</div>');
+ var us=unscoredShort();
+ if(!pool.length)return shell(5,h+'<div class="note info">No scored candidates yet. Finish the fit check in <a class="link" href="#/step/4">step 4</a> first. Parked candidates don\'t appear here.</div>'+(us.length?'<div class="note info">You already have '+us.length+' candidate'+(us.length===1?'':'s')+' on your shortlist whose fit check is not finished: '+unscoredNames(us)+'. '+(us.length===1?'It stays':'They stay')+' on your shortlist, kept as you chose. Finish the fit check in <a class="link" href="#/step/4">step 4</a> and you will see '+(us.length===1?'its':'their')+' score here.</div>':''));
  h+='<div class="card"><h2>Your scored candidates</h2><p class="mute">Highest scores first. Choose up to five. '+sel+' chosen.</p>';
  pool.forEach(function(c){var l=labelOf(c),nf=c.fit.q1===0,full=!c.short&&sel>=5;
   h+='<div class="crow"><span><strong>'+esc(c.name)+'</strong><br><span class="mute">Score '+scoreOf(c)+' of 7 &middot; '+l.t+((c.overlapWhy&&c.overlapWhy.length)?' &middot; overlap noted: '+esc(c.overlapWhy.join(", ")):'')+'</span></span><button type="button" class="chip" aria-pressed="'+(!!c.short)+'" data-a="short" data-id="'+c.id+'"'+((nf||full)?" disabled":"")+'>'+(nf?"Not a fit":(c.short?"On my shortlist":"Add to shortlist"))+'</button></div>';
@@ -328,6 +332,7 @@ function step5(){
    if(l.t==="Weak fit")h+='<div class="note warn">This is a weak fit on score. You can keep it if you have a good reason.</div>';
    h+='</div>';}
  });
+ if(us.length)h+='<div class="note info">Also on your shortlist, with the fit check not finished: '+unscoredNames(us)+'. '+(us.length===1?'It stays':'They stay')+' on your shortlist. Finish the check in <a class="link" href="#/step/4">step 4</a> to see '+(us.length===1?'its':'their')+' score.</div>';
  if(sel===0)h+='<div class="note info">Nothing chosen yet.</div>';
  if(sel>0&&sel<3)h+='<div class="note info">A smaller pool gives you fewer chances to test your approach and see what works. You can go ahead, or add more candidates first.</div>';
  return shell(5,h+'</div>');
@@ -353,7 +358,7 @@ function step7(){
  var sl=shortlisted().sort(byScore),b=S.base;
  function nv(o){return o.s==="value"?o.v:(o.s==="zero"?"0":(o.s==="unknown"?"I don't know":"not set"));}
  var h='<div class="card"><h2>Your Week 1 summary</h2><p><strong>Focus product:</strong> '+esc(S.focus.product?productLine():"not set")+(S.focus.where?" Sold on: "+esc(S.focus.where)+".":"")+'</p><p><strong>Where you started:</strong> orders '+esc(nv(b.orders))+', revenue '+esc(nv(b.revenue))+', partner-sourced sales '+esc(nv(b.partner))+'.</p><p><strong>Candidates:</strong> '+S.cands.length+' found, '+S.cands.filter(complete).length+' scored.</p><p><strong>Shortlist ('+sl.length+'):</strong></p>'+(sl.length?'<p class="mute">Shortlisting records your choice; it does not confirm fit or buyer reach.</p>':'');
- if(sl.length){h+='<ul>'+sl.map(function(c){return '<li>'+esc(c.name)+' &middot; '+fitAssessmentText(c)+((c.reasons||[]).length?" &middot; "+esc(c.reasons.join(", ")):"")+'</li>';}).join("")+'</ul>';}else h+='<p class="mute">Nobody yet.</p>';
+ if(sl.length){h+='<ul>'+sl.map(function(c){return '<li>'+esc(c.name)+' &middot; '+fitAssessmentText(c)+((c.reasons||[]).length?" &middot; "+esc(c.reasons.join(", ")):"")+(complete(c)?"":' &middot; <a class="link" href="#/step/4">finish the fit check in step 4</a>')+'</li>';}).join("")+'</ul>'+(sl.some(function(c){return !complete(c);})?'<p class="mute">A shortlisted candidate with an unfinished fit check stays on your shortlist. Their score appears once all six questions are answered in step 4.</p>':'');}else h+='<p class="mute">Nobody yet.</p>';
  var ck=check();
  if(ck){var tot=ck.reduce(function(a,r){return a+r[1];},0);h+='<h3>Your Week 1 skill check (automatic)</h3><p class="mute">A learning indicator, not a grade. You\'ll compare it with Week 4.</p>'+ck.map(function(r){return '<div class="crow"><span>'+r[0]+'</span><span class="score">'+r[1]+' of 2</span></div>';}).join("")+'<p><strong>Total '+tot+' of 10</strong></p>';}
  h+='</div><div class="card"><h2>What\'s next?</h2>';
@@ -856,6 +861,118 @@ function a11yFind(sig){
  for(var i=0;i<els.length;i++){if(a11ySig(els[i])===sig)return els[i];}
  return null;
 }
+/* Single-choice answer sets. CHIP_ONE lists the actions whose handler stores ONE value (choosing another answer replaces it). The chip action is single-choice
+   when its data-max is 1; schip when its field is ask. CHIP_MANY lists actions that keep several. Anything else stays a plain toggle (one button, or an
+   independent on/off). CHIP_OFF lists the actions whose handler clears the value when the chosen answer is pressed again; those are what the Clear button uses. */
+var CHIP_ONE=" plan chk-set rv-testi ffmt ffreq num newtype fb-dis fitgo fit w2-bsel w2-ch w2-tone w2-judge w2-q4 w2-reply w2-fuv w2-dec w3-pid w3-set w3-reply w3-dec w3-quiz w4-ran w4-vs w4-pd w4-q w4-rd dec em-dec em-fk em-fmaj em-nx em-q em-src em-ck em-trk em-vs em-plist et-dec et-live et-q et-vs et2-chg et2-dec et2-grp et2-n et2-rcert et3-dec et3-fk et3-fmaj et3-fx et3-nx et3-sp et3-vs et4-live fyb-dec fyb-dp fyb-fk fyb-fmaj fyb-has fyb-kind fyb-lk fyb-lm fyb-lp fyb-nx fyb-pbuyer fyb-q fyb-rules fyb-talk fyb-tg fyb-trk fyb-vs lv-dec lv-el lv-fk lv-fmaj lv-nx lv-pacc lv-plat lv-q lv-trk lv-var lv-vs pu-vs pue-vs puf-vs pul-vs pum-vs pus-vs sts-ch sts-dec sts-fk sts-fmaj sts-fmt sts-nx sts-pprod sts-q sts-trk sts-vs ";
+var CHIP_MANY=" cchip fb-miss w3-asset sts-in fyb-pick finc ";
+var CHIP_OFF=" chk-set em-ck em-plist em-src em-trk em-vs et-live et-vs et3-vs et4-live fb-dis ffreq fit fyb-kind fyb-lk fyb-lm fyb-lp fyb-pbuyer fyb-rules fyb-talk fyb-vs lv-el lv-pacc lv-plat lv-trk lv-vs num rv-testi sts-ch sts-pprod sts-trk sts-vs w2-judge w4-pd w4-ran w4-vs dec em-dec et-dec et2-dec et3-dec fyb-dec lv-dec sts-dec w2-dec w3-dec em-fk em-nx et2-chg et2-grp et3-fk et3-fx et3-nx et3-sp fyb-fk fyb-nx fyb-tg lv-fk lv-nx lv-var sts-fk sts-nx w4-rd pu-vs pue-vs puf-vs pul-vs pum-vs pus-vs ";
+var CHIP_CLEAR=" chk-set fb-dis rv-testi ";
+var CLEARING=false;
+function chipMode(d){
+ var a=d.a||"";
+ if(a==="chip")return +d.max===1?"one":"many";
+ if(a==="schip")return d.f==="ask"?"one":"many";
+ if(CHIP_ONE.indexOf(" "+a+" ")>-1)return "one";
+ if(CHIP_MANY.indexOf(" "+a+" ")>-1)return "many";
+ return "toggle";
+}
+/* can this single-choice answer be cleared at all, and should the group offer a Clear button (optional question, sales check, feedback, value-state records) */
+function canClear(d){var a=d.a||"";if(a==="chip")return +d.max===1;if(a==="schip")return d.f==="ask";if(a==="w3-set")return d.f==="ask"||d.f==="meas";return CHIP_OFF.indexOf(" "+a+" ")>-1;}
+function clearWanted(d,label){var a=d.a||"";return canClear(d)&&(/\(optional\)/i.test(label||"")||CHIP_CLEAR.indexOf(" "+a+" ")>-1||/-vs$/.test(a));}
+/* WAI-ARIA radio group keys: next and previous wrap, Home and End jump. Returns the index to move to, or -1 for any other key. */
+function radioStep(i,n,key){
+ if(n<1||i<0)return -1;
+ if(key==="ArrowRight"||key==="ArrowDown")return (i+1)%n;
+ if(key==="ArrowLeft"||key==="ArrowUp")return (i-1+n)%n;
+ if(key==="Home")return 0;
+ if(key==="End")return n-1;
+ return -1;
+}
+/* Best available name for a set of answers: the line just above it when that reads like a question or label, else the card heading, else that line. */
+function a11yName(el){
+ var p=el.previousElementSibling,pt="",card,hd,ht="";
+ if(p&&p.tagName!=="BUTTON"){pt=(p.textContent||"").replace(/\s+/g," ").trim();if(pt.length>160)pt="";}
+ if(pt&&/[?:)]\s*$|\(/.test(pt))return pt;
+ card=el.closest?el.closest(".card"):null;hd=card?card.querySelector("h2,h3"):null;
+ if(hd)ht=(hd.textContent||"").replace(/\s+/g," ").trim();
+ return ht||pt;
+}
+function a11yApply(r,mode,label,btns,d){
+ var i,b,mx,on=-1,tab=-1;
+ if(btns.length<2)mode="toggle";
+ if(mode==="one"){
+  r.setAttribute("role","radiogroup");r.setAttribute("aria-label",label);
+  for(i=0;i<btns.length;i++){
+   b=btns[i];b.setAttribute("role","radio");
+   if(b.getAttribute("aria-pressed")==="true"){b.setAttribute("aria-checked","true");if(on<0)on=i;}else b.setAttribute("aria-checked","false");
+   b.removeAttribute("aria-pressed");
+  }
+  /* roving tabindex: Tab stops once in the group, on the chosen answer (or the first enabled one when nothing is chosen) */
+  tab=on;
+  if(tab<0){for(i=0;i<btns.length;i++){if(btns[i].getAttribute("disabled")===null&&!btns[i].disabled){tab=i;break;}}}
+  for(i=0;i<btns.length;i++)btns[i].setAttribute("tabindex",i===tab?"0":"-1");
+  return mode;
+ }
+ if(mode==="many"){
+  mx=+(d&&d.max)||0;
+  if(mx&&mx<99&&!/up to/i.test(label))label+=", choose up to "+mx;
+  else if(!/choose|tap all|tick|select|any|up to/i.test(label))label+=", choose any";
+ }
+ r.setAttribute("role","group");r.setAttribute("aria-label",label);
+ return mode;
+}
+/* A radio cannot be cleared by pressing it again, so optional answers get a Clear button straight after the group. */
+function a11yClear(g,label,d){
+ var cur=g.querySelector?g.querySelector('[role="radio"][aria-checked="true"]'):null,b;
+ if(!cur||!g.parentNode||!clearWanted(d,label))return;
+ b=document.createElement("button");b.type="button";b.className="clearans";b.setAttribute("data-a","clr");
+ b.setAttribute("aria-label","Clear answer: "+label);b.textContent="Clear answer";
+ g.parentNode.insertBefore(b,g.nextSibling);
+}
+/* Single-choice lists that are not laid out in one row (for example the decision buttons, one to a line). Their buttons are gathered by action inside one card and
+   wrapped in a display:contents group, so the layout does not change. */
+var A11YN=0;
+function a11yLoose(){
+ var app=document.getElementById("app"),bs=document.querySelectorAll("#app button.chip[aria-pressed][data-a]"),groups={},order=[],i,b,d,card,k;
+ for(i=0;i<bs.length;i++){
+  b=bs[i];if(b.closest('[role="radiogroup"],[role="group"]'))continue;
+  d=b.dataset||{};if(chipMode(d)!=="one")continue;
+  card=b.closest(".card")||app;if(!card.__a11yId)card.__a11yId=++A11YN;
+  k=card.__a11yId+"|"+d.a+"|"+(d.w||"")+"|"+(d.q||"")+"|"+(d.f||"")+"|"+(d.id||"")+"|"+(d.sc||"")+"|"+(d.d||"");
+  if(!groups[k]){groups[k]=[];order.push(k);}
+  groups[k].push(b);
+ }
+ for(i=0;i<order.length;i++){if(groups[order[i]].length>1)a11yWrap(groups[order[i]],app);}
+}
+function a11yWrap(g,app){
+ var p=g[0].parentNode,j,first,last,label="",w,n,nodes;
+ function has(x){for(var q=0;q<g.length;q++){if(!p.contains(g[q]))return false;}return true;}
+ while(p&&!has())p=p.parentNode;
+ if(!p)return;
+ function branch(x){while(x.parentNode!==p)x=x.parentNode;return x;}
+ first=branch(g[0]);last=branch(g[g.length-1]);
+ label=a11yName(first);
+ if(!label)return;
+ nodes=[];n=first;while(n){nodes.push(n);if(n===last)break;n=n.nextSibling;}
+ if(nodes.length>14&&p===app)return;
+ w=document.createElement("div");w.style.display="contents";
+ p.insertBefore(w,first);for(j=0;j<nodes.length;j++)w.appendChild(nodes[j]);
+ a11yApply(w,"one",label,g,g[0].dataset||{});
+ a11yClear(w,label,g[0].dataset||{});
+}
+/* radio group keys (WAI-ARIA): arrows, Home and End move focus and choose, so selection follows focus; Space and Enter choose the focused answer (native button) */
+document.addEventListener("keydown",function(e){
+ var t=e.target,gr,all,rs=[],i=-1,j,k;
+ if(!t||!t.getAttribute||t.getAttribute("role")!=="radio")return;
+ gr=t.closest('[role="radiogroup"]');if(!gr)return;
+ all=gr.querySelectorAll('[role="radio"]');
+ for(k=0;k<all.length;k++){if(all[k].getAttribute("disabled")===null&&!all[k].disabled)rs.push(all[k]);}
+ for(k=0;k<rs.length;k++){if(rs[k]===t)i=k;}
+ j=radioStep(i,rs.length,e.key);if(j<0)return;
+ e.preventDefault();rs[j].focus();
+ if(rs[j]!==t)rs[j].click();
+});
 function a11yGroups(){
  var rows=document.querySelectorAll("#app .row");
  for(var i=0;i<rows.length;i++){
@@ -863,17 +980,21 @@ function a11yGroups(){
   if(r.getAttribute("role")||!r.querySelector("button.chip[aria-pressed]"))continue;
   var t="",p=r.previousElementSibling,par=r.parentNode;
   if(p&&p.tagName==="LABEL")t=p.textContent;
+  else if(p&&(p.tagName==="H2"||p.tagName==="H3"))t=p.textContent;
   else if(par.classList&&par.classList.contains("q")){
    var c=par.cloneNode(true),cr=c.querySelectorAll(".row");
    for(var k=0;k<cr.length;k++)cr[k].parentNode.removeChild(cr[k]);
    t=c.textContent;
   }else if(r.querySelector("button[data-a=fitgo]"))t="Choose a candidate";
   t=t.replace(/\s+/g," ").trim();
+  if(!t)t=a11yName(r);
   if(!t)continue;
   var card=r.closest(".card"),hd=card?card.querySelector("h2,h3"):null;
   if(hd&&hd.textContent&&t.indexOf(hd.textContent)<0&&!r.querySelector("button[data-a=fitgo]"))t+=" ("+hd.textContent.trim()+")";
-  r.setAttribute("role","group");r.setAttribute("aria-label",t);
+  var chipBtns=r.querySelectorAll("button.chip[aria-pressed]"),cd=chipBtns[0].dataset||{},cm=a11yApply(r,chipMode(cd),t,chipBtns,cd);
+  if(cm==="one")a11yClear(r,t,cd);
  }
+ a11yLoose();
  var fg=document.querySelectorAll("#app button[data-a=fitgo][title]");
  for(var j=0;j<fg.length;j++)fg[j].setAttribute("aria-label","Candidate "+fg[j].textContent.replace(/\s+/g," ").trim()+": "+fg[j].getAttribute("title"));
 }
@@ -6250,6 +6371,10 @@ document.addEventListener("click",function(e){
  var lk=e.target.closest("a[href^='#/']");
  if(lk&&!lk.dataset.a){e.preventDefault();if(PHASE!=="app"&&!(PHASE==="adminonly"&&/^#\/(admin|community)/.test(lk.getAttribute("href"))))return;route=lk.getAttribute("href");try{history.replaceState(null,"",location.pathname+location.search+route);}catch(x){}window.scrollTo(0,0);render();return;}
  var t=e.target.closest("[data-a]");if(!t||t.disabled)return;var a=t.dataset.a,d=t.dataset;
+ if(a==="clr"){var gp=t.previousElementSibling,cur=gp&&gp.querySelector?gp.querySelector('[role="radio"][aria-checked="true"]'):null,csig;
+  if(cur){csig=a11ySig(cur);CLEARING=true;try{cur.click();}finally{CLEARING=false;}var nf=csig?a11yFind(csig):null;if(nf&&nf.focus)nf.focus();}
+  return;}
+ if(t.getAttribute&&t.getAttribute("role")==="radio"&&t.getAttribute("aria-checked")==="true"&&!CLEARING)return;
  if(a.indexOf("c-")===0){comAction(a,t);return;}
  if(a==="sendcode"){sendCode();return;}
  if(a==="verify"){verifyCode();return;}
@@ -6294,7 +6419,7 @@ document.addEventListener("click",function(e){
  else if(a==="ffreq"){f.freq=(f.freq===d.val?"":d.val);save();}
  else if(a==="finc"){var i=f.inc.indexOf(d.val);if(i>-1)f.inc.splice(i,1);else f.inc.push(d.val);save();}
  else if(a==="schip"&&d.f==="ask"){S.sketch[d.id]=S.sketch[d.id]||{};var sk0=S.sketch[d.id];sk0.ask=(sk0.ask&&sk0.ask[0]===d.val)?[]:[d.val];save();}
- else if(a==="chip"){var arr=getPath(d.path);toggle(arr,d.val,+d.max);save();}
+ else if(a==="chip"){var arr=getPath(d.path);if(+d.max===1){if(CLEARING){if(arr.indexOf(d.val)>-1)arr.length=0;}else if(arr.indexOf(d.val)<0){arr.length=0;arr.push(d.val);}}else toggle(arr,d.val,+d.max);save();}
  else if(a==="num"){setPath(d.path,getPath(d.path)===+d.val?0:+d.val);}
  else if(a==="plan"){S.plan=d.val;save();}
  else if(a==="done"){S.steps[d.n]=!S.steps[d.n];save();}
@@ -6784,7 +6909,7 @@ function comReset(){comPhotoClear();COM.sum=null;COM.prof=null;COM.posts=null;CO
 document.addEventListener("change",function(e){var t=e.target;if(PHASE==="app"&&t&&t.id==="c-cat"&&route==="#/community/new"){var st=document.getElementById("c-step");COM.draft={cat:t.value,title:(document.getElementById("c-title")||{}).value||"",body:(document.getElementById("c-body")||{}).value||"",step:st&&st.checked};render();}});
 
 /* test seam: the automatic tests read the Week 2 rules through this; nothing happens unless a test sets window.__slExpose */
-if(window.__slExpose){try{window.__slExpose({setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,lvActive:lvActive,lvPrepReady:lvPrepReady,lvPrep:lvPrep,lvRoute:lvRoute,lvWeeks:lvWeeks,lvWeekDone:lvWeekDone,lvCurWeek:lvCurWeek,lvStepCount:lvStepCount,lvHasWork:lvHasWork,lvStart:lvStart,lvFresh:lvFresh,lvArchive:lvArchive,lvPastFix:lvPastFix,lvRec:lvRec,lvMySprint:lvMySprint,lvResultsPage:lvResultsPage,lvReviewHead:lvReviewHead,lvPastLate:lvPastLate,pulAction:pulAction,pulInput:pulInput,lvPastSummary:lvPastSummary,lvAction:lvAction,lvInput:lvInput,lvfix:lvfix,lvVerdict:lvVerdict,lvSnap:lvSnap,lvSchCheck:lvSchCheck,lvSchClean:lvSchClean,lvSheetCheck:lvSheetCheck,lvReady:lvReady,lvCommit:lvCommit,lvHeld:lvHeld,lvCounted:lvCounted,lvCountedIdx:lvCountedIdx,lvHeldN:lvHeldN,lvWin:lvWin,lvConfs:lvConfs,lvNums:lvNums,lvSum:lvSum,lvFmtSum:lvFmtSum,lvCompare:lvCompare,lvCaveats:lvCaveats,lvElig:lvElig,lvPlanCount:lvPlanCount,lvRouteInner:lvRouteInner,lvHome:lvHome,lv1s1:lv1s1,lv1s2:lv1s2,lv1s3:lv1s3,lv1s4:lv1s4,lv1s5:lv1s5,lv1s6:lv1s6,lv2s1:lv2s1,lv2s2:lv2s2,lv2s3:lv2s3,lv2s4:lv2s4,lv3s1:lv3s1,lv3s2:lv3s2,lv3s3:lv3s3,lv3s4:lv3s4,lv3s5:lv3s5,lv4s1:lv4s1,lv4s2:lv4s2,lv4s3:lv4s3,lv4s4:lv4s4,lvLogDate:lvLogDate,lvAddConf:lvAddConf,LVCFG:LVCFG,fybActive:fybActive,fybPrepReady:fybPrepReady,fybPrep:fybPrep,fybRoute:fybRoute,fybWeeks:fybWeeks,fybWeekDone:fybWeekDone,fybCurWeek:fybCurWeek,fybStepCount:fybStepCount,fybHasWork:fybHasWork,fybStart:fybStart,fybFresh:fybFresh,fybArchive:fybArchive,fybPastFix:fybPastFix,fybRec:fybRec,fybMySprint:fybMySprint,fybResultsPage:fybResultsPage,fybReviewHead:fybReviewHead,fybPastLate:fybPastLate,pufAction:pufAction,pufInput:pufInput,fybPastSummary:fybPastSummary,fybAction:fybAction,fybInput:fybInput,fybfix:fybfix,fybVerdict:fybVerdict,fybSnap:fybSnap,fybPerCheck:fybPerCheck,fybDraftCheck:fybDraftCheck,fybReady:fybReady,fybCommit:fybCommit,fybLog:fybLog,fybCounts:fybCounts,fybWin:fybWin,fybConfs:fybConfs,fybNums:fybNums,fybSum:fybSum,fybFmtSum:fybFmtSum,fybCompare:fybCompare,fybCaveats:fybCaveats,fybRouteInner:fybRouteInner,fybHome:fybHome,fybPicked:fybPicked,fybPlan:fybPlan,fyb1s1:fyb1s1,fyb1s2:fyb1s2,fyb1s3:fyb1s3,fyb1s4:fyb1s4,fyb1s5:fyb1s5,fyb2s1:fyb2s1,fyb2s2:fyb2s2,fyb2s3:fyb2s3,fyb2s4:fyb2s4,fyb2s5:fyb2s5,fyb3s1:fyb3s1,fyb3s2:fyb3s2,fyb3s3:fyb3s3,fyb3s4:fyb3s4,fyb4s1:fyb4s1,fyb4s2:fyb4s2,fyb4s3:fyb4s3,fyb4s4:fyb4s4,fybAddPlace:fybAddPlace,fybAddLog:fybAddLog,fybAddConf:fybAddConf,FYBCFG:FYBCFG,homeCoachPanel:homeCoachPanel,homeComPanel:homeComPanel,homeLately:homeLately,homeLatelyItems:homeLatelyItems,homeWhen:homeWhen,helpPage:helpPage,comHomePeek:comHomePeek,HOMEC:HOMEC,stsActive:stsActive,stsPrepReady:stsPrepReady,stsPrep:stsPrep,stsRoute:stsRoute,stsWeeks:stsWeeks,stsWeekDone:stsWeekDone,stsCurWeek:stsCurWeek,stsStepCount:stsStepCount,stsHasWork:stsHasWork,stsStart:stsStart,stsFresh:stsFresh,stsArchive:stsArchive,stsPastFix:stsPastFix,stsRec:stsRec,stsMySprint:stsMySprint,stsResultsPage:stsResultsPage,stsReviewHead:stsReviewHead,stsPastLate:stsPastLate,pusAction:pusAction,pusInput:pusInput,stsPastSummary:stsPastSummary,stsAction:stsAction,stsInput:stsInput,stsfix:stsfix,stsVerdict:stsVerdict,stsSnap:stsSnap,stsSchCheck:stsSchCheck,stsDemoCheck:stsDemoCheck,stsReady:stsReady,stsCommit:stsCommit,stsOut:stsOut,stsWin:stsWin,stsConfs:stsConfs,stsNums:stsNums,stsSum:stsSum,stsFmtSum:stsFmtSum,stsCompare:stsCompare,stsCaveats:stsCaveats,stsRouteInner:stsRouteInner,stsHome:stsHome,stsWhere:stsWhere,sts1s1:sts1s1,sts1s2:sts1s2,sts1s3:sts1s3,sts1s4:sts1s4,sts1s5:sts1s5,sts2s1:sts2s1,sts2s2:sts2s2,sts2s3:sts2s3,sts2s4:sts2s4,sts2s5:sts2s5,sts3s1:sts3s1,sts3s2:sts3s2,sts3s3:sts3s3,sts3s4:sts3s4,sts4s1:sts4s1,sts4s2:sts4s2,sts4s3:sts4s3,sts4s4:sts4s4,stsLogDate:stsLogDate,stsAddConf:stsAddConf,stsExposure:stsExposure,STSCFG:STSCFG,emActive:emActive,emPrepReady:emPrepReady,emPrep:emPrep,emRoute:emRoute,emWeeks:emWeeks,emWeekDone:emWeekDone,emCurWeek:emCurWeek,emStepCount:emStepCount,emHasWork:emHasWork,emStart:emStart,emFresh:emFresh,emArchive:emArchive,emPastFix:emPastFix,emRec:emRec,emMySprint:emMySprint,emResultsPage:emResultsPage,emReviewHead:emReviewHead,emPastLate:emPastLate,pumAction:pumAction,pumInput:pumInput,emPastSummary:emPastSummary,emAction:emAction,emInput:emInput,emfix:emfix,emVerdict:emVerdict,emSnap:emSnap,emListCheck:emListCheck,emSchCheck:emSchCheck,emDraftCheck:emDraftCheck,emCompose:emCompose,emReady:emReady,emCommit:emCommit,emSent:emSent,emWin:emWin,emConfs:emConfs,emRecip:emRecip,emCaveats:emCaveats,emRouteInner:emRouteInner,emHome:emHome,em1s1:em1s1,em1s2:em1s2,em1s3:em1s3,em1s4:em1s4,em1s5:em1s5,em2s1:em2s1,em2s2:em2s2,em2s3:em2s3,em2s4:em2s4,em2s5:em2s5,em3s1:em3s1,em3s2:em3s2,em3s3:em3s3,em3s4:em3s4,em4s1:em4s1,em4s2:em4s2,em4s3:em4s3,em4s4:em4s4,emLogDate:emLogDate,emAddConf:emAddConf,xaNameOf:xaNameOf,pastSummary:pastSummary,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
+if(window.__slExpose){try{window.__slExpose({chipMode:chipMode,canClear:canClear,clearWanted:clearWanted,radioStep:radioStep,a11yApply:a11yApply,a11yLoose:a11yLoose,a11yClear:a11yClear,unscoredShort:unscoredShort,setCom:function(v){for(var k in v)COM[k]=v[k];},setState:function(v){S=v;},getState:function(){return S;},setContent:function(c){CONTENT=c;},blank:blank,normalise:normalise,w2fix:w2fix,w2Compose:w2Compose,w2Guard:w2Guard,w2Pitch:w2Pitch,w2PitchScore:w2PitchScore,w2Rec:w2Rec,w2Sent:w2Sent,w2Pending:w2Pending,w2Waiting:w2Waiting,w2Issues:w2Issues,w2FuOpens:w2FuOpens,w2Due:w2Due,w2NeedsAnswer:w2NeedsAnswer,w2FuDraft:w2FuDraft,w2AnswerDraft:w2AnswerDraft,w2Action:w2Action,w2Input:w2Input,O:O,OW:OW,addDays:addDays,ymd:ymd,parseYmd:parseYmd,today:today,week1Done:week1Done,home:home,home2:home2,w2s1:w2s1,w2s2:w2s2,w2s3:w2s3,w2s4:w2s4,w2s5:w2s5,w2s6:w2s6,esc:esc,w2Suggest:w2Suggest,homeHub:homeHub,experimentsPage:experimentsPage,resultsPage:resultsPage,profilePage:profilePage,tabsFor:tabsFor,tabOf:tabOf,navHtml:navHtml,effRoute:effRoute,setRoute:function(r){route=r;},setFlags:function(f){FLAGS=f;},setMe:function(m){ME=m;},setPhase:function(p){PHASE=p;},shellNav:shellNav,render:render,home3:home3,home4:home4,etPrompt:etPrompt,etListingNote:etListingNote,etLiveMode:etLiveMode,etUse:etUse,etCommit:etCommit,etDays:etDays,etAction:etAction,etInput:etInput,etfix:etfix,etHome:etHome,ets1:ets1,ets2:ets2,ets3:ets3,ets4:ets4,ets5:ets5,ets6:ets6,etWin:etWin,etWinCheck:etWinCheck,etChgGrp:etChgGrp,etSuggest:etSuggest,etReady:etReady,etCommitChange:etCommitChange,et2Done:et2Done,et2Action:et2Action,et2Input:et2Input,et2Home:et2Home,et2s1:et2s1,et2s2:et2s2,et2s3:et2s3,et2s4:et2s4,et2s5:et2s5,et2s6:et2s6,et2Log:et2Log,etRoute:etRoute,etDaysBetween:etDaysBetween,rvExp:rvExp,etActive:etActive,etBn:etBn,etPrepReady:etPrepReady,etPrep:etPrep,et4Action:et4Action,etRoute:etRoute,etWeeks:etWeeks,etWeekDone:etWeekDone,etCurWeek:etCurWeek,etStepCount:etStepCount,etHasWork:etHasWork,etStart:etStart,etFresh:etFresh,etArchive:etArchive,etResetP:etResetP,etPastFix:etPastFix,etRec:etRec,etMySprint:etMySprint,etResultsPage:etResultsPage,etReviewHead:etReviewHead,etPastLate:etPastLate,puEAction:puEAction,puEInput:puEInput,etPastSummary:etPastSummary,etWith:etWith,sprArchive:sprArchive,sprGo:sprGo,sprConfirmX:sprConfirmX,sprAction:sprAction,sprHasWork:sprHasWork,rvSnap:rvSnap,rWeeks:rWeeks,rTrack:rTrack,rNext:rNext,rHomeList:rHomeList,rSoFar:rSoFar,etBlockP:etBlockP,etBlockHtml:etBlockHtml,xaName:xaName,xaTotal:xaTotal,et4Input:et4Input,lvActive:lvActive,lvPrepReady:lvPrepReady,lvPrep:lvPrep,lvRoute:lvRoute,lvWeeks:lvWeeks,lvWeekDone:lvWeekDone,lvCurWeek:lvCurWeek,lvStepCount:lvStepCount,lvHasWork:lvHasWork,lvStart:lvStart,lvFresh:lvFresh,lvArchive:lvArchive,lvPastFix:lvPastFix,lvRec:lvRec,lvMySprint:lvMySprint,lvResultsPage:lvResultsPage,lvReviewHead:lvReviewHead,lvPastLate:lvPastLate,pulAction:pulAction,pulInput:pulInput,lvPastSummary:lvPastSummary,lvAction:lvAction,lvInput:lvInput,lvfix:lvfix,lvVerdict:lvVerdict,lvSnap:lvSnap,lvSchCheck:lvSchCheck,lvSchClean:lvSchClean,lvSheetCheck:lvSheetCheck,lvReady:lvReady,lvCommit:lvCommit,lvHeld:lvHeld,lvCounted:lvCounted,lvCountedIdx:lvCountedIdx,lvHeldN:lvHeldN,lvWin:lvWin,lvConfs:lvConfs,lvNums:lvNums,lvSum:lvSum,lvFmtSum:lvFmtSum,lvCompare:lvCompare,lvCaveats:lvCaveats,lvElig:lvElig,lvPlanCount:lvPlanCount,lvRouteInner:lvRouteInner,lvHome:lvHome,lv1s1:lv1s1,lv1s2:lv1s2,lv1s3:lv1s3,lv1s4:lv1s4,lv1s5:lv1s5,lv1s6:lv1s6,lv2s1:lv2s1,lv2s2:lv2s2,lv2s3:lv2s3,lv2s4:lv2s4,lv3s1:lv3s1,lv3s2:lv3s2,lv3s3:lv3s3,lv3s4:lv3s4,lv3s5:lv3s5,lv4s1:lv4s1,lv4s2:lv4s2,lv4s3:lv4s3,lv4s4:lv4s4,lvLogDate:lvLogDate,lvAddConf:lvAddConf,LVCFG:LVCFG,fybActive:fybActive,fybPrepReady:fybPrepReady,fybPrep:fybPrep,fybRoute:fybRoute,fybWeeks:fybWeeks,fybWeekDone:fybWeekDone,fybCurWeek:fybCurWeek,fybStepCount:fybStepCount,fybHasWork:fybHasWork,fybStart:fybStart,fybFresh:fybFresh,fybArchive:fybArchive,fybPastFix:fybPastFix,fybRec:fybRec,fybMySprint:fybMySprint,fybResultsPage:fybResultsPage,fybReviewHead:fybReviewHead,fybPastLate:fybPastLate,pufAction:pufAction,pufInput:pufInput,fybPastSummary:fybPastSummary,fybAction:fybAction,fybInput:fybInput,fybfix:fybfix,fybVerdict:fybVerdict,fybSnap:fybSnap,fybPerCheck:fybPerCheck,fybDraftCheck:fybDraftCheck,fybReady:fybReady,fybCommit:fybCommit,fybLog:fybLog,fybCounts:fybCounts,fybWin:fybWin,fybConfs:fybConfs,fybNums:fybNums,fybSum:fybSum,fybFmtSum:fybFmtSum,fybCompare:fybCompare,fybCaveats:fybCaveats,fybRouteInner:fybRouteInner,fybHome:fybHome,fybPicked:fybPicked,fybPlan:fybPlan,fyb1s1:fyb1s1,fyb1s2:fyb1s2,fyb1s3:fyb1s3,fyb1s4:fyb1s4,fyb1s5:fyb1s5,fyb2s1:fyb2s1,fyb2s2:fyb2s2,fyb2s3:fyb2s3,fyb2s4:fyb2s4,fyb2s5:fyb2s5,fyb3s1:fyb3s1,fyb3s2:fyb3s2,fyb3s3:fyb3s3,fyb3s4:fyb3s4,fyb4s1:fyb4s1,fyb4s2:fyb4s2,fyb4s3:fyb4s3,fyb4s4:fyb4s4,fybAddPlace:fybAddPlace,fybAddLog:fybAddLog,fybAddConf:fybAddConf,FYBCFG:FYBCFG,homeCoachPanel:homeCoachPanel,homeComPanel:homeComPanel,homeLately:homeLately,homeLatelyItems:homeLatelyItems,homeWhen:homeWhen,helpPage:helpPage,comHomePeek:comHomePeek,HOMEC:HOMEC,stsActive:stsActive,stsPrepReady:stsPrepReady,stsPrep:stsPrep,stsRoute:stsRoute,stsWeeks:stsWeeks,stsWeekDone:stsWeekDone,stsCurWeek:stsCurWeek,stsStepCount:stsStepCount,stsHasWork:stsHasWork,stsStart:stsStart,stsFresh:stsFresh,stsArchive:stsArchive,stsPastFix:stsPastFix,stsRec:stsRec,stsMySprint:stsMySprint,stsResultsPage:stsResultsPage,stsReviewHead:stsReviewHead,stsPastLate:stsPastLate,pusAction:pusAction,pusInput:pusInput,stsPastSummary:stsPastSummary,stsAction:stsAction,stsInput:stsInput,stsfix:stsfix,stsVerdict:stsVerdict,stsSnap:stsSnap,stsSchCheck:stsSchCheck,stsDemoCheck:stsDemoCheck,stsReady:stsReady,stsCommit:stsCommit,stsOut:stsOut,stsWin:stsWin,stsConfs:stsConfs,stsNums:stsNums,stsSum:stsSum,stsFmtSum:stsFmtSum,stsCompare:stsCompare,stsCaveats:stsCaveats,stsRouteInner:stsRouteInner,stsHome:stsHome,stsWhere:stsWhere,sts1s1:sts1s1,sts1s2:sts1s2,sts1s3:sts1s3,sts1s4:sts1s4,sts1s5:sts1s5,sts2s1:sts2s1,sts2s2:sts2s2,sts2s3:sts2s3,sts2s4:sts2s4,sts2s5:sts2s5,sts3s1:sts3s1,sts3s2:sts3s2,sts3s3:sts3s3,sts3s4:sts3s4,sts4s1:sts4s1,sts4s2:sts4s2,sts4s3:sts4s3,sts4s4:sts4s4,stsLogDate:stsLogDate,stsAddConf:stsAddConf,stsExposure:stsExposure,STSCFG:STSCFG,emActive:emActive,emPrepReady:emPrepReady,emPrep:emPrep,emRoute:emRoute,emWeeks:emWeeks,emWeekDone:emWeekDone,emCurWeek:emCurWeek,emStepCount:emStepCount,emHasWork:emHasWork,emStart:emStart,emFresh:emFresh,emArchive:emArchive,emPastFix:emPastFix,emRec:emRec,emMySprint:emMySprint,emResultsPage:emResultsPage,emReviewHead:emReviewHead,emPastLate:emPastLate,pumAction:pumAction,pumInput:pumInput,emPastSummary:emPastSummary,emAction:emAction,emInput:emInput,emfix:emfix,emVerdict:emVerdict,emSnap:emSnap,emListCheck:emListCheck,emSchCheck:emSchCheck,emDraftCheck:emDraftCheck,emCompose:emCompose,emReady:emReady,emCommit:emCommit,emSent:emSent,emWin:emWin,emConfs:emConfs,emRecip:emRecip,emCaveats:emCaveats,emRouteInner:emRouteInner,emHome:emHome,em1s1:em1s1,em1s2:em1s2,em1s3:em1s3,em1s4:em1s4,em1s5:em1s5,em2s1:em2s1,em2s2:em2s2,em2s3:em2s3,em2s4:em2s4,em2s5:em2s5,em3s1:em3s1,em3s2:em3s2,em3s3:em3s3,em3s4:em3s4,em4s1:em4s1,em4s2:em4s2,em4s3:em4s3,em4s4:em4s4,emLogDate:emLogDate,emAddConf:emAddConf,xaNameOf:xaNameOf,pastSummary:pastSummary,etPrepPrefilled:etPrepPrefilled,setSb:function(x){sb=x;},getSPR:function(){return SPR;},etVerdict:etVerdict,etSnap:etSnap,etConfs:etConfs,etPhase:etPhase,etNums:etNums,et3AddLog:et3AddLog,et3AddConf:et3AddConf,et3Action:et3Action,et3Input:et3Input,et3Done:et3Done,et4Done:et4Done,et3h1:et3h1,et4h:et4h,et3s1:et3s1,et3s2:et3s2,et3s3:et3s3,et3s4:et3s4,et3s5:et3s5,et3s6:et3s6,et4s1:et4s1,et4s2:et4s2,et4s3:et4s3,et4s4:et4s4,et4s5:et4s5,et4s6:et4s6,et3Entry:et3Entry,et3ConfDate:et3ConfDate,etConfMajor:etConfMajor,etRecNums:etRecNums,etCmWin:etCmWin,etCaveats:etCaveats,puAction:puAction,pastWinOpen:pastWinOpen,rvPastHtml:rvPastHtml,fbCard:fbCard,fbDraft:fbDraft,setFeedback:function(m){SPR.feedback=m||{};},setSprints:function(a){SPR={loaded:true,err:"",serverDay:"",serverNow:"",sprints:a||[],feedback:{}};},setSprintsFailed:function(){SPR={loaded:false,err:"x",serverDay:"",serverNow:"",sprints:[]};},getUI:function(){return UI;},chkRec:chkRec,sprHasWork:sprHasWork,sprCanUndo:sprCanUndo,sprCanCorrect:sprCanCorrect,rvWinStart:rvWinStart,d5fix:d5fix,sprArchive:sprArchive,sprintBar:sprintBar,sprAction:sprAction,rvRemindNote:rvRemindNote,remindCard:remindCard,rvDay30Res:rvDay30Res,rvPostNote:rvPostNote,rvCleanHist:rvCleanHist,reviewPage:reviewPage,rvAction:rvAction,rvInput:rvInput,rvfix:rvfix,rvPhase:rvPhase,rvDay:rvDay,rvStart:rvStart,rvDay30:rvDay30,rvEnd:rvEnd,rvClock:rvClock,rvWorked:rvWorked,rvSnap:rvSnap,rvCanUpdate:rvCanUpdate,w4s1:w4s1,w4s2:w4s2,w4s3:w4s3,w4s4:w4s4,w4s5:w4s5,w4s6:w4s6,w4Input:w4Input,w4Action:w4Action,w4Verdict:w4Verdict,w4Inputs:w4Inputs,w4Rec:w4Rec,w4NextAction:w4NextAction,week3Done:week3Done,w4Counts:w4Ctr,w4fix:w4fix,VORDER:VORDER,w3s1:w3s1,w3s2:w3s2,w3s3:w3s3,w3s4:w3s4,w3s5:w3s5,w3s6:w3s6,w3Input:w3Input,w3Opt:w3Opt,w3Suggest:w3Suggest,w2Cand:w2Cand,w3Compose:w3Compose,w3Pitch:w3Pitch,w3PitchScore:w3PitchScore,w3Guard:w3Guard,w3Rec:w3Rec,w3Path:w3Path,w3Effort:w3Effort,w3Carry:w3Carry,w3NextAction:w3NextAction,w3Issues:w3Issues,w3fix:w3fix,w3Action:w3Action,w3Money:w3Money,w3Pick:w3Pick,week2Done:week2Done,STEPS3:STEPS3,W3OPTS:W3OPTS,verSummary:verSummary,supportStepLine:supportStepLine,helpCard:helpCard,setVersions:function(v){UI.versions=v;}});}catch(e){}}
 /* ---------- start ---------- */
 sb.auth.onAuthStateChange(function(ev,sess){
  SYNC.token=sess?sess.access_token:null;
