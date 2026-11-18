@@ -1750,9 +1750,18 @@ var VORDER=[
  ["R7","At least "+VMIN_PARTNERS+" partners contacted and two or more polite refusals and no yes, or no replies at all after follow-ups and a week or more of waiting","Approach needs reviewing"],
  ["R8","Anything else (still waiting, soft maybe-later replies, too little to read)","Insufficient evidence"]
 ];
+function w4Got(i){
+ var g=[],o=vstate(i.orders),e=vstate(i.enq),c=vstate(i.clicks),n;
+ if(o==="pos"){n=+i.orders.v;g.push(n+" order"+(n===1?"":"s"));}else if(o==="zero")g.push("zero orders (confirmed)");
+ if(e==="pos"){n=+i.enq.v;g.push(n+" enquir"+(n===1?"y":"ies"));}else if(e==="zero")g.push("zero enquiries (confirmed)");
+ if(c==="pos"){n=+i.clicks.v;g.push(n+" link click"+(n===1?"":"s"));}else if(c==="zero")g.push("zero link clicks (confirmed)");
+ return g;
+}
+function w4GotText(g){return g.length<2?g.join(""):g.slice(0,-1).join(", ")+" and "+g[g.length-1];}
 function w4Verdict(i){
  var cs=vstate(i.clicks),os=vstate(i.orders),es=vstate(i.enq),cn=cs==="pos"?+i.clicks.v:0,res=i.yes+i.maybe+i.no;
  var small="One sprint with a few partners is a small sample. It shows what happened, not what will always happen.";
+ if(i.partners===0&&w4Got(i).length){var gt=w4Got(i),r1=vmk("Insufficient evidence","info","R1",["No outreach is logged in the app, so there is nothing to read about the approach.","You recorded "+w4GotText(gt)+". These are kept and shown as recorded."],["We cannot link the results you recorded ("+w4GotText(gt)+") to this experiment, because no outreach is logged. They may come from outreach outside the app, or from somewhere else.","Recorded results are not proof that a partnership caused them."],["If you contacted a partner outside the app, record that message in the Week 2 Message Builder, with the date you sent it, so your results can be read alongside it.","If the results came from somewhere else, keep them separate from this experiment, and send one message to a partner you already know when you are ready."]);r1.rec=1;return r1;}
  if(i.partners===0)return vmk("Insufficient evidence","info","R1",["No outreach has been completed yet, so there is nothing to read."],["This says nothing about whether the approach works, because it has not been tried."],["Send one message to a partner you already know. One is enough to start learning."]);
  if(os==="pos")return vmk("Promising","ok","R2",["You recorded "+i.orders.v+" sale"+(+i.orders.v===1?"":"s")+" linked to this work."+(cs==="pos"?" About "+cn+" people clicked through.":""),(es==="pos"?"You also had "+i.enq.v+" enquir"+(+i.enq.v===1?"y":"ies")+".":"")],[small,"One sale can be luck or timing, so treat it as encouraging, not proven.",cs==="unk"?"You could not see clicks, so how traffic led to the sale is uncertain.":"",(i.yes===0&&i.no>=2)?"Other partners declined, so the signals point in different directions.":(i.no>=2?"Other partners declined, so the signals point in different directions.":"")],["Run the same idea with a second partner, or repeat with this one, then compare the two results."]);
  if(os==="zero"&&cs==="pos"&&cn>=VMIN_CLICKS)return vmk("Traffic but no sales","warn","R3",["About "+cn+" people clicked through, and you confirmed zero orders."],["This tells you people arrived but did not buy. It does not show why.","The partner’s audience may simply not have been ready to buy, or the offer may not have matched what they wanted."],["Look at what people saw when they landed: the page, the price and the offer.","Check the fit before blaming the partner. Did their audience match your buyer?"]);
@@ -1785,10 +1794,12 @@ function w4Rec(v){
  else if(l==="Interest not yet converted"){t="Repeat Partnership-to-Sales and turn the interest into a run";b="There is real interest. The next job is to turn it into a small, specific collaboration.";f="Send the proposal or run what was agreed, and record your numbers.";}
  else if(l==="Mixed or unclear"){t="Repeat once, with one visible way to count orders";b="Some of what happened is not visible to you, so there is not yet a clear read.";f="Check your store for orders that used your link or code, enter them, then decide.";}
  else if(l==="Approach needs reviewing"){t="Change one thing, then try again";b="The pattern points to reviewing who you contact and how you ask, not to giving up.";f="Choose one change (partner type, offer or ask) and try the next partner.";x="If your buyer is hard to reach this way, Find Your Buyers may be a better next experiment. It is open now.";}
+ else if(v.rule==="R1"&&v.rec){t="Log your outreach, or make first contact";b="You recorded results, but no outreach is logged, so they cannot yet be read as evidence about this experiment.";f="Record any message you sent outside the app, or send one message to a partner you already know.";}
  else{t="Make first contact, or repeat with another partner";b="There is not enough evidence yet to choose a direction, which is normal after one sprint.";f=v.rule==="R1"?"Send one message to a partner you already know.":"Message the next partner and wait for the follow-up window.";}
  if(low)x=(x?x+" ":"")+"You said contacting people felt hard. Bring this to the group session and choose the gentlest next step.";
  var bs={"Promising":"You recorded at least one sale linked to this work.","Traffic but no sales":"You confirmed zero orders after people clicked through.","Interest not yet converted":"At least one partner showed real interest, with no sales recorded yet.","Mixed or unclear":"Some of what happened is not visible to you, so the evidence is incomplete.","Approach needs reviewing":"Several partners declined, or did not reply after follow-ups.","Insufficient evidence":"There is not enough recorded yet to read."};
  var as={"Promising":"We are assuming the sale came from this partnership rather than other activity. Your numbers cannot prove that.","Traffic but no sales":"We are assuming the page and offer, rather than the partner, are the weak point. Your numbers cannot confirm that.","Interest not yet converted":"We are assuming the interest is genuine. A yes is encouraging but it is not a sale.","Mixed or unclear":"We are assuming nothing sold, or that something did. We cannot tell which until you can see the orders.","Approach needs reviewing":"We are assuming the approach, rather than timing or busy inboxes, is the cause. That is a guess.","Insufficient evidence":"We are not assuming anything yet. One sprint is a small sample."};
+ if(v.rec){bs[l]="You recorded results, but no outreach is logged to link them to.";as[l]="We are not assuming these results came from this experiment. If they did, recording the outreach lets them be read that way.";}
  return {t:t,b:b,first:f,basis:bs[l]||"",assume:as[l]||"",extra:x,provisional:!!(S.col&&S.col.runEnd&&S.col.runEnd>=today()&&S.w4.ran!=="no")};
 }
 function week3Done(){return STEPS3.filter(function(s){return S.w3.steps[s.n];}).length===6||S.w3.dec==="ready";}
@@ -1949,7 +1960,7 @@ function rvWorked(){
  if(c.status==="proposed")out.push("You sent a collaboration proposal.");
  if(c.reply==="agreed")out.push("A partner agreed to a collaboration.");
  if(S.w4.ran==="yes")out.push("The collaboration ran.");
- if(vstate(r.orders)==="pos")out.push("You recorded "+r.orders.v+" sale"+(+r.orders.v===1?"":"s")+" linked to this work.");
+ if(vstate(r.orders)==="pos")out.push(w4Inputs().partners===0?"You recorded "+r.orders.v+" order"+(+r.orders.v===1?"":"s")+". No outreach is logged, so we cannot link "+(+r.orders.v===1?"it":"them")+" to this experiment.":"You recorded "+r.orders.v+" sale"+(+r.orders.v===1?"":"s")+" linked to this work.");
  if(vstate(r.enq)==="pos")out.push("You had "+r.enq.v+" enquir"+(+r.enq.v===1?"y":"ies")+".");
  if(!out.length){var sl=shortlisted().length;if(sl)out.push("You found and shortlisted "+sl+" partner"+(sl===1?"":"s")+". Shortlisting records your choice; it does not confirm fit or buyer reach.");out.push("You now have a clear first step to take, and evidence to learn from.");}
  return out;
